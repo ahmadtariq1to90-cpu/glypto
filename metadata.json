@@ -1,0 +1,8 @@
+{
+  "name": "Glypto - Advanced AI Micro Tools",
+  "description": "A comprehensive suite of AI-powered tools for social media, productivity, and content creation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
