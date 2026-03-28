@@ -86,25 +86,43 @@ export default function App() {
 
   // Adsterra Ad Trigger Function
   const triggerAd = () => {
-    console.log("Adsterra Ad Triggered");
-    // Agar aapke paas Direct Link hai, to aap ise use kar sakte hain:
-    // window.open('YOUR_DIRECT_LINK_URL', '_blank');
+    // Check if ad has already been shown in this session
+    const adShown = sessionStorage.getItem("ad_shown_session");
+    
+    if (!adShown) {
+      console.log("Adsterra Ad Triggered (First time this session)");
+      // Mark as shown for this session
+      sessionStorage.setItem("ad_shown_session", "true");
+      
+      // Option 1: Direct Link (Manual Popup)
+      // window.open('https://www.highrevenuenetwork.com/YOUR_DIRECT_LINK_ID', '_blank');
+      
+      // Option 2: Dynamic Popunder Script Loading
+      // We load the script only once per session to ensure it triggers only once
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://pl29003352.profitablecpmratenetwork.com/d8/f1/23/d8f123d4048f9e356ef303a430f8b020.js";
+      document.body.appendChild(script);
+    } else {
+      console.log("Ad already shown this session. Skipping.");
+    }
   };
 
-  // Effect for random ad triggers (5-20 seconds)
+  // Effect for random ad triggers (5-20 seconds) - Only if not shown yet
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    const adShown = sessionStorage.getItem("ad_shown_session");
+    if (adShown) return;
 
+    let timeoutId: NodeJS.Timeout;
     const scheduleNextAd = () => {
-      const randomDelay = Math.floor(Math.random() * (20000 - 5000 + 1)) + 5000; // 5 to 20 seconds
+      const randomDelay = Math.floor(Math.random() * (20000 - 5000 + 1)) + 5000;
       timeoutId = setTimeout(() => {
         triggerAd();
-        scheduleNextAd(); // Schedule the next one
+        // We don't reschedule if the user wants it only "once"
       }, randomDelay);
     };
 
     scheduleNextAd();
-
     return () => clearTimeout(timeoutId);
   }, []);
 
