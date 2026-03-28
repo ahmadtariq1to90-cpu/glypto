@@ -87,13 +87,26 @@ export default function App() {
   // Adsterra Ad Trigger Function
   const triggerAd = () => {
     console.log("Adsterra Ad Triggered");
-    // Option 1: Direct Link (Aggressive)
-    // window.open('https://www.highrevenuenetwork.com/YOUR_DIRECT_LINK_ID', '_blank');
-    
-    // Option 2: Social Bar / Interstitial
-    // Agar aapne index.html mein script lagayi hai, to wo automatically clicks handle karegi.
-    // Lekin React navigation ke liye hum manually trigger kar sakte hain agar script API provide karti hai.
+    // Agar aapke paas Direct Link hai, to aap ise use kar sakte hain:
+    // window.open('YOUR_DIRECT_LINK_URL', '_blank');
   };
+
+  // Effect for random ad triggers (5-20 seconds)
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const scheduleNextAd = () => {
+      const randomDelay = Math.floor(Math.random() * (20000 - 5000 + 1)) + 5000; // 5 to 20 seconds
+      timeoutId = setTimeout(() => {
+        triggerAd();
+        scheduleNextAd(); // Schedule the next one
+      }, randomDelay);
+    };
+
+    scheduleNextAd();
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const handleNavigate = (view: ToolView) => {
     triggerAd(); // Trigger ad on navigation
