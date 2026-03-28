@@ -84,6 +84,23 @@ const TOOLS: Tool[] = [
 export default function App() {
   const [currentView, setCurrentView] = useState<ToolView>("home");
 
+  // Adsterra Ad Trigger Function
+  const triggerAd = () => {
+    console.log("Adsterra Ad Triggered");
+    // Option 1: Direct Link (Aggressive)
+    // window.open('https://www.highrevenuenetwork.com/YOUR_DIRECT_LINK_ID', '_blank');
+    
+    // Option 2: Social Bar / Interstitial
+    // Agar aapne index.html mein script lagayi hai, to wo automatically clicks handle karegi.
+    // Lekin React navigation ke liye hum manually trigger kar sakte hain agar script API provide karti hai.
+  };
+
+  const handleNavigate = (view: ToolView) => {
+    triggerAd(); // Trigger ad on navigation
+    setCurrentView(view);
+    window.scrollTo(0, 0);
+  };
+
   const renderTool = () => {
     if (currentView === "all-tools") {
       return (
@@ -101,7 +118,7 @@ export default function App() {
                 transition={{ delay: idx * 0.05 }}
                 whileHover={{ y: -4 }}
                 className="glass-card p-6 rounded-3xl cursor-pointer group hover:border-indigo-500/20 transition-all"
-                onClick={() => setCurrentView(tool.id)}
+                onClick={() => handleNavigate(tool.id as ToolView)}
               >
                 <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-6 shadow-sm transition-transform duration-500 group-hover:scale-110", tool.color)}>
                   <tool.icon className="h-6 w-6" />
@@ -149,7 +166,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div 
             className="flex items-center gap-2.5 cursor-pointer group"
-            onClick={() => setCurrentView("home")}
+            onClick={() => handleNavigate("home")}
           >
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-indigo-100 group-hover:scale-105 transition-transform">
               <Sparkles className="h-5 w-5" />
@@ -159,10 +176,10 @@ export default function App() {
           
           <div className="hidden md:flex items-center gap-8">
             <nav className="flex items-center gap-6">
-              <button onClick={() => setCurrentView("all-tools")} className="text-sm font-medium text-zinc-500 hover:text-indigo-600 transition-colors">Tools</button>
+              <button onClick={() => handleNavigate("all-tools")} className="text-sm font-medium text-zinc-500 hover:text-indigo-600 transition-colors">Tools</button>
               <button className="text-sm font-medium text-zinc-500 hover:text-indigo-600 transition-colors">About</button>
             </nav>
-            <Button size="sm" className="rounded-full px-5 h-9 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all hover:scale-105" onClick={() => setCurrentView("all-tools")}>Get Started</Button>
+            <Button size="sm" className="rounded-full px-5 h-9 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all hover:scale-105" onClick={() => handleNavigate("all-tools")}>Get Started</Button>
           </div>
         </div>
       </header>
@@ -194,7 +211,7 @@ export default function App() {
                   <Button 
                     size="lg" 
                     className="rounded-full px-7 h-12 text-sm font-bold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all hover:scale-105 border-none"
-                    onClick={() => setCurrentView("all-tools")}
+                    onClick={() => handleNavigate("all-tools")}
                   >
                     Explore All Tools
                   </Button>
@@ -216,7 +233,7 @@ export default function App() {
                       key={tool.id}
                       whileHover={{ y: -4 }}
                       className="glass-card p-6 rounded-3xl cursor-pointer group hover:border-indigo-500/20 transition-all relative overflow-hidden"
-                      onClick={() => setCurrentView(tool.id)}
+                      onClick={() => handleNavigate(tool.id as ToolView)}
                     >
                       <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-6 shadow-sm", tool.color)}>
                         <tool.icon className="h-6 w-6" />
@@ -252,7 +269,7 @@ export default function App() {
             >
               <div className="flex items-center justify-between">
                 <button 
-                  onClick={() => setCurrentView(currentView === "all-tools" ? "home" : "all-tools")}
+                  onClick={() => handleNavigate(currentView === "all-tools" ? "home" : "all-tools")}
                   className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors text-sm font-bold uppercase tracking-wider group"
                 >
                   <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
