@@ -12,23 +12,42 @@ export function CaptionGenerator() {
   const [loading, setLoading] = useState(false);
   const [captions, setCaptions] = useState<string[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const getFriendlyErrorMessage = (error: any) => {
+    const message = error.message || String(error);
+    if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
+      return "You've reached the limit for now. Please wait a moment before trying again.";
+    }
+    if (message.includes("500") || message.toLowerCase().includes("server error")) {
+      return "Our AI is currently taking a short break. Please try again in a few seconds.";
+    }
+    if (message.toLowerCase().includes("invalid") || message.toLowerCase().includes("missing")) {
+      return "It looks like some information is missing. Please check your input and try again.";
+    }
+    if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
+      return "Connection lost. Please check your internet and try again.";
+    }
+    return "Something went wrong while generating. Please try again.";
+  };
 
   const handleGenerate = async () => {
     if (!topic.trim()) {
-      setError(true);
+      setError("Please enter a topic to generate captions.");
       return;
     }
-    setError(false);
+    setError(null);
     setLoading(true);
     setCaptions([]);
     try {
       const prompt = `Generate 5 catchy and ${tone} ${platform} captions for the topic: "${topic}". Include relevant hashtags and emojis. Return each caption on a new line starting with a number.`;
       const result = await generateText(prompt, "You are a social media expert.");
       const lines = result.split("\n").filter(l => l.trim() && /^\d/.test(l));
+      if (lines.length === 0) throw new Error("Invalid response format from AI");
       setCaptions(lines.map(l => l.replace(/^\d+\.\s*/, "").trim()));
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      setError(getFriendlyErrorMessage(err));
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -56,11 +75,11 @@ export function CaptionGenerator() {
                 value={topic}
                 onChange={(e) => {
                   setTopic(e.target.value);
-                  if (e.target.value.trim()) setError(false);
+                  if (e.target.value.trim()) setError(null);
                 }}
               />
               {error && (
-                <p className="absolute -bottom-6 left-1 text-[10px] font-bold text-red-500 uppercase tracking-wider animate-in fade-in slide-in-from-top-1">Please enter a topic</p>
+                <p className="absolute -bottom-6 left-1 text-[10px] font-bold text-red-500 uppercase tracking-wider animate-in fade-in slide-in-from-top-1">{error}</p>
               )}
             </div>
           </div>

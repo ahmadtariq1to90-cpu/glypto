@@ -11,10 +11,33 @@ export function BioGenerator() {
   const [loading, setLoading] = useState(false);
   const [bios, setBios] = useState<string[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const getFriendlyErrorMessage = (error: any) => {
+    const message = error.message || String(error);
+    if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
+      return "You've reached the limit for now. Please wait a moment before trying again.";
+    }
+    if (message.includes("500") || message.toLowerCase().includes("server error")) {
+      return "Our AI is currently taking a short break. Please try again in a few seconds.";
+    }
+    if (message.toLowerCase().includes("invalid") || message.toLowerCase().includes("missing")) {
+      return "It looks like some information is missing. Please check your input and try again.";
+    }
+    if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
+      return "Connection lost. Please check your internet and try again.";
+    }
+    return "Something went wrong while generating. Please try again.";
+  };
 
   const handleGenerate = async () => {
-    if (!keywords) return;
+    if (!keywords.trim()) {
+      setError("Please enter some keywords about yourself.");
+      return;
+    }
+    setError(null);
     setLoading(true);
+    setBios([]);
     try {
       const prompt = `Generate 5 creative and catchy Instagram bios based on these keywords: "${keywords}". 
       Tone: ${tone}. 
@@ -23,9 +46,11 @@ export function BioGenerator() {
       
       const result = await generateText(prompt, "You are a social media branding expert.");
       const lines = result.split("\n").filter(l => l.trim() && /^\d/.test(l));
+      if (lines.length === 0) throw new Error("Invalid response format from AI");
       setBios(lines.map(l => l.replace(/^\d+\.\s*/, "").trim()));
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      setError(getFriendlyErrorMessage(err));
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -54,11 +79,20 @@ export function BioGenerator() {
           <div className="space-y-4">
             <label className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em]">About You / Your Brand</label>
             <textarea
-              className="w-full p-6 rounded-3xl border border-zinc-100 bg-zinc-50/50 outline-none focus:ring-8 focus:ring-pink-500/5 focus:border-pink-500/50 transition-all min-h-[200px] text-xl font-medium placeholder:text-zinc-300"
+              className={cn(
+                "w-full p-6 rounded-3xl border bg-zinc-50/50 outline-none transition-all min-h-[200px] text-xl font-medium placeholder:text-zinc-300",
+                error ? "border-red-300 ring-8 ring-red-500/5" : "border-zinc-100 focus:ring-8 focus:ring-pink-500/5 focus:border-pink-500/50"
+              )}
               placeholder="e.g. Photographer, Traveler, Coffee Lover, Tech Enthusiast"
               value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
+              onChange={(e) => {
+                setKeywords(e.target.value);
+                if (e.target.value.trim()) setError(null);
+              }}
             />
+            {error && (
+              <p className="text-xs font-bold text-red-500 uppercase tracking-wider animate-in fade-in slide-in-from-top-1 ml-2">{error}</p>
+            )}
           </div>
           
           <div className="space-y-4">

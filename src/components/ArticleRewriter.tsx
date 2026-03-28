@@ -12,14 +12,31 @@ export function ArticleRewriter() {
   const [loading, setLoading] = useState(false);
   const [tone, setTone] = useState("professional");
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const getFriendlyErrorMessage = (error: any) => {
+    const message = error.message || String(error);
+    if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
+      return "You've reached the limit for now. Please wait a moment before trying again.";
+    }
+    if (message.includes("500") || message.toLowerCase().includes("server error")) {
+      return "Our AI is currently taking a short break. Please try again in a few seconds.";
+    }
+    if (message.toLowerCase().includes("invalid") || message.toLowerCase().includes("missing")) {
+      return "It looks like some information is missing. Please check your input and try again.";
+    }
+    if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
+      return "Connection lost. Please check your internet and try again.";
+    }
+    return "Something went wrong while generating. Please try again.";
+  };
 
   const handleRewrite = async () => {
     if (!text.trim()) {
-      setError(true);
+      setError("Please enter some text to rewrite.");
       return;
     }
-    setError(false);
+    setError(null);
     setLoading(true);
     try {
       const prompt = `Rewrite the following article in a ${tone} tone, making it more engaging and clear while preserving the original meaning:
@@ -28,8 +45,9 @@ export function ArticleRewriter() {
       
       const result = await generateText(prompt, "You are an expert editor and content rewriter.");
       setRewritten(result);
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      setError(getFriendlyErrorMessage(err));
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -94,11 +112,11 @@ export function ArticleRewriter() {
                   value={text}
                   onChange={(e) => {
                     setText(e.target.value);
-                    if (e.target.value.trim()) setError(false);
+                    if (e.target.value.trim()) setError(null);
                   }}
                 />
                 {error && (
-                  <p className="absolute -bottom-6 left-1 text-[10px] font-bold text-red-500 uppercase tracking-wider animate-in fade-in slide-in-from-top-1">Please enter some text</p>
+                  <p className="absolute -bottom-6 left-1 text-[10px] font-bold text-red-500 uppercase tracking-wider animate-in fade-in slide-in-from-top-1">{error}</p>
                 )}
               </div>
             </div>

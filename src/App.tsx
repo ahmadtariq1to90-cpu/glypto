@@ -94,7 +94,9 @@ export default function App() {
   const [showAdBlockMsg, setShowAdBlockMsg] = useState(false);
 
   // Adsterra Direct Link (Recommended for Popunder control)
-  const POPUNDER_URL = "https://pl29003352.profitablecpmratenetwork.com/d8/f1/23/d8f123d4048f9e356ef303a430f8b020.js";
+  // IMPORTANT: Replace this URL with your actual Adsterra Direct Link URL
+  // If you put a .js URL here, it will NOT open a new tab correctly.
+  const POPUNDER_URL = "https://www.highrevenuenetwork.com/YOUR_DIRECT_LINK_HERE";
 
   // Detect Ad Blocker
   useEffect(() => {
@@ -136,7 +138,7 @@ export default function App() {
       const script = document.createElement("script");
       script.id = scriptId;
       script.type = "text/javascript";
-      script.src = "https://pl29003205.profitablecpmratenetwork.com/88/a1/ee/88a1ee9665c441b7575bda546e234b4b.js";
+      script.src = "https://pl29003352.profitablecpmratenetwork.com/d8/f1/23/d8f123d4048f9e356ef303a430f8b020.js";
       document.body.appendChild(script);
     };
 
@@ -165,9 +167,21 @@ export default function App() {
   }, [socialBarKey]);
 
   const triggerPopunder = () => {
-    // We use window.open for reliable popunder behavior
-    // Note: Some browsers might block this if not triggered by a direct user click
-    window.open(POPUNDER_URL, '_blank');
+    // IMPORTANT: For the "Click-to-Unlock" logic to work, you MUST use an Adsterra DIRECT LINK.
+    // If you use a Script URL (ending in .js), the browser will just show the code (as seen in your screenshot).
+    
+    if (POPUNDER_URL.includes(".js")) {
+      console.warn("You are using a Script URL instead of a Direct Link. Injecting as script instead of opening tab.");
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = POPUNDER_URL;
+      document.body.appendChild(script);
+    } else if (POPUNDER_URL !== "https://www.highrevenuenetwork.com/YOUR_DIRECT_LINK_HERE") {
+      // This is the correct way for a Direct Link
+      window.open(POPUNDER_URL, '_blank');
+    } else {
+      console.error("Please set your Adsterra Direct Link in App.tsx");
+    }
   };
 
   const handleAction = (id: string, action: () => void) => {
@@ -460,13 +474,13 @@ export default function App() {
               </p>
               <div className="space-y-3 pt-1" itemScope itemType="https://schema.org/Organization">
                 <meta itemProp="name" content="Glypto" />
-                <div className="flex items-center gap-3 text-zinc-500 hover:text-indigo-600 transition-colors cursor-pointer group">
+                <div className="flex items-center gap-3 text-zinc-500 hover:text-indigo-600 transition-colors cursor-pointer group" onClick={() => handleAction("footer-contact", () => window.location.href = "mailto:support@glypto.com")}>
                   <div className="w-9 h-9 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-indigo-600 transition-all shadow-sm">
                     <Mail className="h-3.5 w-3.5" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Contact Us</span>
-                    <a href="mailto:support@glypto.com" className="text-xs font-bold" itemProp="email">support@glypto.com</a>
+                    <span className="text-xs font-bold">support@glypto.com</span>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -502,8 +516,8 @@ export default function App() {
           <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-zinc-100 gap-4">
             <p className="text-zinc-400 text-[10px] font-medium">© 2026 Glypto. All rights reserved.</p>
             <div className="flex items-center gap-4">
-              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors">Security</span>
-              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors">Status</span>
+              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-security", () => {})}>Security</span>
+              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-status", () => {})}>Status</span>
             </div>
           </div>
         </div>

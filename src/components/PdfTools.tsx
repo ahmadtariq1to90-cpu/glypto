@@ -1,14 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
+import * as pdfjsLib from 'pdfjs-dist';
 import { Button } from "./ui/Button";
-import { FileText, Plus, Scissors, Download, Loader2, Trash2 } from "lucide-react";
+import { FileText, Plus, Scissors, Download, Loader2, Trash2, Eye } from "lucide-react";
 import { cn } from "../lib/utils";
+
+// Set worker source for pdfjs
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export function PdfTools() {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"merge" | "split">("merge");
   const [pageRange, setPageRange] = useState("");
+  const [previews, setPreviews] = useState<Record<string, string[]>>({});
+  const [generatingPreviews, setGeneratingPreviews] = useState(false);
+
+  const generatePreviews = async (file: File) => {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      const pagePreviews: string[] = [];
+      
+      // Generate previews for the first few pages (up to 8)
+      const numPages = Math.min(pdf.numPages, 8); 
+      for (let i = 1; i <= numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 0.3 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) continue;
+        
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        
+        await page.render({ canvasContext: context, viewport, canvas } as any).promise;
+        pagePreviews.push(canvas.toDataURL());
+      }
+      setPreviews(prev => ({ ...prev, [file.name]: pagePreviews }));
+    } catch (error) {
+      console.error("Error generating previews:", error);
+    }
+  };
+
+  useEffect(() => {
+    const newFiles = files.filter(f => !previews[f.name]);
+    if (newFiles.length > 0) {
+      setGeneratingPreviews(true);
+      Promise.all(newFiles.map(generatePreviews)).finally(() => setGeneratingPreviews(false));
+    }
+  }, [files]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -186,24 +228,75 @@ export function PdfTools() {
               </button>
             </div>
             
-            <div className="grid gap-4">
+            <div className="grid gap-6">
               {files.map((file, i) => (
-                <div key={i} className="flex items-center justify-between p-6 bg-zinc-50/50 border border-zinc-100 rounded-3xl group hover:border-indigo-200 hover:bg-white transition-all duration-300">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600">
-                      <FileText className="h-6 w-6" />
+                <div key={i} className="space-y-4">
+                  <div className="flex items-center justify-between p-6 bg-zinc-50/50 border border-zinc-100 rounded-3xl group hover:border-indigo-200 hover:bg-white transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600">
+                        <FileText className="h-6 w-6" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-lg font-bold text-zinc-700 truncate max-w-[300px]">{file.name}</span>
+                        <span className="text-sm text-zinc-400 font-medium">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-lg font-bold text-zinc-700 truncate max-w-[300px]">{file.name}</span>
-                      <span className="text-sm text-zinc-400 font-medium">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                    </div>
+                    <button 
+                      onClick={() => removeFile(i)}
+                      className="p-3 hover:bg-red-50 text-zinc-300 hover:text-red-500 transition-all rounded-2xl border border-transparent hover:border-red-100"
+                    >
+                      <Trash2 className="h-6 w-6" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => removeFile(i)}
-                    className="p-3 hover:bg-red-50 text-zinc-300 hover:text-red-500 transition-all rounded-2xl border border-transparent hover:border-red-100"
-                  >
-                    <Trash2 className="h-6 w-6" />
-                  </button>
+
+                  {/* Preview Section */}
+                  {previews[file.name] && (
+                    <div className="p-6 bg-white border border-zinc-100 rounded-[2rem] shadow-sm animate-in fade-in zoom-in duration-500">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Eye className="h-4 w-4 text-indigo-400" />
+                        <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Page Previews</span>
+                      </div>
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                        {previews[file.name].map((src, idx) => {
+                          const isSelected = mode === "split" && pageRange.split(',').some(range => {
+                            const r = range.trim().split('-');
+                            const pageNum = idx + 1;
+                            if (r.length === 2) {
+                              return pageNum >= parseInt(r[0]) && pageNum <= parseInt(r[1]);
+                            }
+                            return pageNum === parseInt(r[0]);
+                          });
+
+                          return (
+                            <div 
+                              key={idx} 
+                              className={cn(
+                                "shrink-0 w-24 aspect-[3/4] bg-zinc-100 rounded-xl overflow-hidden border-2 transition-all relative group",
+                                isSelected ? "border-indigo-500 ring-4 ring-indigo-500/10 scale-105" : "border-zinc-100"
+                              )}
+                            >
+                              <img src={src} className="w-full h-full object-cover" alt={`Page ${idx + 1}`} />
+                              <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-sm p-1 text-[8px] text-white font-bold text-center">
+                                Page {idx + 1}
+                              </div>
+                              {isSelected && (
+                                <div className="absolute inset-0 bg-indigo-500/10 flex items-center justify-center">
+                                  <div className="bg-indigo-500 text-white p-1 rounded-full">
+                                    <Plus className="h-3 w-3" />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {previews[file.name].length >= 8 && (
+                          <div className="shrink-0 w-24 aspect-[3/4] bg-zinc-50 rounded-xl flex items-center justify-center border-2 border-dashed border-zinc-200 text-zinc-400 text-[10px] font-bold text-center p-2">
+                            More pages available...
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -16,17 +16,35 @@ export function ResumeBuilder() {
   });
   const [loading, setLoading] = useState(false);
   const [resume, setResume] = useState("");
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const getFriendlyErrorMessage = (error: any) => {
+    const message = error.message || String(error);
+    if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
+      return "You've reached the limit for now. Please wait a moment before trying again.";
+    }
+    if (message.includes("500") || message.toLowerCase().includes("server error")) {
+      return "Our AI is currently taking a short break. Please try again in a few seconds.";
+    }
+    if (message.toLowerCase().includes("invalid") || message.toLowerCase().includes("missing")) {
+      return "It looks like some information is missing. Please check your input and try again.";
+    }
+    if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
+      return "Connection lost. Please check your internet and try again.";
+    }
+    return "Something went wrong while generating. Please try again.";
+  };
 
   const handleGenerate = async () => {
-    const newErrors: Record<string, boolean> = {
-      name: !formData.name.trim(),
-      role: !formData.role.trim()
-    };
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.role.trim()) newErrors.role = "Target role is required";
+    
     setErrors(newErrors);
-    if (Object.values(newErrors).some(Boolean)) return;
+    if (Object.keys(newErrors).length > 0) return;
 
     setLoading(true);
+    setResume("");
     try {
       const prompt = `Create a professional resume for ${formData.name} who is a ${formData.role}. 
       Experience: ${formData.experience}
@@ -36,8 +54,9 @@ export function ResumeBuilder() {
       
       const result = await generateText(prompt, "You are a professional resume writer and career coach.");
       setResume(result);
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      setErrors({ general: getFriendlyErrorMessage(err) });
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -67,10 +86,11 @@ export function ResumeBuilder() {
                   value={formData.name}
                   onChange={(e) => {
                     setFormData({...formData, name: e.target.value});
-                    if (e.target.value.trim()) setErrors(prev => ({...prev, name: false}));
+                    if (e.target.value.trim()) setErrors(prev => ({...prev, name: ""}));
                   }}
                 />
               </div>
+              {errors.name && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider mt-1 ml-1">{errors.name}</p>}
             </div>
             
             <div className="space-y-1.5">
@@ -85,10 +105,11 @@ export function ResumeBuilder() {
                   value={formData.role}
                   onChange={(e) => {
                     setFormData({...formData, role: e.target.value});
-                    if (e.target.value.trim()) setErrors(prev => ({...prev, role: false}));
+                    if (e.target.value.trim()) setErrors(prev => ({...prev, role: ""}));
                   }}
                 />
               </div>
+              {errors.role && <p className="text-[10px] font-bold text-red-500 uppercase tracking-wider mt-1 ml-1">{errors.role}</p>}
             </div>
 
             <div className="space-y-1.5">
@@ -133,6 +154,9 @@ export function ResumeBuilder() {
               </div>
             )}
           </Button>
+          {errors.general && (
+            <p className="text-xs font-bold text-red-500 text-center uppercase tracking-wider animate-in fade-in slide-in-from-top-1">{errors.general}</p>
+          )}
         </div>
       </div>
 
