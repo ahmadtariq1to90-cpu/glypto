@@ -31,6 +31,7 @@ import { ImageToCartoon } from "./components/ImageToCartoon";
 import { PdfTools } from "./components/PdfTools";
 import { BioGenerator } from "./components/BioGenerator";
 import { FeedbackForm } from "./components/FeedbackForm";
+import { StaticPage } from "./components/StaticPage";
 import { Button } from "./components/ui/Button";
 import { cn } from "./lib/utils";
 
@@ -134,11 +135,14 @@ export default function App() {
     const scriptId = "adsterra-social-bar";
     
     const loadSocialBar = () => {
-      if (document.getElementById(scriptId)) return;
+      // Remove existing script if any
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) existingScript.remove();
+
       const script = document.createElement("script");
       script.id = scriptId;
       script.type = "text/javascript";
-      script.src = "https://pl29003352.profitablecpmratenetwork.com/d8/f1/23/d8f123d4048f9e356ef303a430f8b020.js";
+      script.src = `https://pl29003352.profitablecpmratenetwork.com/d8/f1/23/d8f123d4048f9e356ef303a430f8b020.js?t=${Date.now()}`;
       document.body.appendChild(script);
     };
 
@@ -148,13 +152,15 @@ export default function App() {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         mutation.removedNodes.forEach((node) => {
-          if (node instanceof HTMLElement && (node.className.includes('social-bar') || node.id.includes('adsterra'))) {
+          if (node instanceof HTMLElement && (
+            node.className.includes('social-bar') || 
+            node.id.includes('adsterra') ||
+            node.getAttribute('data-social-bar') === 'true'
+          )) {
             const randomDelay = Math.floor(Math.random() * (20000 - 10000 + 1)) + 10000;
             console.log(`Ad closed, re-scheduling in ${randomDelay / 1000}s...`);
             setTimeout(() => {
-              const oldScript = document.getElementById(scriptId);
-              if (oldScript) oldScript.remove();
-              setSocialBarKey(prev => prev + 1); // Force re-render
+              setSocialBarKey(prev => prev + 1); // Force re-run effect
             }, randomDelay);
           }
         });
@@ -239,6 +245,15 @@ export default function App() {
             ))}
           </div>
         </div>
+      );
+    }
+
+    if (["about", "privacy", "terms", "contact", "support"].includes(currentView)) {
+      return (
+        <StaticPage 
+          type={currentView as any} 
+          onBack={() => handleNavigate("home")} 
+        />
       );
     }
 
@@ -334,7 +349,7 @@ export default function App() {
           <div className="hidden md:flex items-center gap-8">
             <nav className="flex items-center gap-6">
               <button onClick={() => handleAction("nav-tools", () => handleNavigate("all-tools"))} className="text-sm font-medium text-zinc-500 hover:text-indigo-600 transition-colors">Tools</button>
-              <button onClick={() => handleAction("nav-about", () => {})} className="text-sm font-medium text-zinc-500 hover:text-indigo-600 transition-colors">About</button>
+              <button onClick={() => handleAction("nav-about", () => handleNavigate("about"))} className="text-sm font-medium text-zinc-500 hover:text-indigo-600 transition-colors">About</button>
             </nav>
             <Button size="sm" className="rounded-full px-5 h-9 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all hover:scale-105" onClick={() => handleAction("nav-get-started", () => handleNavigate("all-tools"))}>Get Started</Button>
           </div>
@@ -372,8 +387,8 @@ export default function App() {
                   >
                     Explore All Tools
                   </Button>
-                  <Button size="lg" variant="outline" className="rounded-full px-7 h-12 text-sm font-bold border-zinc-200 hover:bg-white transition-all" onClick={() => handleAction("hero-demo", () => {})}>
-                    Watch Demo
+                  <Button size="lg" variant="outline" className="rounded-full px-7 h-12 text-sm font-bold border-zinc-200 hover:bg-white transition-all" onClick={() => handleAction("hero-demo", () => handleNavigate("all-tools"))}>
+                    Try AI Tools
                   </Button>
                 </div>
               </div>
@@ -474,7 +489,7 @@ export default function App() {
               </p>
               <div className="space-y-3 pt-1" itemScope itemType="https://schema.org/Organization">
                 <meta itemProp="name" content="Glypto" />
-                <div className="flex items-center gap-3 text-zinc-500 hover:text-indigo-600 transition-colors cursor-pointer group" onClick={() => handleAction("footer-contact", () => window.location.href = "mailto:support@glypto.com")}>
+                <div className="flex items-center gap-3 text-zinc-500 hover:text-indigo-600 transition-colors cursor-pointer group" onClick={() => handleAction("footer-contact", () => handleNavigate("contact"))}>
                   <div className="w-9 h-9 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-indigo-600 transition-all shadow-sm">
                     <Mail className="h-3.5 w-3.5" />
                   </div>
@@ -484,9 +499,17 @@ export default function App() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {[Shield, Zap, ExternalLink].map((Icon, i) => (
-                    <div key={i} className="w-9 h-9 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm">
-                      <Icon className="h-3.5 w-3.5" />
+                  {[
+                    { icon: Shield, id: "security", view: "privacy" },
+                    { icon: Zap, id: "status", view: "support" },
+                    { icon: ExternalLink, id: "external", view: "about" }
+                  ].map((item, i) => (
+                    <div 
+                      key={i} 
+                      className="w-9 h-9 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm"
+                      onClick={() => handleAction(`footer-icon-${item.id}`, () => handleNavigate(item.view as any))}
+                    >
+                      <item.icon className="h-3.5 w-3.5" />
                     </div>
                   ))}
                 </div>
@@ -497,18 +520,18 @@ export default function App() {
               <h4 className="font-bold text-[10px] text-zinc-900 uppercase tracking-widest">Product</h4>
               <ul className="space-y-2 text-xs text-zinc-500 font-medium">
                 <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-all-tools", () => handleNavigate("all-tools"))}>All Tools</li>
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-api", () => {})}>API Docs</li>
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-updates", () => {})}>Updates</li>
+                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-api", () => handleNavigate("support"))}>API Docs</li>
+                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-updates", () => handleNavigate("support"))}>Updates</li>
               </ul>
             </div>
 
             <div className="space-y-3">
               <h4 className="font-bold text-[10px] text-zinc-900 uppercase tracking-widest">Company</h4>
               <ul className="space-y-2 text-xs text-zinc-500 font-medium">
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-about", () => {})}>About</li>
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-privacy", () => {})}>Privacy</li>
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-terms", () => {})}>Terms</li>
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-support", () => {})}>Support</li>
+                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-about", () => handleNavigate("about"))}>About</li>
+                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-privacy", () => handleNavigate("privacy"))}>Privacy</li>
+                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-terms", () => handleNavigate("terms"))}>Terms</li>
+                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-support", () => handleNavigate("support"))}>Support</li>
               </ul>
             </div>
           </div>
@@ -516,8 +539,8 @@ export default function App() {
           <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-zinc-100 gap-4">
             <p className="text-zinc-400 text-[10px] font-medium">© 2026 Glypto. All rights reserved.</p>
             <div className="flex items-center gap-4">
-              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-security", () => {})}>Security</span>
-              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-status", () => {})}>Status</span>
+              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-security", () => handleNavigate("privacy"))}>Security</span>
+              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-status", () => handleNavigate("support"))}>Status</span>
             </div>
           </div>
         </div>
