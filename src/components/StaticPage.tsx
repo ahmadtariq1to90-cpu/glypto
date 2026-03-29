@@ -14,8 +14,8 @@ import {
   ChevronRight
 } from "lucide-react";
 import { motion } from "motion/react";
-import { Button } from "./ui/Button";
-import { cn } from "../lib/utils";
+import { Button } from "./ui/Button.tsx";
+import { cn } from "../lib/utils.ts";
 
 interface StaticPageProps {
   type: "about" | "privacy" | "terms" | "contact" | "support" | "blog";

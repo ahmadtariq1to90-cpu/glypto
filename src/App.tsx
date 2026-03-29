@@ -43,16 +43,16 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Tool, ToolView } from "./types";
-import { CaptionGenerator } from "./components/CaptionGenerator";
-import { ResumeBuilder } from "./components/ResumeBuilder";
-import { ArticleRewriter } from "./components/ArticleRewriter";
-import { ImageToCartoon } from "./components/ImageToCartoon";
-import { PdfTools } from "./components/PdfTools";
-import { BioGenerator } from "./components/BioGenerator";
-import { FeedbackForm } from "./components/FeedbackForm";
-import { StaticPage } from "./components/StaticPage";
-import { Button } from "./components/ui/Button";
-import { SimpleTools } from "./components/SimpleTools";
+import { CaptionGenerator } from "./components/CaptionGenerator.tsx";
+import { ResumeBuilder } from "./components/ResumeBuilder.tsx";
+import { ArticleRewriter } from "./components/ArticleRewriter.tsx";
+import { ImageToCartoon } from "./components/ImageToCartoon.tsx";
+import { PdfTools } from "./components/PdfTools.tsx";
+import { BioGenerator } from "./components/BioGenerator.tsx";
+import { FeedbackForm } from "./components/FeedbackForm.tsx";
+import { StaticPage } from "./components/StaticPage.tsx";
+import { Button } from "./components/ui/Button.tsx";
+import { SimpleTools } from "./components/SimpleTools.tsx";
 import { cn } from "./lib/utils";
 
 const TOOLS: Tool[] = [
