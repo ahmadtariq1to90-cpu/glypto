@@ -77,3 +77,13 @@
 @keyframes shimmer {
   100% { transform: translateX(100%); }
 }
+
+@keyframes glow {
+  0% { box-shadow: 0 0 15px rgba(79, 70, 229, 0.4); transform: scale(1); }
+  50% { box-shadow: 0 0 30px rgba(79, 70, 229, 0.7); transform: scale(1.02); }
+  100% { box-shadow: 0 0 15px rgba(79, 70, 229, 0.4); transform: scale(1); }
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
+}

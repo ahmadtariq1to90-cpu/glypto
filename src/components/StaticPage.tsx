@@ -21,6 +21,129 @@ interface StaticPageProps {
   onBack: () => void;
 }
 
+function ContactSection({ onBack }: { onBack: () => void }) {
+  const [formState, setFormState] = React.useState<'idle' | 'sending' | 'sent'>('idle');
+  const [showForm, setShowForm] = React.useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormState('sending');
+    setTimeout(() => {
+      setFormState('sent');
+    }, 1500);
+  };
+
+  if (formState === 'sent') {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center py-12 space-y-6"
+      >
+        <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+          <CheckCircle2 className="h-10 w-10" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-2xl font-black text-zinc-900">Thanks for reaching out!</h3>
+          <p className="text-zinc-500 font-medium">We've received your message and will get back to you within 24 hours.</p>
+        </div>
+        <Button 
+          onClick={() => setFormState('idle')}
+          className="rounded-xl px-8 h-12 bg-zinc-900 hover:bg-zinc-800 font-bold"
+        >
+          Send Another Message
+        </Button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className="space-y-12">
+      {/* FAQs Section */}
+      <div className="space-y-6">
+        <h4 className="text-xl font-black text-zinc-900 flex items-center gap-2">
+          <HelpCircle className="h-5 w-5 text-indigo-600" />
+          Common Questions
+        </h4>
+        <div className="grid gap-4">
+          {[
+            { q: "How can I report a bug?", a: "You can use the form below or the feedback button on each tool page." },
+            { q: "Is my data safe?", a: "Absolutely. We don't store any of your inputs or generated content." },
+            { q: "Can I request a new tool?", a: "Yes! We love hearing suggestions. Use the form below to let us know." }
+          ].map((faq, i) => (
+            <div key={i} className="p-5 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-1">
+              <p className="font-bold text-zinc-900 text-sm">{faq.q}</p>
+              <p className="text-sm text-zinc-500 font-medium">{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Contact Form Section */}
+      <div className="space-y-6 pt-6 border-t border-zinc-100">
+        {!showForm ? (
+          <div className="text-center py-8 space-y-6">
+            <div className="space-y-2">
+              <h4 className="text-xl font-black text-zinc-900">Need more help?</h4>
+              <p className="text-sm text-zinc-500 font-medium">Our support team is ready to assist you with any specific inquiries.</p>
+            </div>
+            <Button 
+              onClick={() => setShowForm(true)}
+              className="rounded-2xl px-10 h-14 bg-indigo-600 hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-100"
+            >
+              Contact Support
+            </Button>
+          </div>
+        ) : (
+          <motion.form 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onSubmit={handleSubmit} 
+            className="space-y-4"
+          >
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Name</label>
+                <input 
+                  required
+                  type="text" 
+                  placeholder="Your Name"
+                  className="w-full h-12 px-4 rounded-xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email</label>
+                <input 
+                  required
+                  type="email" 
+                  placeholder="your@email.com"
+                  className="w-full h-12 px-4 rounded-xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium"
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Message</label>
+              <textarea 
+                required
+                rows={4}
+                placeholder="How can we help you?"
+                className="w-full p-4 rounded-xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium resize-none"
+              />
+            </div>
+            <Button 
+              type="submit"
+              disabled={formState === 'sending'}
+              className="w-full h-14 rounded-2xl bg-rose-600 hover:bg-rose-700 font-bold shadow-lg shadow-rose-100 transition-all hover:scale-[1.02]"
+            >
+              {formState === 'sending' ? 'Sending...' : 'Send Message'}
+            </Button>
+          </motion.form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function StaticPage({ type, onBack }: StaticPageProps) {
   const content = {
     about: {
@@ -101,35 +224,7 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
       icon: Mail,
       color: "text-rose-600",
       bg: "bg-rose-50",
-      body: (
-        <div className="space-y-8">
-          <div className="p-8 bg-white rounded-[2.5rem] border border-zinc-100 shadow-xl shadow-rose-50/50 space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">
-                <Mail className="h-6 w-6" />
-              </div>
-              <div>
-                <h4 className="font-bold text-zinc-900">Email Support</h4>
-                <p className="text-sm text-zinc-500">Response time: within 24 hours</p>
-              </div>
-            </div>
-            <p className="text-lg font-bold text-zinc-700">support@glypto.com</p>
-            <Button className="w-full h-14 rounded-2xl bg-rose-600 hover:bg-rose-700 font-bold" onClick={() => window.location.href = "mailto:support@glypto.com"}>
-              Send Message
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-6 bg-zinc-50 rounded-3xl border border-zinc-100 text-center">
-              <Globe className="h-5 w-5 text-zinc-400 mx-auto mb-2" />
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Global Support</p>
-            </div>
-            <div className="p-6 bg-zinc-50 rounded-3xl border border-zinc-100 text-center">
-              <MessageSquare className="h-5 w-5 text-zinc-400 mx-auto mb-2" />
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">24/7 Monitoring</p>
-            </div>
-          </div>
-        </div>
-      )
+      body: <ContactSection onBack={onBack} />
     },
     support: {
       title: "Help & Support",

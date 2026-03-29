@@ -93,11 +93,12 @@ export default function App() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [adBlockEnabled, setAdBlockEnabled] = useState(false);
   const [showAdBlockMsg, setShowAdBlockMsg] = useState(false);
+  const [showFloatingButton, setShowFloatingButton] = useState(false);
 
   // Adsterra Direct Link (Recommended for Popunder control)
   // IMPORTANT: Replace this URL with your actual Adsterra Direct Link URL
   // If you put a .js URL here, it will NOT open a new tab correctly.
-  const POPUNDER_URL = "https://www.highrevenuenetwork.com/YOUR_DIRECT_LINK_HERE";
+  const POPUNDER_URL = "https://www.profitablecpmratenetwork.com/f9m4007n?key=3f639659b925b42d6a78964347716335";
 
   // Detect Ad Blocker
   useEffect(() => {
@@ -172,6 +173,19 @@ export default function App() {
     return () => observer.disconnect();
   }, [socialBarKey]);
 
+  // Floating Button Scroll Listener
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowFloatingButton(true);
+      } else {
+        setShowFloatingButton(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const triggerPopunder = () => {
     // IMPORTANT: For the "Click-to-Unlock" logic to work, you MUST use an Adsterra DIRECT LINK.
     // If you use a Script URL (ending in .js), the browser will just show the code (as seen in your screenshot).
@@ -182,7 +196,7 @@ export default function App() {
       script.type = "text/javascript";
       script.src = POPUNDER_URL;
       document.body.appendChild(script);
-    } else if (POPUNDER_URL !== "https://www.highrevenuenetwork.com/YOUR_DIRECT_LINK_HERE") {
+    } else if (POPUNDER_URL && !POPUNDER_URL.includes("YOUR_DIRECT_LINK_HERE")) {
       // This is the correct way for a Direct Link
       window.open(POPUNDER_URL, '_blank');
     } else {
@@ -382,13 +396,10 @@ export default function App() {
                 <div className="flex flex-wrap justify-center gap-3 pt-2">
                   <Button 
                     size="lg" 
-                    className="rounded-full px-7 h-12 text-sm font-bold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all hover:scale-105 border-none"
+                    className="rounded-full px-10 h-14 text-base font-bold bg-indigo-600 hover:bg-indigo-700 shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all hover:scale-105 border-none animate-glow"
                     onClick={() => handleAction("hero-explore", () => handleNavigate("all-tools"))}
                   >
-                    Explore All Tools
-                  </Button>
-                  <Button size="lg" variant="outline" className="rounded-full px-7 h-12 text-sm font-bold border-zinc-200 hover:bg-white transition-all" onClick={() => handleAction("hero-demo", () => handleNavigate("all-tools"))}>
-                    Try AI Tools
+                    Start for Free
                   </Button>
                 </div>
               </div>
@@ -474,60 +485,69 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="glass-card border-t border-white/40 py-10 md:py-12 mt-12">
-        <div className="max-w-7xl mx-auto px-6 space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2 space-y-4">
+      <footer className="glass-card border-t border-white/40 py-10 md:py-16 mt-12">
+        <div className="max-w-7xl mx-auto px-6 space-y-12">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+            <div className="col-span-1 md:col-span-4 space-y-6">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-md">
-                  <Sparkles className="h-4 w-4" />
+                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-md">
+                  <Sparkles className="h-5 w-5" />
                 </div>
-                <span className="text-lg font-black font-display tracking-tighter">Glypto</span>
+                <span className="text-xl font-black font-display tracking-tighter">Glypto</span>
               </div>
               <p className="text-zinc-500 max-w-sm text-sm leading-relaxed font-medium">
                 Empowering the next generation of creators with advanced AI micro-tools. Professional results, simplified.
               </p>
-              <div className="space-y-3 pt-1" itemScope itemType="https://schema.org/Organization">
+              <div className="space-y-4 pt-2" itemScope itemType="https://schema.org/Organization">
                 <meta itemProp="name" content="Glypto" />
                 <div className="flex items-center gap-3 text-zinc-500 hover:text-indigo-600 transition-colors cursor-pointer group" onClick={() => handleAction("footer-contact", () => handleNavigate("contact"))}>
-                  <div className="w-9 h-9 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-indigo-600 transition-all shadow-sm">
-                    <Mail className="h-3.5 w-3.5" />
+                  <div className="w-10 h-10 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 group-hover:text-indigo-600 transition-all shadow-sm">
+                    <Mail className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Contact Us</span>
-                    <span className="text-xs font-bold">support@glypto.com</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Contact Us</span>
+                    <span className="text-sm font-bold">support@glypto.com</span>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  {[
-                    { icon: Shield, id: "security", view: "privacy" },
-                    { icon: Zap, id: "status", view: "support" },
-                    { icon: ExternalLink, id: "external", view: "about" }
-                  ].map((item, i) => (
-                    <div 
-                      key={i} 
-                      className="w-9 h-9 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-zinc-400 hover:text-indigo-600 transition-all cursor-pointer shadow-sm"
-                      onClick={() => handleAction(`footer-icon-${item.id}`, () => handleNavigate(item.view as any))}
-                    >
-                      <item.icon className="h-3.5 w-3.5" />
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
             
-            <div className="space-y-3">
-              <h4 className="font-bold text-[10px] text-zinc-900 uppercase tracking-widest">Product</h4>
-              <ul className="space-y-2 text-xs text-zinc-500 font-medium">
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-all-tools", () => handleNavigate("all-tools"))}>All Tools</li>
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-api", () => handleNavigate("support"))}>API Docs</li>
-                <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-updates", () => handleNavigate("support"))}>Updates</li>
+            <div className="col-span-1 md:col-span-2 space-y-4">
+              <h4 className="font-bold text-[11px] text-zinc-900 uppercase tracking-widest">Social & Design</h4>
+              <ul className="space-y-3 text-sm text-zinc-500 font-medium">
+                {TOOLS.filter(t => t.category === "Social" || t.category === "Design").map(tool => (
+                  <li key={tool.id} className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction(`footer-tool-${tool.id}`, () => handleNavigate(tool.id as any))}>
+                    {tool.name}
+                  </li>
+                ))}
               </ul>
             </div>
 
-            <div className="space-y-3">
-              <h4 className="font-bold text-[10px] text-zinc-900 uppercase tracking-widest">Company</h4>
-              <ul className="space-y-2 text-xs text-zinc-500 font-medium">
+            <div className="col-span-1 md:col-span-2 space-y-4">
+              <h4 className="font-bold text-[11px] text-zinc-900 uppercase tracking-widest">Productivity</h4>
+              <ul className="space-y-3 text-sm text-zinc-500 font-medium">
+                {TOOLS.filter(t => t.category === "Productivity").map(tool => (
+                  <li key={tool.id} className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction(`footer-tool-${tool.id}`, () => handleNavigate(tool.id as any))}>
+                    {tool.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="col-span-1 md:col-span-2 space-y-4">
+              <h4 className="font-bold text-[11px] text-zinc-900 uppercase tracking-widest">Content</h4>
+              <ul className="space-y-3 text-sm text-zinc-500 font-medium">
+                {TOOLS.filter(t => t.category === "Content").map(tool => (
+                  <li key={tool.id} className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction(`footer-tool-${tool.id}`, () => handleNavigate(tool.id as any))}>
+                    {tool.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="col-span-1 md:col-span-2 space-y-4">
+              <h4 className="font-bold text-[11px] text-zinc-900 uppercase tracking-widest">Company</h4>
+              <ul className="space-y-3 text-sm text-zinc-500 font-medium">
                 <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-about", () => handleNavigate("about"))}>About</li>
                 <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-privacy", () => handleNavigate("privacy"))}>Privacy</li>
                 <li className="hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-terms", () => handleNavigate("terms"))}>Terms</li>
@@ -536,15 +556,31 @@ export default function App() {
             </div>
           </div>
           
-          <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-zinc-100 gap-4">
-            <p className="text-zinc-400 text-[10px] font-medium">© 2026 Glypto. All rights reserved.</p>
-            <div className="flex items-center gap-4">
-              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-security", () => handleNavigate("privacy"))}>Security</span>
-              <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 cursor-pointer transition-colors" onClick={() => handleAction("footer-status", () => handleNavigate("support"))}>Status</span>
-            </div>
+          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-zinc-100 gap-4">
+            <p className="text-zinc-400 text-[11px] font-medium">© 2026 Glypto. All rights reserved.</p>
           </div>
         </div>
       </footer>
+
+      {/* Floating Start Button */}
+      <AnimatePresence>
+        {showFloatingButton && currentView === "home" && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40"
+          >
+            <Button
+              size="lg"
+              className="rounded-full px-10 h-14 text-base font-bold bg-indigo-600 hover:bg-indigo-700 shadow-[0_0_30px_rgba(79,70,229,0.6)] border-none animate-glow"
+              onClick={() => handleAction("floating-start", () => handleNavigate("all-tools"))}
+            >
+              Start for Free
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
