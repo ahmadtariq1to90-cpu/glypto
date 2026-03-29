@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { generateText } from "../lib/gemini.ts";
-import { Button } from "./ui/Button.tsx";
+import { generateText } from "../lib/gemini";
+import { Button } from "./ui/Button";
 import { Loader2, Copy, Check, Sparkles, FileText } from "lucide-react";
 import Markdown from "react-markdown";
 import { motion } from "motion/react";
-import { cn } from "../lib/utils.ts";
+import { cn } from "../lib/utils";
 
 export function ArticleRewriter() {
   const [text, setText] = useState("");

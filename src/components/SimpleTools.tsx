@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "./ui/Button.tsx";
+import { Button } from "./ui/Button";
 import { Copy, Check, RefreshCw, QrCode, Lock, ArrowLeftRight, Eraser, LayoutGrid } from "lucide-react";
 
 export function SimpleTools({ type }: { type: string }) {

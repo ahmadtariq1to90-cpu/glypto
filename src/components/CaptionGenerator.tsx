@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { cn } from "../lib/utils.ts";
-import { generateText } from "../lib/gemini.ts";
-import { Button } from "./ui/Button.tsx";
+import { cn } from "../lib/utils";
+import { generateText } from "../lib/gemini";
+import { Button } from "./ui/Button";
 import { Loader2, Copy, Check, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 

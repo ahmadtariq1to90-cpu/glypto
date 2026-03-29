@@ -43,17 +43,17 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Tool, ToolView } from "./types";
-import { CaptionGenerator } from "@/src/components/CaptionGenerator.tsx";
-import { ResumeBuilder } from "@/src/components/ResumeBuilder.tsx";
-import { ArticleRewriter } from "@/src/components/ArticleRewriter.tsx";
-import { ImageToCartoon } from "@/src/components/ImageToCartoon.tsx";
-import { PdfTools } from "@/src/components/PdfTools.tsx";
-import { BioGenerator } from "@/src/components/BioGenerator.tsx";
-import { FeedbackForm } from "@/src/components/FeedbackForm.tsx";
-import { StaticPage } from "@/src/components/StaticPage.tsx";
-import { Button } from "@/src/components/ui/Button.tsx";
-import { SimpleTools } from "@/src/components/SimpleTools.tsx";
-import { cn } from "@/src/lib/utils.ts";
+import { CaptionGenerator } from "./components/CaptionGenerator";
+import { ResumeBuilder } from "./components/ResumeBuilder";
+import { ArticleRewriter } from "./components/ArticleRewriter";
+import { ImageToCartoon } from "./components/ImageToCartoon";
+import { PdfTools } from "./components/PdfTools";
+import { BioGenerator } from "./components/BioGenerator";
+import { FeedbackForm } from "./components/FeedbackForm";
+import { StaticPage } from "./components/StaticPage";
+import { Button } from "./components/ui/Button";
+import { SimpleTools } from "./components/SimpleTools";
+import { cn } from "./lib/utils";
 
 const TOOLS: Tool[] = [
   {
