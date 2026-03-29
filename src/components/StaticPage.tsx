@@ -10,14 +10,15 @@ import {
   CheckCircle2,
   Globe,
   Lock,
-  MessageSquare
+  MessageSquare,
+  ChevronRight
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "./ui/Button";
 import { cn } from "../lib/utils";
 
 interface StaticPageProps {
-  type: "about" | "privacy" | "terms" | "contact" | "support";
+  type: "about" | "privacy" | "terms" | "contact" | "support" | "blog";
   onBack: () => void;
 }
 
@@ -256,6 +257,31 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
               Contact Support
             </Button>
           </div>
+        </div>
+      )
+    },
+    blog: {
+      title: "Glypto Blog",
+      subtitle: "Insights, updates, and AI tips.",
+      icon: MessageSquare,
+      color: "text-indigo-600",
+      bg: "bg-indigo-50",
+      body: (
+        <div className="space-y-12">
+          {[
+            { title: "The Future of AI Micro-Tools", date: "March 25, 2026", excerpt: "How small, specialized AI tools are changing the way we work and create content." },
+            { title: "Mastering Social Media with Glypto", date: "March 20, 2026", excerpt: "Tips and tricks for using our AI Caption Generator to boost your engagement." },
+            { title: "Privacy in the Age of AI", date: "March 15, 2026", excerpt: "Why Glypto prioritizes your data security and how we keep our tools anonymous." }
+          ].map((post, i) => (
+            <div key={i} className="space-y-3 group cursor-pointer">
+              <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">{post.date}</p>
+              <h4 className="text-2xl font-bold text-zinc-900 group-hover:text-indigo-600 transition-colors">{post.title}</h4>
+              <p className="text-zinc-500 font-medium leading-relaxed">{post.excerpt}</p>
+              <div className="pt-2">
+                <Button variant="ghost" className="p-0 h-auto font-bold text-zinc-900 hover:bg-transparent">Read More →</Button>
+              </div>
+            </div>
+          ))}
         </div>
       )
     }

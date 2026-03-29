@@ -1,6 +1,6 @@
 {
-  "name": "Glypto - Advanced AI Micro Tools",
-  "description": "A comprehensive suite of AI-powered tools for social media, productivity, and content creation.",
+  "name": "OneAI - All-in-One AI Platform",
+  "description": "A powerful AI platform featuring chat, image generation, and productivity tools inspired by 1min.ai.",
   "requestFramePermissions": [
     "camera",
     "microphone"
