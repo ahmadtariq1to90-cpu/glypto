@@ -9,8 +9,6 @@ export function CaptionGenerator() {
   const [topic, setTopic] = useState("");
   const [platform, setPlatform] = useState("Instagram");
   const [tone, setTone] = useState("Engaging");
-  const [audience, setAudience] = useState("");
-  const [cta, setCta] = useState("");
   const [length, setLength] = useState("Medium");
   const [loading, setLoading] = useState(false);
   const [captions, setCaptions] = useState<string[]>([]);
@@ -27,16 +25,13 @@ export function CaptionGenerator() {
     if (message.includes("500") || message.toLowerCase().includes("server error")) {
       return "Our AI is currently taking a short break. Please try again in a few seconds.";
     }
-    if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized")) {
-      return "AI Service is not properly configured. Please check the API settings.";
-    }
-    if (message.toLowerCase().includes("invalid") || message.toLowerCase().includes("missing")) {
-      return "The AI response was incomplete. Please try refining your topic and try again.";
+    if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("not configured")) {
+      return "AI Service is not properly configured. Please add your OPENROUTER_API_KEY to the environment secrets.";
     }
     if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
       return "Connection lost. Please check your internet and try again.";
     }
-    return `Error: ${message.length > 100 ? "Something went wrong. Please try a different topic." : message}`;
+    return message.length < 100 ? message : "Something went wrong while generating. Please try again.";
   };
 
   const handleGenerate = async () => {
@@ -51,14 +46,12 @@ export function CaptionGenerator() {
       const prompt = `Generate 5 SEO-optimized, highly engaging, and ${tone} captions for ${platform}.
       
       Topic: "${topic}"
-      Target Audience: ${audience || "General"}
-      Call to Action: ${cta || "Engage with the post"}
       Desired Length: ${length}
       
       Instructions:
       - Use relevant keywords for SEO.
       - Include trending hashtags and appropriate emojis.
-      - Each caption should be unique and highly relevant to the audience.
+      - Each caption should be unique.
       - Length should be ${length === "Short" ? "under 100 characters" : length === "Medium" ? "between 100-250 characters" : "over 250 characters"}.
       - Format: Return ONLY the 5 captions, each starting with its number (e.g., "1. [Caption text]").
       - Do not include any introductory or concluding text.`;
@@ -132,28 +125,6 @@ export function CaptionGenerator() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-            <div className="space-y-3">
-              <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Target Audience</label>
-              <input
-                type="text"
-                className="w-full p-3 rounded-xl bg-zinc-50/50 border border-zinc-100 outline-none text-sm font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/30 transition-all"
-                placeholder="e.g. Tech enthusiasts, Foodies..."
-                value={audience}
-                onChange={(e) => setAudience(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Call to Action</label>
-              <input
-                type="text"
-                className="w-full p-3 rounded-xl bg-zinc-50/50 border border-zinc-100 outline-none text-sm font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/30 transition-all"
-                placeholder="e.g. Click the link in bio, Tag a friend..."
-                value={cta}
-                onChange={(e) => setCta(e.target.value)}
-              />
-            </div>
-
             <div className="space-y-3">
               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Platform</label>
               <div className="flex flex-wrap gap-2">

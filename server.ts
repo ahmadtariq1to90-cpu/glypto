@@ -16,10 +16,12 @@ async function startServer() {
   // OpenRouter API Route
   app.post("/api/ai/generate", async (req, res) => {
     const { prompt, systemInstruction, model = "google/gemini-2.0-flash-lite-001" } = req.body;
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    
+    // Use environment variable if available, otherwise fallback to the provided key
+    const apiKey = process.env.OPENROUTER_API_KEY || "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";
 
-    if (!apiKey) {
-      return res.status(500).json({ error: "OPENROUTER_API_KEY is not configured in the environment." });
+    if (!apiKey || apiKey === "YOUR_OPENROUTER_API_KEY") {
+      return res.status(500).json({ error: "OPENROUTER_API_KEY is not configured. Please add it to your environment secrets." });
     }
 
     try {
