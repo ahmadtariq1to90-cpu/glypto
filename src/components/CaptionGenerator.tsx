@@ -9,6 +9,9 @@ export function CaptionGenerator() {
   const [topic, setTopic] = useState("");
   const [platform, setPlatform] = useState("Instagram");
   const [tone, setTone] = useState("Engaging");
+  const [audience, setAudience] = useState("");
+  const [cta, setCta] = useState("");
+  const [length, setLength] = useState("Medium");
   const [loading, setLoading] = useState(false);
   const [captions, setCaptions] = useState<string[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -16,19 +19,24 @@ export function CaptionGenerator() {
 
   const getFriendlyErrorMessage = (error: any) => {
     const message = error.message || String(error);
+    console.error("Caption Generation Error:", error);
+
     if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
       return "You've reached the limit for now. Please wait a moment before trying again.";
     }
     if (message.includes("500") || message.toLowerCase().includes("server error")) {
       return "Our AI is currently taking a short break. Please try again in a few seconds.";
     }
+    if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized")) {
+      return "AI Service is not properly configured. Please check the API settings.";
+    }
     if (message.toLowerCase().includes("invalid") || message.toLowerCase().includes("missing")) {
-      return "It looks like some information is missing. Please check your input and try again.";
+      return "The AI response was incomplete. Please try refining your topic and try again.";
     }
     if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
       return "Connection lost. Please check your internet and try again.";
     }
-    return "Something went wrong while generating. Please try again.";
+    return `Error: ${message.length > 100 ? "Something went wrong. Please try a different topic." : message}`;
   };
 
   const handleGenerate = async () => {
@@ -40,17 +48,27 @@ export function CaptionGenerator() {
     setLoading(true);
     setCaptions([]);
     try {
-      const prompt = `Generate 5 SEO-optimized, highly engaging, and ${tone} captions for ${platform} about the topic: "${topic}". 
+      const prompt = `Generate 5 SEO-optimized, highly engaging, and ${tone} captions for ${platform}.
+      
+      Topic: "${topic}"
+      Target Audience: ${audience || "General"}
+      Call to Action: ${cta || "Engage with the post"}
+      Desired Length: ${length}
       
       Instructions:
       - Use relevant keywords for SEO.
       - Include trending hashtags and appropriate emojis.
-      - Each caption should be unique and not random.
+      - Each caption should be unique and highly relevant to the audience.
+      - Length should be ${length === "Short" ? "under 100 characters" : length === "Medium" ? "between 100-250 characters" : "over 250 characters"}.
       - Format: Return ONLY the 5 captions, each starting with its number (e.g., "1. [Caption text]").
       - Do not include any introductory or concluding text.`;
 
-      const result = await generateText(prompt, "You are a social media expert and SEO specialist.");
+      const result = await generateText(prompt, "You are a social media expert and SEO specialist. You always provide high-quality, SEO-optimized captions.");
       
+      if (!result) {
+        throw new Error("The AI returned an empty response. Please try again.");
+      }
+
       // More robust parsing: split by lines and look for numbered items
       const lines = result.split("\n")
         .map(l => l.trim())
@@ -60,19 +78,23 @@ export function CaptionGenerator() {
         // Fallback: if no numbered lines, just split by newlines and take non-empty ones
         const fallbackLines = result.split("\n")
           .map(l => l.trim())
-          .filter(l => l.length > 10); // Assume a caption is at least 10 chars
+          .filter(l => l.length > 20); // Assume a caption is at least 20 chars
         
         if (fallbackLines.length > 0) {
           setCaptions(fallbackLines.slice(0, 5));
         } else {
-          throw new Error("Invalid response format from AI");
+          // If even fallback fails, maybe the AI returned one big block
+          if (result.length > 50) {
+            setCaptions([result]);
+          } else {
+            throw new Error("Invalid response format from AI. Please try again.");
+          }
         }
       } else {
         setCaptions(lines.map(l => l.replace(/^\d+[\.\)]\s*/, "").trim()).slice(0, 5));
       }
     } catch (err: any) {
       setError(getFriendlyErrorMessage(err));
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -111,6 +133,28 @@ export function CaptionGenerator() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
             <div className="space-y-3">
+              <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Target Audience</label>
+              <input
+                type="text"
+                className="w-full p-3 rounded-xl bg-zinc-50/50 border border-zinc-100 outline-none text-sm font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/30 transition-all"
+                placeholder="e.g. Tech enthusiasts, Foodies..."
+                value={audience}
+                onChange={(e) => setAudience(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Call to Action</label>
+              <input
+                type="text"
+                className="w-full p-3 rounded-xl bg-zinc-50/50 border border-zinc-100 outline-none text-sm font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/30 transition-all"
+                placeholder="e.g. Click the link in bio, Tag a friend..."
+                value={cta}
+                onChange={(e) => setCta(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-3">
               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Platform</label>
               <div className="flex flex-wrap gap-2">
                 {["Instagram", "Twitter", "LinkedIn", "TikTok"].map((p) => (
@@ -118,7 +162,7 @@ export function CaptionGenerator() {
                     key={p}
                     onClick={() => setPlatform(p)}
                     className={cn(
-                      "px-5 py-2.5 rounded-xl text-xs font-bold transition-all border-2",
+                      "px-4 py-2 rounded-xl text-[11px] font-bold transition-all border-2",
                       platform === p 
                         ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200 scale-105" 
                         : "bg-white text-zinc-500 border-zinc-100 hover:border-indigo-300 hover:text-indigo-600 hover:scale-[1.02]"
@@ -138,13 +182,33 @@ export function CaptionGenerator() {
                     key={t}
                     onClick={() => setTone(t)}
                     className={cn(
-                      "px-5 py-2.5 rounded-xl text-xs font-bold transition-all border-2",
+                      "px-4 py-2 rounded-xl text-[11px] font-bold transition-all border-2",
                       tone === t 
                         ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200 scale-105" 
                         : "bg-white text-zinc-500 border-zinc-100 hover:border-indigo-300 hover:text-indigo-600 hover:scale-[1.02]"
                     )}
                   >
                     {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3 md:col-span-2">
+              <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Caption Length</label>
+              <div className="flex gap-2">
+                {["Short", "Medium", "Long"].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLength(l)}
+                    className={cn(
+                      "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all border-2",
+                      length === l 
+                        ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200" 
+                        : "bg-white text-zinc-500 border-zinc-100 hover:border-indigo-300 hover:text-indigo-600"
+                    )}
+                  >
+                    {l}
                   </button>
                 ))}
               </div>
