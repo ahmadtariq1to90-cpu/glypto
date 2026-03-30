@@ -1,5 +1,5 @@
-export const chatModel = "google/gemini-2.0-flash-lite-001";
-export const imageModel = "openai/gpt-4o"; // For image-related prompts if needed
+export const chatModel = "google/gemini-2.0-flash-001";
+export const imageModel = "openai/gpt-4o";
 
 export async function generateText(prompt: string, systemInstruction?: string) {
   try {
@@ -15,9 +15,9 @@ export async function generateText(prompt: string, systemInstruction?: string) {
       }),
     });
 
+    const contentType = response.headers.get("content-type");
     if (!response.ok) {
-      const contentType = response.headers.get("content-type");
-      let errorMessage = "Failed to generate text from AI service.";
+      let errorMessage = "AI Service Error";
       
       if (contentType && contentType.includes("application/json")) {
         const errorData = await response.json();
@@ -28,7 +28,6 @@ export async function generateText(prompt: string, systemInstruction?: string) {
       throw new Error(errorMessage);
     }
 
-    const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       const text = await response.text();
       console.error("Non-JSON response from server:", text);

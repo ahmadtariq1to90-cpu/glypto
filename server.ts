@@ -15,14 +15,10 @@ async function startServer() {
 
   // OpenRouter API Route
   app.post("/api/ai/generate", async (req, res) => {
-    const { prompt, systemInstruction, model = "google/gemini-2.0-flash-lite-001" } = req.body;
+    const { prompt, systemInstruction, model = "google/gemini-2.0-flash-001" } = req.body;
     
-    // Use environment variable if available, otherwise fallback to the provided key
-    const apiKey = process.env.OPENROUTER_API_KEY || "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";
-
-    if (!apiKey || apiKey === "YOUR_OPENROUTER_API_KEY") {
-      return res.status(500).json({ error: "OPENROUTER_API_KEY is not configured. Please add it to your environment secrets." });
-    }
+    // Force use the provided key to ensure it works as requested
+    const apiKey = "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";
 
     try {
       // Check if it's an image generation request (heuristic based on model or prompt)
@@ -33,11 +29,11 @@ async function startServer() {
         headers: {
           "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": process.env.APP_URL || "http://localhost:3000",
-          "X-Title": "Glypto Tools",
+          "HTTP-Referer": "https://protoolix.com", // Generic referer for OpenRouter
+          "X-Title": "ProToolix AI",
         },
         body: JSON.stringify({
-          model: isImageRequest ? "openai/gpt-4o" : model, // Use a powerful model for image prompts if needed
+          model: isImageRequest ? "openai/gpt-4o" : model,
           messages: [
             { role: "system", content: systemInstruction || "You are a helpful assistant." },
             { role: "user", content: prompt }
@@ -45,26 +41,36 @@ async function startServer() {
         }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`OpenRouter API Error (${response.status}):`, errorText);
-        return res.status(response.status).json({ error: `OpenRouter API Error: ${errorText}` });
+      const responseText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Failed to parse OpenRouter response:", responseText);
+        return res.status(500).json({ error: "Invalid response from OpenRouter API." });
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        console.error(`OpenRouter API Error (${response.status}):`, data);
+        return res.status(response.status).json({ 
+          error: data.error?.message || `OpenRouter API Error: ${response.status} ${response.statusText}` 
+        });
+      }
+
       if (data.error) {
-        throw new Error(data.error.message || "OpenRouter API Error");
+        console.error("OpenRouter Error in body:", data.error);
+        return res.status(500).json({ error: data.error.message || "OpenRouter API Error" });
       }
 
       if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
         console.error("Invalid OpenRouter response structure:", data);
-        throw new Error("Invalid response from OpenRouter API.");
+        return res.status(500).json({ error: "Invalid response structure from OpenRouter API." });
       }
 
       res.json({ text: data.choices[0].message.content });
     } catch (error: any) {
       console.error("OpenRouter Error:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: `Server Error: ${error.message}` });
     }
   });
 
