@@ -42,15 +42,23 @@ async function startServer() {
             { role: "system", content: systemInstruction || "You are a helpful assistant." },
             { role: "user", content: prompt }
           ],
-          // Some OpenRouter models might support image generation via specific parameters or tools, 
-          // but standard chat completions don't. 
-          // For true image generation, we'd need a dedicated image generation API.
         }),
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`OpenRouter API Error (${response.status}):`, errorText);
+        return res.status(response.status).json({ error: `OpenRouter API Error: ${errorText}` });
+      }
 
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error.message || "OpenRouter API Error");
+      }
+
+      if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
+        console.error("Invalid OpenRouter response structure:", data);
+        throw new Error("Invalid response from OpenRouter API.");
       }
 
       res.json({ text: data.choices[0].message.content });

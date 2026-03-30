@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MessageSquare, X, Send, Bot, User, Sparkles } from "lucide-react";
-import { GoogleGenAI } from "@google/genai";
+import { MessageSquare, X, Send, Sparkles } from "lucide-react";
+import { generateText } from "../lib/gemini";
 import { Button } from "./ui/Button";
 
 interface Message {
@@ -33,12 +33,7 @@ export function ChatBot() {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: userMessage,
-        config: {
-          systemInstruction: `You are the official AI assistant for ProToolix (formerly Glypto). 
+      const systemInstruction = `You are the official AI assistant for ProToolix (formerly Glypto). 
           Your goal is to help users understand and use the website's AI tools.
           
           RULES:
@@ -48,11 +43,11 @@ export function ChatBot() {
           4. ProToolix tools include: AI Caption Generator, AI Resume Builder, Article Rewriter, Image to Cartoon, PDF Tools, Instagram Bio Generator, Background Remover, QR Code Generator, Password Generator, Unit Converter, Tweet Generator, AI Email Writer, and Simple Logo Maker.
           5. If asked about the rebranding, explain that Glypto is now ProToolix, offering a more premium and optimized experience.
           
-          Example of declining: "I'm sorry, but I can only assist with questions related to ProToolix and our AI tools. How can I help you with our productivity suite today?"`
-        }
-      });
+          Example of declining: "I'm sorry, but I can only assist with questions related to ProToolix and our AI tools. How can I help you with our productivity suite today?"`;
 
-      setMessages(prev => [...prev, { role: "bot", content: response.text || "I'm sorry, I couldn't process that request." }]);
+      const response = await generateText(userMessage, systemInstruction);
+
+      setMessages(prev => [...prev, { role: "bot", content: response || "I'm sorry, I couldn't process that request." }]);
     } catch (error) {
       console.error("ChatBot Error:", error);
       setMessages(prev => [...prev, { role: "bot", content: "I'm having trouble connecting right now. Please try again later." }]);

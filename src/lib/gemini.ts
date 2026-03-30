@@ -16,8 +16,23 @@ export async function generateText(prompt: string, systemInstruction?: string) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to generate text from AI service.");
+      const contentType = response.headers.get("content-type");
+      let errorMessage = "Failed to generate text from AI service.";
+      
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } else {
+        errorMessage = await response.text() || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response from server:", text);
+      throw new Error("Invalid response format from server.");
     }
 
     const data = await response.json();
@@ -55,7 +70,13 @@ export async function generateImage(prompt: string) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to generate image prompt.");
+      const errorText = await response.text();
+      throw new Error(`Failed to generate image prompt: ${errorText}`);
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Invalid response format from server for image prompt.");
     }
 
     const data = await response.json();
