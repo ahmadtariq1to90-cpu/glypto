@@ -5,6 +5,17 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 export const chatModel = "gemini-3-flash-preview";
 export const imageModel = "gemini-2.5-flash-image";
 
+export async function generateText(prompt: string, systemInstruction?: string) {
+  const response = await ai.models.generateContent({
+    model: chatModel,
+    contents: prompt,
+    config: {
+      systemInstruction: systemInstruction || "You are a helpful AI assistant.",
+    },
+  });
+  return response.text;
+}
+
 export async function generateChatResponse(prompt: string, history: { role: string, parts: { text: string }[] }[] = []) {
   const chat = ai.chats.create({
     model: chatModel,
