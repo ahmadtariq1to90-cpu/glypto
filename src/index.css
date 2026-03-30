@@ -83,3 +83,15 @@
 .animate-float-premium {
   animation: float 6s ease-in-out infinite;
 }
+
+.mesh-bg {
+  @apply absolute inset-0 overflow-hidden pointer-events-none -z-10;
+}
+
+.mesh-blob {
+  @apply absolute rounded-full blur-[120px] opacity-20;
+}
+
+.tool-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
+}
