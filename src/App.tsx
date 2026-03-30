@@ -669,15 +669,6 @@ export default function App() {
               >
                 {/* Hero Section */}
                 <div className="text-center space-y-8 max-w-5xl mx-auto px-4 pt-12 md:pt-24 relative">
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6 animate-in fade-in slide-in-from-bottom-4"
-                  >
-                    <Sparkles className="h-3 w-3" />
-                    The Future of Productivity
-                  </motion.div>
                   <h1 className="text-5xl md:text-8xl font-black font-display tracking-tight text-text-main leading-[0.95] mb-8">
                     AI Tools for the <br />
                     <span className="premium-gradient-text">Modern Creator</span>

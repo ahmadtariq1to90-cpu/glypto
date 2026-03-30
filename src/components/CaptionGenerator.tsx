@@ -40,11 +40,36 @@ export function CaptionGenerator() {
     setLoading(true);
     setCaptions([]);
     try {
-      const prompt = `Generate 5 catchy and ${tone} ${platform} captions for the topic: "${topic}". Include relevant hashtags and emojis. Return each caption on a new line starting with a number.`;
-      const result = await generateText(prompt, "You are a social media expert.");
-      const lines = result.split("\n").filter(l => l.trim() && /^\d/.test(l));
-      if (lines.length === 0) throw new Error("Invalid response format from AI");
-      setCaptions(lines.map(l => l.replace(/^\d+\.\s*/, "").trim()));
+      const prompt = `Generate 5 SEO-optimized, highly engaging, and ${tone} captions for ${platform} about the topic: "${topic}". 
+      
+      Instructions:
+      - Use relevant keywords for SEO.
+      - Include trending hashtags and appropriate emojis.
+      - Each caption should be unique and not random.
+      - Format: Return ONLY the 5 captions, each starting with its number (e.g., "1. [Caption text]").
+      - Do not include any introductory or concluding text.`;
+
+      const result = await generateText(prompt, "You are a social media expert and SEO specialist.");
+      
+      // More robust parsing: split by lines and look for numbered items
+      const lines = result.split("\n")
+        .map(l => l.trim())
+        .filter(l => l && /^\d+[\.\)]/.test(l));
+
+      if (lines.length === 0) {
+        // Fallback: if no numbered lines, just split by newlines and take non-empty ones
+        const fallbackLines = result.split("\n")
+          .map(l => l.trim())
+          .filter(l => l.length > 10); // Assume a caption is at least 10 chars
+        
+        if (fallbackLines.length > 0) {
+          setCaptions(fallbackLines.slice(0, 5));
+        } else {
+          throw new Error("Invalid response format from AI");
+        }
+      } else {
+        setCaptions(lines.map(l => l.replace(/^\d+[\.\)]\s*/, "").trim()).slice(0, 5));
+      }
     } catch (err: any) {
       setError(getFriendlyErrorMessage(err));
       console.error(err);
