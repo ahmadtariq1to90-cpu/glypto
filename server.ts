@@ -2,6 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +65,25 @@ async function startServer() {
       appType: "spa",
     });
     app.use(vite.middlewares);
+    
+    // Catch-all for development to handle SPA routing on reload
+    app.use("*", async (req, res, next) => {
+      const url = req.originalUrl;
+      try {
+        // If it's an API route, let it pass through
+        if (url.startsWith("/api")) {
+          return next();
+        }
+        // For everything else, Vite's middleware handles it, 
+        // but this ensures we always fall back to index.html for SPA routes
+        const template = fs.readFileSync(path.resolve(__dirname, "index.html"), "utf-8");
+        const html = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ "Content-Type": "text/html" }).end(html);
+      } catch (e) {
+        vite.ssrFixStacktrace(e as Error);
+        next(e);
+      }
+    });
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
