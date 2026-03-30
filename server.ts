@@ -15,10 +15,10 @@ async function startServer() {
 
   // OpenRouter API Route
   app.post("/api/ai/generate", async (req, res) => {
-    const { prompt, systemInstruction, model = "google/gemini-2.0-flash-lite-001" } = req.body;
+    const { prompt, systemInstruction, model = "google/gemini-2.0-flash-001" } = req.body;
     
-    // Force use the provided key to ensure it works as requested
-    const apiKey = "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";
+    // Use the correct key provided by the user
+    const apiKey = "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";
 
     try {
       console.log(`Generating with model: ${model}`);
@@ -28,8 +28,8 @@ async function startServer() {
         headers: {
           "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://protoolix.com",
-          "X-Title": "ProToolix AI",
+          "HTTP-Referer": "https://ais-dev-bwvrysfgbvwyku7csbwmon-570040145977.asia-southeast1.run.app",
+          "X-Title": "ProToolix",
         },
         body: JSON.stringify({
           model: model,

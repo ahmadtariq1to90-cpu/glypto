@@ -1,4 +1,4 @@
-export const chatModel = "google/gemini-2.0-flash-lite-001";
+export const chatModel = "google/gemini-2.0-flash-001";
 export const imageModel = "openai/gpt-4o";
 
 export async function generateText(prompt: string, systemInstruction?: string) {
