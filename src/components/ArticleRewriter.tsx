@@ -16,19 +16,18 @@ export function ArticleRewriter() {
 
   const getFriendlyErrorMessage = (error: any) => {
     const message = error.message || String(error);
+    console.error("Article Rewrite Error:", error);
+
     if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
       return "You've reached the limit for now. Please wait a moment before trying again.";
     }
     if (message.includes("500") || message.toLowerCase().includes("server error")) {
       return "Our AI is currently taking a short break. Please try again in a few seconds.";
     }
-    if (message.toLowerCase().includes("invalid") || message.toLowerCase().includes("missing")) {
-      return "It looks like some information is missing. Please check your input and try again.";
-    }
     if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
       return "Connection lost. Please check your internet and try again.";
     }
-    return "Something went wrong while generating. Please try again.";
+    return message;
   };
 
   const handleRewrite = async () => {

@@ -1,4 +1,4 @@
-export const chatModel = "google/gemini-2.0-flash-001";
+export const chatModel = "google/gemini-2.0-flash-lite-001";
 export const imageModel = "openai/gpt-4o";
 
 export async function generateText(prompt: string, systemInstruction?: string) {
@@ -21,7 +21,12 @@ export async function generateText(prompt: string, systemInstruction?: string) {
       
       if (contentType && contentType.includes("application/json")) {
         const errorData = await response.json();
-        errorMessage = errorData.error || errorMessage;
+        // If errorData.error is an object, try to get its message
+        if (typeof errorData.error === 'object' && errorData.error !== null) {
+          errorMessage = errorData.error.message || JSON.stringify(errorData.error);
+        } else {
+          errorMessage = errorData.error || errorMessage;
+        }
       } else {
         errorMessage = await response.text() || errorMessage;
       }

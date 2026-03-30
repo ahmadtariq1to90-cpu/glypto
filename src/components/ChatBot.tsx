@@ -48,9 +48,10 @@ export function ChatBot() {
       const response = await generateText(userMessage, systemInstruction);
 
       setMessages(prev => [...prev, { role: "bot", content: response || "I'm sorry, I couldn't process that request." }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("ChatBot Error:", error);
-      setMessages(prev => [...prev, { role: "bot", content: "I'm having trouble connecting right now. Please try again later." }]);
+      const errorMessage = error.message || String(error);
+      setMessages(prev => [...prev, { role: "bot", content: `Error: ${errorMessage}. Please try again later.` }]);
     } finally {
       setIsLoading(false);
     }

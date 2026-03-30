@@ -31,7 +31,7 @@ export function CaptionGenerator() {
     if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
       return "Connection lost. Please check your internet and try again.";
     }
-    return message.length < 100 ? message : "Something went wrong while generating. Please try again.";
+    return message;
   };
 
   const handleGenerate = async () => {
