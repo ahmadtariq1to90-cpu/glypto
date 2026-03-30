@@ -18,7 +18,7 @@ async function startServer() {
     const { prompt, systemInstruction, model = "google/gemini-2.0-flash-lite-001" } = req.body;
     
     // Force use the provided key to ensure it works as requested
-    const apiKey = "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";
+    const apiKey = "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";
 
     try {
       console.log(`Generating with model: ${model}`);
