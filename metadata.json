@@ -1,6 +1,6 @@
 {
-  "name": "OneAI - All-in-One AI Platform",
-  "description": "A powerful AI platform featuring chat, image generation, and productivity tools inspired by 1min.ai.",
+  "name": "ProToolix - Premium AI Productivity Suite",
+  "description": "Experience the next generation of content creation with ProToolix's suite of ultra-smooth, professional AI micro-tools.",
   "requestFramePermissions": [
     "camera",
     "microphone"
