@@ -17,6 +17,11 @@ interface Template {
   fields: string[];
   color: string;
   previewUrl: string;
+  examples: {
+    name: string;
+    role: string;
+    image: string;
+  }[];
 }
 
 const BUILTIN_TEMPLATES: Template[] = [
@@ -29,7 +34,11 @@ const BUILTIN_TEMPLATES: Template[] = [
       "Professional Summary", "Work Experience", "Education", "Key Skills", "Languages"
     ],
     color: "#0ea5e9",
-    previewUrl: "https://i.ibb.co/0jFDYCkC/images-3.png"
+    previewUrl: "https://i.ibb.co/0jFDYCkC/images-3.png",
+    examples: [
+      { name: "Alex Rivera", role: "Senior Software Engineer", image: "https://i.ibb.co/0jFDYCkC/images-3.png" },
+      { name: "Sarah Chen", role: "Product Designer", image: "https://i.ibb.co/0jFDYCkC/images-3.png" }
+    ]
   },
   {
     id: "bakchos",
@@ -40,7 +49,11 @@ const BUILTIN_TEMPLATES: Template[] = [
       "Summary", "Core Competencies", "Professional Experience", "Academic Background", "Certifications"
     ],
     color: "#10b981",
-    previewUrl: "https://i.ibb.co/rK2vQzrj/bakchos.png"
+    previewUrl: "https://i.ibb.co/rK2vQzrj/bakchos.png",
+    examples: [
+      { name: "James Wilson", role: "Chief Operations Officer", image: "https://i.ibb.co/rK2vQzrj/bakchos.png" },
+      { name: "Maria Garcia", role: "Marketing Director", image: "https://i.ibb.co/rK2vQzrj/bakchos.png" }
+    ]
   },
   {
     id: "skill-focused",
@@ -51,7 +64,11 @@ const BUILTIN_TEMPLATES: Template[] = [
       "Technical Skills", "Soft Skills", "Experience", "Education", "Projects", "Achievements"
     ],
     color: "#f59e0b",
-    previewUrl: "https://i.ibb.co/7JyhWwWS/images-2.png"
+    previewUrl: "https://i.ibb.co/7JyhWwWS/images-2.png",
+    examples: [
+      { name: "David Kim", role: "Full Stack Developer", image: "https://i.ibb.co/7JyhWwWS/images-2.png" },
+      { name: "Elena Rossi", role: "Data Scientist", image: "https://i.ibb.co/7JyhWwWS/images-2.png" }
+    ]
   }
 ];
 
@@ -81,6 +98,154 @@ export function ResumeBuilder() {
     setStep("fill");
   };
 
+  const renderResumeContent = () => {
+    if (!selectedTemplate) return null;
+
+    if (selectedTemplate.id === "elite") {
+      return (
+        <div className="p-12 md:p-16 flex flex-col h-full">
+          <div className="border-b-4 pb-10 mb-10" style={{ borderColor: customColor }}>
+            <h1 className="text-6xl font-black tracking-tighter text-zinc-900 uppercase leading-none mb-4">
+              {formData["Full Name"] || "Your Name"}
+            </h1>
+            <div className="flex flex-wrap gap-6 text-sm font-black uppercase tracking-widest text-zinc-500">
+              <span style={{ color: customColor }}>{formData["Target Role"] || "Professional Title"}</span>
+              {formData["Email"] && <span>• {formData["Email"]}</span>}
+              {formData["Phone"] && <span>• {formData["Phone"]}</span>}
+              {formData["Location"] && <span>• {formData["Location"]}</span>}
+            </div>
+          </div>
+          <div className="grid grid-cols-12 gap-12 flex-grow">
+            <div className="col-span-8 space-y-12">
+              <section className="space-y-4">
+                <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Professional Summary</h2>
+                <p className="text-zinc-600 leading-relaxed font-medium">{formData["Professional Summary"] || "Enter your summary..."}</p>
+              </section>
+              <section className="space-y-4">
+                <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Work Experience</h2>
+                <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Work Experience"] || "Enter your experience..."}</div>
+              </section>
+              <section className="space-y-4">
+                <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Education</h2>
+                <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Education"] || "Enter your education..."}</div>
+              </section>
+            </div>
+            <div className="col-span-4 space-y-12 border-l pl-12 border-zinc-100">
+              <section className="space-y-4">
+                <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Key Skills</h2>
+                <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Key Skills"] || "Enter your skills..."}</div>
+              </section>
+              <section className="space-y-4">
+                <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Languages</h2>
+                <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Languages"] || "Enter languages..."}</div>
+              </section>
+              {formData["LinkedIn"] && (
+                <section className="space-y-4">
+                  <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>LinkedIn</h2>
+                  <div className="text-zinc-600 leading-relaxed font-medium break-all">{formData["LinkedIn"]}</div>
+                </section>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (selectedTemplate.id === "bakchos") {
+      return (
+        <div className="p-12 md:p-16 space-y-12">
+          <div className="text-center space-y-4 border-b-8 pb-12" style={{ borderColor: customColor }}>
+            <h1 className="text-7xl font-black tracking-tighter text-zinc-900 uppercase leading-none">
+              {formData["Full Name"] || "Your Name"}
+            </h1>
+            <p className="text-2xl font-black tracking-[0.3em] text-zinc-400 uppercase">
+              {formData["Current Position"] || "Current Position"}
+            </p>
+            <div className="flex justify-center gap-8 text-xs font-black uppercase tracking-widest text-zinc-500">
+              {formData["Email"] && <span>{formData["Email"]}</span>}
+              {formData["Phone"] && <span>{formData["Phone"]}</span>}
+              {formData["Location"] && <span>{formData["Location"]}</span>}
+            </div>
+          </div>
+          <section className="space-y-6">
+            <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Summary</h2>
+            <p className="text-zinc-600 leading-relaxed font-medium text-center max-w-3xl mx-auto">{formData["Summary"] || "Enter your summary..."}</p>
+          </section>
+          <section className="space-y-6">
+            <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Core Competencies</h2>
+            <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap text-center">{formData["Core Competencies"] || "Enter competencies..."}</div>
+          </section>
+          <section className="space-y-6">
+            <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Professional Experience</h2>
+            <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Professional Experience"] || "Enter experience..."}</div>
+          </section>
+          <div className="grid grid-cols-2 gap-12">
+            <section className="space-y-6">
+              <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Academic</h2>
+              <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap text-center">{formData["Academic Background"] || "Enter background..."}</div>
+            </section>
+            <section className="space-y-6">
+              <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Certifications</h2>
+              <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap text-center">{formData["Certifications"] || "Enter certifications..."}</div>
+            </section>
+          </div>
+        </div>
+      );
+    }
+
+    if (selectedTemplate.id === "skill-focused") {
+      return (
+        <div className="p-12 md:p-16 space-y-12">
+          <div className="flex justify-between items-start border-b-2 pb-10" style={{ borderColor: customColor }}>
+            <div className="space-y-2">
+              <h1 className="text-6xl font-black tracking-tighter text-zinc-900 uppercase leading-none">
+                {formData["Full Name"] || "Your Name"}
+              </h1>
+              <p className="text-xl font-black text-indigo-600 uppercase tracking-widest">
+                {formData["Headline"] || "Professional Headline"}
+              </p>
+            </div>
+            <div className="text-right text-xs font-black uppercase tracking-widest text-zinc-500 space-y-1">
+              {formData["Email"] && <p>{formData["Email"]}</p>}
+              {formData["Phone"] && <p>{formData["Phone"]}</p>}
+              {formData["Location"] && <p>{formData["Location"]}</p>}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-12">
+            <section className="space-y-6 p-8 bg-zinc-50 rounded-[2rem]">
+              <h2 className="text-lg font-black uppercase tracking-widest" style={{ color: customColor }}>Technical Skills</h2>
+              <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Technical Skills"] || "Enter technical skills..."}</div>
+            </section>
+            <section className="space-y-6 p-8 bg-zinc-50 rounded-[2rem]">
+              <h2 className="text-lg font-black uppercase tracking-widest" style={{ color: customColor }}>Soft Skills</h2>
+              <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Soft Skills"] || "Enter soft skills..."}</div>
+            </section>
+          </div>
+          <section className="space-y-6">
+            <h2 className="text-2xl font-black uppercase tracking-tighter border-l-8 pl-6" style={{ borderColor: customColor }}>Experience</h2>
+            <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Experience"] || "Enter experience..."}</div>
+          </section>
+          <section className="space-y-6">
+            <h2 className="text-2xl font-black uppercase tracking-tighter border-l-8 pl-6" style={{ borderColor: customColor }}>Projects</h2>
+            <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Projects"] || "Enter projects..."}</div>
+          </section>
+          <div className="grid grid-cols-2 gap-12">
+            <section className="space-y-6">
+              <h2 className="text-lg font-black uppercase tracking-widest border-l-8 pl-6" style={{ borderColor: customColor }}>Education</h2>
+              <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Education"] || "Enter education..."}</div>
+            </section>
+            <section className="space-y-6">
+              <h2 className="text-lg font-black uppercase tracking-widest border-l-8 pl-6" style={{ borderColor: customColor }}>Achievements</h2>
+              <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Achievements"] || "Enter achievements..."}</div>
+            </section>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -103,7 +268,8 @@ export function ResumeBuilder() {
           description: "Custom template analyzed by AI.",
           fields: identifiedFields.length > 0 ? identifiedFields : ["Full Name", "Summary", "Experience", "Skills", "Education"],
           color: "#4f46e5",
-          previewUrl: reader.result as string
+          previewUrl: reader.result as string,
+          examples: []
         };
 
         handleTemplateSelect(customTemplate);
@@ -118,6 +284,12 @@ export function ResumeBuilder() {
   };
 
   const handleGenerate = async () => {
+    const isFormEmpty = Object.values(formData).every(v => !v.trim());
+    if (isFormEmpty) {
+      setErrors({ general: "Please fill in at least one field to generate your resume." });
+      return;
+    }
+
     setLoading(true);
     setErrors({});
     try {
@@ -148,9 +320,11 @@ export function ResumeBuilder() {
     setLoading(true);
     try {
       const canvas = await html2canvas(resumeRef.current, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
-        backgroundColor: "#ffffff"
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: 1200
       });
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
@@ -207,12 +381,34 @@ export function ResumeBuilder() {
                       </Button>
                     </div>
                   </div>
-                  <div className="p-10 space-y-4 bg-gradient-to-b from-white to-zinc-50/80">
+                  <div className="p-10 space-y-6 bg-gradient-to-b from-white to-zinc-50/80">
                     <div className="flex items-center justify-between">
                       <h3 className="font-black text-2xl text-zinc-900 tracking-tighter">{template.name}</h3>
                       <div className="w-5 h-5 rounded-full shadow-inner border-2 border-white" style={{ backgroundColor: template.color }} />
                     </div>
-                    <p className="text-xs text-zinc-500 font-bold leading-relaxed line-clamp-2 uppercase tracking-wide opacity-80">{template.description}</p>
+                    <p className="text-xs text-zinc-500 font-bold leading-relaxed uppercase tracking-wide opacity-80">{template.description}</p>
+                    
+                    <div className="space-y-3 pt-4 border-t border-zinc-100">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Example Resumes</p>
+                      <div className="flex gap-2">
+                        {template.examples.map((example, i) => (
+                          <div key={i} className="flex-1 group/example relative">
+                            <div className="aspect-[3/4] rounded-lg overflow-hidden bg-zinc-100 border border-zinc-200 shadow-sm transition-all group-hover/example:shadow-md">
+                              <img 
+                                src={example.image} 
+                                alt={example.name}
+                                className="w-full h-full object-cover grayscale group-hover/example:grayscale-0 transition-all"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                            <div className="mt-2">
+                              <p className="text-[10px] font-bold text-zinc-900 truncate">{example.name}</p>
+                              <p className="text-[8px] font-medium text-zinc-400 truncate uppercase">{example.role}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -281,10 +477,12 @@ export function ResumeBuilder() {
                   <h3 className="text-lg font-bold font-display tracking-tight text-zinc-900">Enter Your Details</h3>
                 </div>
 
-                <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-5 max-h-[calc(100vh-350px)] overflow-y-auto pr-2 custom-scrollbar">
                   {selectedTemplate.fields.map((field) => (
                     <div key={field} className="space-y-1.5">
-                      <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">{field}</label>
+                      <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">
+                        {field} {["LinkedIn", "Languages", "Achievements", "Projects", "Location"].includes(field) && <span className="text-zinc-300 font-medium lowercase">(Optional)</span>}
+                      </label>
                       <div className="rounded-xl border border-zinc-100 bg-zinc-50/30 focus-within:ring-4 focus-within:ring-indigo-500/5 focus-within:border-indigo-500/30 transition-all">
                         {field.toLowerCase().includes("experience") || field.toLowerCase().includes("summary") || field.toLowerCase().includes("about") ? (
                           <textarea
@@ -329,16 +527,23 @@ export function ResumeBuilder() {
               </div>
             </div>
 
-            <div className="lg:col-span-3">
-              <div className="glass-card p-8 rounded-3xl min-h-[600px] bg-white shadow-xl border-white/40 flex flex-col items-center justify-center text-center space-y-6">
-                <div className="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center shadow-inner">
-                  <Eye className="h-10 w-10 text-indigo-200" />
+            <div className="lg:col-span-3 sticky top-24">
+              <div className="glass-card p-4 rounded-3xl bg-zinc-50/50 shadow-xl border-white/40 overflow-hidden">
+                <div className="flex items-center justify-between mb-4 px-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Live Preview</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">{selectedTemplate.name}</span>
                 </div>
-                <div>
-                  <h4 className="text-xl font-bold text-zinc-900 mb-2">Live Preview</h4>
-                  <p className="max-w-xs mx-auto text-sm font-medium text-zinc-400 leading-relaxed">
-                    Your resume will appear here once generated. You've selected the <span className="text-indigo-600 font-bold">{selectedTemplate.name}</span> template.
-                  </p>
+                
+                <div className="relative origin-top scale-[0.45] md:scale-[0.55] lg:scale-[0.65] xl:scale-[0.75] -mb-[55%] md:-mb-[45%] lg:-mb-[35%] xl:-mb-[25%] pointer-events-none select-none shadow-2xl">
+                  <div 
+                    className="bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-zinc-100 antialiased mx-auto"
+                    style={{ minHeight: "297mm", width: "210mm", imageRendering: "auto" }}
+                  >
+                    {renderResumeContent()}
+                  </div>
                 </div>
               </div>
             </div>
@@ -353,28 +558,28 @@ export function ResumeBuilder() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="space-y-8"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <Button 
                 variant="ghost" 
                 onClick={() => setStep("fill")}
-                className="rounded-xl font-bold"
+                className="rounded-xl font-bold w-full sm:w-auto"
               >
                 <ChevronLeft className="mr-1 h-4 w-4" />
                 Edit Details
               </Button>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <Button 
                   variant="outline" 
                   onClick={downloadPDF}
                   disabled={loading}
-                  className="rounded-xl font-bold border-2"
+                  className="rounded-xl font-bold border-2 w-full sm:w-auto"
                 >
                   {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                   Download PDF
                 </Button>
                 <Button 
                   onClick={() => setStep("select")}
-                  className="rounded-xl font-bold bg-zinc-900 hover:bg-zinc-800"
+                  className="rounded-xl font-bold bg-zinc-900 hover:bg-zinc-800 w-full sm:w-auto"
                 >
                   New Resume
                 </Button>
@@ -383,144 +588,10 @@ export function ResumeBuilder() {
 
             <div 
               ref={resumeRef}
-              className="bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-zinc-100 max-w-4xl mx-auto"
-              style={{ minHeight: "297mm", width: "210mm" }}
+              className="bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-zinc-100 max-w-4xl mx-auto antialiased"
+              style={{ minHeight: "297mm", width: "210mm", imageRendering: "auto" }}
             >
-              {selectedTemplate.id === "elite" && (
-                <div className="p-12 md:p-16 flex flex-col h-full">
-                  <div className="border-b-4 pb-10 mb-10" style={{ borderColor: customColor }}>
-                    <h1 className="text-6xl font-black tracking-tighter text-zinc-900 uppercase leading-none mb-4">
-                      {formData["Full Name"] || "Your Name"}
-                    </h1>
-                    <div className="flex flex-wrap gap-6 text-sm font-black uppercase tracking-widest text-zinc-500">
-                      <span style={{ color: customColor }}>{formData["Target Role"] || "Professional Title"}</span>
-                      {formData["Email"] && <span>• {formData["Email"]}</span>}
-                      {formData["Phone"] && <span>• {formData["Phone"]}</span>}
-                      {formData["Location"] && <span>• {formData["Location"]}</span>}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-12 gap-12 flex-grow">
-                    <div className="col-span-8 space-y-12">
-                      <section className="space-y-4">
-                        <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Professional Summary</h2>
-                        <p className="text-zinc-600 leading-relaxed font-medium">{formData["Professional Summary"] || "Enter your summary..."}</p>
-                      </section>
-                      <section className="space-y-4">
-                        <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Work Experience</h2>
-                        <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Work Experience"] || "Enter your experience..."}</div>
-                      </section>
-                      <section className="space-y-4">
-                        <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Education</h2>
-                        <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Education"] || "Enter your education..."}</div>
-                      </section>
-                    </div>
-                    <div className="col-span-4 space-y-12 border-l pl-12 border-zinc-100">
-                      <section className="space-y-4">
-                        <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Key Skills</h2>
-                        <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Key Skills"] || "Enter your skills..."}</div>
-                      </section>
-                      <section className="space-y-4">
-                        <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>Languages</h2>
-                        <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Languages"] || "Enter languages..."}</div>
-                      </section>
-                      {formData["LinkedIn"] && (
-                        <section className="space-y-4">
-                          <h2 className="text-lg font-black uppercase tracking-widest border-b-2 pb-2" style={{ borderColor: customColor }}>LinkedIn</h2>
-                          <div className="text-zinc-600 leading-relaxed font-medium break-all">{formData["LinkedIn"]}</div>
-                        </section>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {selectedTemplate.id === "bakchos" && (
-                <div className="p-12 md:p-16 space-y-12">
-                  <div className="text-center space-y-4 border-b-8 pb-12" style={{ borderColor: customColor }}>
-                    <h1 className="text-7xl font-black tracking-tighter text-zinc-900 uppercase leading-none">
-                      {formData["Full Name"] || "Your Name"}
-                    </h1>
-                    <p className="text-2xl font-black tracking-[0.3em] text-zinc-400 uppercase">
-                      {formData["Current Position"] || "Current Position"}
-                    </p>
-                    <div className="flex justify-center gap-8 text-xs font-black uppercase tracking-widest text-zinc-500">
-                      {formData["Email"] && <span>{formData["Email"]}</span>}
-                      {formData["Phone"] && <span>{formData["Phone"]}</span>}
-                      {formData["Location"] && <span>{formData["Location"]}</span>}
-                    </div>
-                  </div>
-                  <section className="space-y-6">
-                    <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Summary</h2>
-                    <p className="text-zinc-600 leading-relaxed font-medium text-center max-w-3xl mx-auto">{formData["Summary"] || "Enter your summary..."}</p>
-                  </section>
-                  <section className="space-y-6">
-                    <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Core Competencies</h2>
-                    <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap text-center">{formData["Core Competencies"] || "Enter competencies..."}</div>
-                  </section>
-                  <section className="space-y-6">
-                    <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Professional Experience</h2>
-                    <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Professional Experience"] || "Enter experience..."}</div>
-                  </section>
-                  <div className="grid grid-cols-2 gap-12">
-                    <section className="space-y-6">
-                      <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Academic</h2>
-                      <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap text-center">{formData["Academic Background"] || "Enter background..."}</div>
-                    </section>
-                    <section className="space-y-6">
-                      <h2 className="text-xl font-black uppercase tracking-[0.4em] text-center py-2 bg-zinc-50 rounded-xl" style={{ color: customColor }}>Certifications</h2>
-                      <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap text-center">{formData["Certifications"] || "Enter certifications..."}</div>
-                    </section>
-                  </div>
-                </div>
-              )}
-
-              {selectedTemplate.id === "skill-focused" && (
-                <div className="p-12 md:p-16 space-y-12">
-                  <div className="flex justify-between items-start border-b-2 pb-10" style={{ borderColor: customColor }}>
-                    <div className="space-y-2">
-                      <h1 className="text-6xl font-black tracking-tighter text-zinc-900 uppercase leading-none">
-                        {formData["Full Name"] || "Your Name"}
-                      </h1>
-                      <p className="text-xl font-black text-indigo-600 uppercase tracking-widest">
-                        {formData["Headline"] || "Professional Headline"}
-                      </p>
-                    </div>
-                    <div className="text-right text-xs font-black uppercase tracking-widest text-zinc-500 space-y-1">
-                      {formData["Email"] && <p>{formData["Email"]}</p>}
-                      {formData["Phone"] && <p>{formData["Phone"]}</p>}
-                      {formData["Location"] && <p>{formData["Location"]}</p>}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-12">
-                    <section className="space-y-6 p-8 bg-zinc-50 rounded-[2rem]">
-                      <h2 className="text-lg font-black uppercase tracking-widest" style={{ color: customColor }}>Technical Skills</h2>
-                      <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Technical Skills"] || "Enter technical skills..."}</div>
-                    </section>
-                    <section className="space-y-6 p-8 bg-zinc-50 rounded-[2rem]">
-                      <h2 className="text-lg font-black uppercase tracking-widest" style={{ color: customColor }}>Soft Skills</h2>
-                      <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Soft Skills"] || "Enter soft skills..."}</div>
-                    </section>
-                  </div>
-                  <section className="space-y-6">
-                    <h2 className="text-2xl font-black uppercase tracking-tighter border-l-8 pl-6" style={{ borderColor: customColor }}>Experience</h2>
-                    <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Experience"] || "Enter experience..."}</div>
-                  </section>
-                  <section className="space-y-6">
-                    <h2 className="text-2xl font-black uppercase tracking-tighter border-l-8 pl-6" style={{ borderColor: customColor }}>Projects</h2>
-                    <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Projects"] || "Enter projects..."}</div>
-                  </section>
-                  <div className="grid grid-cols-2 gap-12">
-                    <section className="space-y-6">
-                      <h2 className="text-lg font-black uppercase tracking-widest border-l-8 pl-6" style={{ borderColor: customColor }}>Education</h2>
-                      <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Education"] || "Enter education..."}</div>
-                    </section>
-                    <section className="space-y-6">
-                      <h2 className="text-lg font-black uppercase tracking-widest border-l-8 pl-6" style={{ borderColor: customColor }}>Achievements</h2>
-                      <div className="text-zinc-600 leading-relaxed font-medium whitespace-pre-wrap">{formData["Achievements"] || "Enter achievements..."}</div>
-                    </section>
-                  </div>
-                </div>
-              )}
+              {renderResumeContent()}
             </div>
           </motion.div>
         )}

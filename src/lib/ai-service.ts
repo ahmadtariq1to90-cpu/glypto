@@ -1,10 +1,9 @@
 
 export async function generateAIContent(prompt: string, systemInstruction?: string, model: string = "google/gemini-2.0-flash-001") {
-  // Force use the user's provided key to ensure it works as requested
-  const apiKey = "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".trim();
+  const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
-    throw new Error("OPENROUTER_API_KEY is not configured.");
+    throw new Error("OPENROUTER_API_KEY is not configured in the environment.");
   }
 
   // Ensure model name is correct for OpenRouter

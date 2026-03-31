@@ -1,15 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 
-export const chatModel = "gemini-2.0-flash";
+export const chatModel = "google/gemini-2.0-flash-001";
 export const imageModel = "openai/gpt-4o";
 
 // Initialize Gemini AI
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const ai = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
 
 export async function generateText(prompt: string, systemInstruction?: string, imageBase64?: string, mimeType?: string) {
   try {
-    // If it's a Gemini model, use the native SDK directly in the frontend
-    if (chatModel.startsWith("gemini-") || chatModel.includes("google/gemini")) {
+    // If it's a Gemini model AND we have a Gemini API key, use the native SDK directly in the frontend
+    if (ai && (chatModel.startsWith("gemini-") || chatModel.includes("google/gemini"))) {
       const modelName = chatModel.includes("/") ? chatModel.split("/")[1] : chatModel;
       
       const parts: any[] = [{ text: prompt }];

@@ -60,6 +60,7 @@ const PdfTools = lazy(() => import("./components/PdfTools").then(m => ({ default
 const BioGenerator = lazy(() => import("./components/BioGenerator").then(m => ({ default: m.BioGenerator })));
 const StaticPage = lazy(() => import("./components/StaticPage").then(m => ({ default: m.StaticPage })));
 const SimpleTools = lazy(() => import("./components/SimpleTools").then(m => ({ default: m.SimpleTools })));
+const ImageGenerator = lazy(() => import("./components/ImageGenerator").then(m => ({ default: m.ImageGenerator })));
 
 const TOOLS: Tool[] = [
   {
@@ -169,6 +170,24 @@ const TOOLS: Tool[] = [
     category: "Content",
     color: "bg-indigo-400",
     image: "https://picsum.photos/seed/email/600/400"
+  },
+  {
+    id: "qr-scan",
+    name: "QR Code Scanner",
+    description: "Scan any QR code instantly using your camera or an uploaded image. Fast, secure, and easy to use.",
+    icon: Search,
+    category: "Utility",
+    color: "bg-emerald-400",
+    image: "https://picsum.photos/seed/qrscan/600/400"
+  },
+  {
+    id: "image-gen",
+    name: "AI Image Generator",
+    description: "Transform your text descriptions into stunning AI-generated images. High-quality, unique art in seconds.",
+    icon: ImageIcon,
+    category: "Design",
+    color: "bg-indigo-600",
+    image: "https://picsum.photos/seed/imggen/600/400"
   },
   {
     id: "logo",
@@ -472,11 +491,12 @@ export default function App() {
             );
           }
 
-          if (["bg-remover", "qr-gen", "pass-gen", "unit-conv", "logo"].includes(view)) {
+          if (["bg-remover", "qr-gen", "qr-scan", "pass-gen", "unit-conv", "logo"].includes(view)) {
             return <SimpleTools type={view as any} />;
           }
 
           switch (view) {
+            case "image-gen": return <ImageGenerator />;
             case "caption":
             case "tweet":
               return <CaptionGenerator />;
