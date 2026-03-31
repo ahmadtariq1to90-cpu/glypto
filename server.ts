@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import { generateAIContent } from "./src/lib/ai-service.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,53 +18,13 @@ async function startServer() {
   app.post("/api/ai/generate", async (req, res) => {
     const { prompt, systemInstruction, model = "google/gemini-2.0-flash-001" } = req.body;
     
-    // Use the correct key provided by the user
-    const apiKey = "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";
-
     try {
       console.log(`Generating with model: ${model}`);
-      
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://ais-dev-bwvrysfgbvwyku7csbwmon-570040145977.asia-southeast1.run.app",
-          "X-Title": "ProToolix",
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { role: "system", content: systemInstruction || "You are a helpful assistant." },
-            { role: "user", content: prompt }
-          ],
-        }),
-      });
-
-      const responseText = await response.text();
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Failed to parse OpenRouter response:", responseText);
-        return res.status(500).json({ error: `Invalid JSON from OpenRouter: ${responseText.substring(0, 100)}` });
-      }
-
-      if (!response.ok) {
-        console.error(`OpenRouter API Error (${response.status}):`, data);
-        const errorMsg = data.error?.message || data.error || `OpenRouter Error ${response.status}: ${response.statusText}`;
-        return res.status(response.status).json({ error: errorMsg });
-      }
-
-      if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
-        console.error("Invalid OpenRouter response structure:", data);
-        return res.status(500).json({ error: "No response choices returned from AI." });
-      }
-
-      res.json({ text: data.choices[0].message.content });
+      const text = await generateAIContent(prompt, systemInstruction, model);
+      res.json({ text });
     } catch (error: any) {
-      console.error("Server-side OpenRouter Error:", error);
-      res.status(500).json({ error: `Server Error: ${error.message}` });
+      console.error("Server-side AI Generation Error:", error);
+      res.status(500).json({ error: error.message || "Internal Server Error during AI generation" });
     }
   });
 

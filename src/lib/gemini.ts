@@ -1,8 +1,42 @@
-export const chatModel = "google/gemini-2.0-flash-001";
+import { GoogleGenAI } from "@google/genai";
+
+export const chatModel = "gemini-2.0-flash";
 export const imageModel = "openai/gpt-4o";
 
-export async function generateText(prompt: string, systemInstruction?: string) {
+// Initialize Gemini AI
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+
+export async function generateText(prompt: string, systemInstruction?: string, imageBase64?: string, mimeType?: string) {
   try {
+    // If it's a Gemini model, use the native SDK directly in the frontend
+    if (chatModel.startsWith("gemini-") || chatModel.includes("google/gemini")) {
+      const modelName = chatModel.includes("/") ? chatModel.split("/")[1] : chatModel;
+      
+      const parts: any[] = [{ text: prompt }];
+      if (imageBase64 && mimeType) {
+        parts.push({
+          inlineData: {
+            data: imageBase64,
+            mimeType: mimeType
+          }
+        });
+      }
+
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: [{ role: "user", parts }],
+        config: {
+          systemInstruction: systemInstruction || "You are a helpful assistant.",
+        },
+      });
+      
+      if (!response.text) {
+        throw new Error("Empty response from Gemini AI.");
+      }
+      return response.text;
+    }
+
+    // Fallback to backend proxy for other models (like GPT-4o via OpenRouter)
     const response = await fetch("/api/ai/generate", {
       method: "POST",
       headers: {

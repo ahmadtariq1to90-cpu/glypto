@@ -209,6 +209,10 @@ export default function App() {
   }, [isDarkMode]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
         setIsMenuOpen(false);
@@ -525,7 +529,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
-      <ChatBot />
       {/* AdBlock Warning - Premium Minimalist */}
       <AnimatePresence>
         {showAdBlockMsg && adBlockEnabled && (
