@@ -13,7 +13,10 @@ const STYLES = [
   { id: "cyberpunk", label: "Cyberpunk", icon: "🌆", prompt: "cyberpunk aesthetic, neon lights, futuristic, dark atmosphere, high contrast" },
   { id: "minimalist", label: "Minimalist", icon: "⚪", prompt: "minimalist style, clean, simple, elegant, flat design" },
   { id: "anime", label: "Anime", icon: "🎌", prompt: "anime style, high quality, studio ghibli inspired, vibrant" },
-  { id: "sketch", label: "Sketch", icon: "✏️", prompt: "hand-drawn sketch, charcoal, artistic, rough lines" }
+  { id: "sketch", label: "Sketch", icon: "✏️", prompt: "hand-drawn sketch, charcoal, artistic, rough lines" },
+  { id: "pixel-art", label: "Pixel Art", icon: "👾", prompt: "pixel art style, 8-bit, 16-bit, retro gaming aesthetic, blocky, vibrant colors" },
+  { id: "watercolor", label: "Watercolor", icon: "🌊", prompt: "watercolor painting, soft edges, fluid colors, artistic paper texture, delicate brushwork" },
+  { id: "steampunk", label: "Steampunk", icon: "⚙️", prompt: "steampunk aesthetic, brass and copper machinery, Victorian era, gears, steam-powered, intricate details, sepia tones" }
 ];
 
 const RATIOS = [
@@ -305,6 +308,13 @@ export function ImageGenerator() {
                     <span className="px-2 py-1 bg-white rounded-md text-[9px] font-bold text-zinc-400 border border-zinc-100 uppercase tracking-widest">{selectedRatio}</span>
                   </div>
                 </div>
+                <Button 
+                  onClick={downloadImage} 
+                  className="w-full mt-6 h-16 rounded-[1.5rem] bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
+                >
+                  <Download className="h-5 w-5" />
+                  Download Image
+                </Button>
               </motion.div>
             ) : (
               <div className="glass-card p-12 rounded-[3.5rem] bg-zinc-50/50 border-dashed border-4 border-zinc-200 flex flex-col items-center justify-center text-center space-y-8 min-h-[600px]">
