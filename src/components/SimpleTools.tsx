@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/Button";
 import { Copy, Check, RefreshCw, QrCode, Lock, ArrowLeftRight, Eraser, LayoutGrid, Search, Camera, Upload, Download, Loader2, Sparkles, Wand2, X } from "lucide-react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
 import { motion, AnimatePresence } from "motion/react";
 
 export function SimpleTools({ type }: { type: string }) {
@@ -162,7 +162,26 @@ export function SimpleTools({ type }: { type: string }) {
   if (type === "qr-scan") {
     const [scannedResult, setScannedResult] = useState<string | null>(null);
     const [scanning, setScanning] = useState(false);
+    const [fileScanning, setFileScanning] = useState(false);
     const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+
+    const handleFileScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setFileScanning(true);
+      const html5QrCode = new Html5Qrcode("qr-reader-hidden");
+      try {
+        const decodedText = await html5QrCode.scanFile(file, true);
+        setScannedResult(decodedText);
+      } catch (err) {
+        console.error("Error scanning file", err);
+        alert("No QR code found in this image.");
+      } finally {
+        setFileScanning(false);
+        html5QrCode.clear();
+      }
+    };
 
     useEffect(() => {
       if (scanning && !scannerRef.current) {
@@ -215,13 +234,22 @@ export function SimpleTools({ type }: { type: string }) {
                 type="file" 
                 className="absolute inset-0 opacity-0 cursor-pointer z-10"
                 accept="image/*"
-                onChange={() => setScanning(true)}
+                onChange={handleFileScan}
+                disabled={fileScanning}
               />
-              <Upload className="h-8 w-8 text-zinc-300 group-hover:text-emerald-500 transition-colors" />
-              <span className="font-bold uppercase tracking-widest text-xs text-zinc-400 group-hover:text-emerald-600 transition-colors">Upload Image</span>
+              {fileScanning ? (
+                <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+              ) : (
+                <Upload className="h-8 w-8 text-zinc-300 group-hover:text-emerald-500 transition-colors" />
+              )}
+              <span className="font-bold uppercase tracking-widest text-xs text-zinc-400 group-hover:text-emerald-600 transition-colors">
+                {fileScanning ? "Scanning..." : "Upload Image"}
+              </span>
             </div>
           </div>
         )}
+
+        <div id="qr-reader-hidden" style={{ display: 'none' }}></div>
 
         {scanning && (
           <div className="space-y-6">
@@ -310,66 +338,6 @@ export function SimpleTools({ type }: { type: string }) {
             <button onClick={() => handleCopy(result)} className="p-3 bg-white rounded-xl shadow-md hover:text-indigo-600 transition-all active:scale-90">
               {copied ? <Check className="h-6 w-6 text-emerald-500" /> : <Copy className="h-6 w-6 text-zinc-400" />}
             </button>
-          </motion.div>
-        )}
-      </div>
-    );
-  }
-
-  if (type === "unit-conv") {
-    const [from, setFrom] = useState("km");
-    const [to, setTo] = useState("mi");
-    
-    const convert = () => {
-      const val = parseFloat(input);
-      if (isNaN(val)) return;
-      let res = 0;
-      if (from === "km" && to === "mi") res = val * 0.621371;
-      if (from === "mi" && to === "km") res = val / 0.621371;
-      if (from === "kg" && to === "lb") res = val * 2.20462;
-      if (from === "lb" && to === "kg") res = val / 2.20462;
-      setResult(res.toFixed(2));
-    };
-
-    return (
-      <div className="glass-card p-8 rounded-[2.5rem] space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
-        <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-50">
-          <ArrowLeftRight className="h-10 w-10" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-3xl font-black tracking-tight text-zinc-900">Unit Converter</h3>
-          <p className="text-zinc-500 font-medium max-w-sm mx-auto leading-relaxed">Quickly convert between different units of measurement.</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-          <input
-            type="number"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Value"
-            className="w-full h-14 px-6 rounded-2xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 outline-none font-bold text-lg shadow-inner"
-          />
-          <select value={from} onChange={(e) => setFrom(e.target.value)} className="h-14 px-4 rounded-2xl bg-zinc-50 border border-zinc-100 outline-none font-bold text-zinc-600">
-            <option value="km">KM</option>
-            <option value="mi">MI</option>
-            <option value="kg">KG</option>
-            <option value="lb">LB</option>
-          </select>
-          <select value={to} onChange={(e) => setTo(e.target.value)} className="h-14 px-4 rounded-2xl bg-zinc-50 border border-zinc-100 outline-none font-bold text-zinc-600">
-            <option value="mi">MI</option>
-            <option value="km">KM</option>
-            <option value="lb">LB</option>
-            <option value="kg">KG</option>
-          </select>
-        </div>
-        <Button onClick={convert} className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-lg font-bold shadow-lg shadow-emerald-100">Convert Now</Button>
-        {result && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center p-8 bg-emerald-50 rounded-[2rem] border-2 border-emerald-100"
-          >
-            <p className="text-4xl font-black text-emerald-700">{result} <span className="text-lg uppercase tracking-widest opacity-50">{to}</span></p>
           </motion.div>
         )}
       </div>

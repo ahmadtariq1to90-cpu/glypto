@@ -1,14 +1,43 @@
 import React, { useState } from "react";
 import { Button } from "./ui/Button";
-import { ImageIcon, Loader2, Download, Sparkles, RefreshCw, Wand2 } from "lucide-react";
+import { ImageIcon, Loader2, Download, Sparkles, RefreshCw, Wand2, Maximize2, Layout, Settings2, Key } from "lucide-react";
 import { GoogleGenAI } from "@google/genai";
 import { motion, AnimatePresence } from "motion/react";
+import { cn } from "../lib/utils";
+
+const STYLES = [
+  { id: "photorealistic", label: "Photorealistic", icon: "📸", prompt: "highly detailed, photorealistic, 8k, masterpiece, cinematic lighting" },
+  { id: "digital-art", label: "Digital Art", icon: "🎨", prompt: "digital art, vibrant colors, clean lines, professional illustration" },
+  { id: "3d-render", label: "3D Render", icon: "🧊", prompt: "3d render, unreal engine 5, octane render, volumetric lighting, high detail" },
+  { id: "oil-painting", label: "Oil Painting", icon: "🖌️", prompt: "oil painting style, visible brushstrokes, classical art, rich textures" },
+  { id: "cyberpunk", label: "Cyberpunk", icon: "🌆", prompt: "cyberpunk aesthetic, neon lights, futuristic, dark atmosphere, high contrast" },
+  { id: "minimalist", label: "Minimalist", icon: "⚪", prompt: "minimalist style, clean, simple, elegant, flat design" },
+  { id: "anime", label: "Anime", icon: "🎌", prompt: "anime style, high quality, studio ghibli inspired, vibrant" },
+  { id: "sketch", label: "Sketch", icon: "✏️", prompt: "hand-drawn sketch, charcoal, artistic, rough lines" }
+];
+
+const RATIOS = [
+  { id: "1:1", label: "Square", icon: "⬜" },
+  { id: "16:9", label: "Landscape", icon: "🎞️" },
+  { id: "9:16", label: "Portrait", icon: "📱" }
+];
 
 export function ImageGenerator() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState(STYLES[0].id);
+  const [selectedRatio, setSelectedRatio] = useState("1:1");
+  const [isHighQuality, setIsHighQuality] = useState(false);
+
+  const checkApiKey = async () => {
+    // @ts-ignore
+    if (window.aistudio && !(await window.aistudio.hasSelectedApiKey())) {
+      // @ts-ignore
+      await window.aistudio.openSelectKey();
+    }
+  };
 
   const generateImage = async () => {
     if (!prompt.trim()) return;
@@ -16,16 +45,25 @@ export function ImageGenerator() {
     setError(null);
 
     try {
+      if (isHighQuality) {
+        await checkApiKey();
+      }
+
+      const stylePrompt = STYLES.find(s => s.id === selectedStyle)?.prompt || "";
+      const finalPrompt = `${prompt}, ${stylePrompt}`;
+
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const modelName = isHighQuality ? 'gemini-3.1-flash-image-preview' : 'gemini-2.5-flash-image';
+      
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
+        model: modelName,
         contents: {
-          parts: [{ text: prompt }],
+          parts: [{ text: finalPrompt }],
         },
         config: {
           imageConfig: {
-            aspectRatio: "1:1",
-            imageSize: "1K"
+            aspectRatio: selectedRatio as any,
+            imageSize: isHighQuality ? "2K" : "1K"
           },
         },
       });
@@ -45,7 +83,13 @@ export function ImageGenerator() {
       }
     } catch (err: any) {
       console.error("Image generation error:", err);
-      setError(err.message || "Failed to generate image. Please check your API key.");
+      if (err.message?.includes("entity was not found")) {
+        setError("API Key error. Please re-select your API key.");
+        // @ts-ignore
+        if (window.aistudio) window.aistudio.openSelectKey();
+      } else {
+        setError(err.message || "Failed to generate image. Please check your API key.");
+      }
     } finally {
       setLoading(false);
     }
@@ -60,110 +104,226 @@ export function ImageGenerator() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-12 pb-20">
       <div className="text-center space-y-4">
-        <div className="w-20 h-20 bg-indigo-600 text-white rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-indigo-200">
-          <ImageIcon className="h-10 w-10" />
-        </div>
-        <h2 className="text-4xl font-black tracking-tight text-zinc-900">AI Image Generator</h2>
-        <p className="text-zinc-500 font-medium max-w-lg mx-auto">
-          Describe what you want to see, and our AI will bring it to life in seconds.
+        <motion.div 
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="w-24 h-24 bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-indigo-200"
+        >
+          <ImageIcon className="h-12 w-12" />
+        </motion.div>
+        <h2 className="text-5xl font-black tracking-tight text-zinc-900 font-display">AI Image Studio</h2>
+        <p className="text-xl text-zinc-500 font-medium max-w-2xl mx-auto leading-relaxed">
+          The most advanced AI image generation tool. Turn your wildest imaginations into professional-grade visual masterpieces.
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div className="glass-card p-8 rounded-3xl space-y-6 shadow-xl border-white/40">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Your Prompt</label>
+      <div className="grid lg:grid-cols-12 gap-10">
+        <div className="lg:col-span-7 space-y-8">
+          <div className="glass-card p-8 rounded-[3rem] bg-white shadow-2xl border-white/40 space-y-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-[4rem] -z-10 opacity-50" />
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <label className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Wand2 className="h-3 w-3" />
+                  Visual Prompt
+                </label>
+                <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md uppercase tracking-widest">AI Powered</span>
+              </div>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="A futuristic city with flying cars and neon lights, digital art style..."
-                className="w-full h-40 p-4 rounded-2xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 outline-none font-medium resize-none transition-all"
+                placeholder="Describe your vision in detail... e.g., A majestic dragon soaring over a crystal-clear lake at sunset, cinematic lighting, hyper-realistic."
+                className="w-full h-48 p-6 rounded-[2rem] bg-zinc-50 border-2 border-zinc-100 focus:border-indigo-500 focus:ring-8 focus:ring-indigo-500/5 outline-none font-medium text-lg resize-none transition-all placeholder:text-zinc-300 shadow-inner"
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <label className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Layout className="h-3 w-3" />
+                  Aspect Ratio
+                </label>
+                <div className="flex gap-2">
+                  {RATIOS.map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => setSelectedRatio(r.id)}
+                      className={cn(
+                        "flex-1 py-3 rounded-2xl text-xs font-bold transition-all border-2 flex flex-col items-center gap-1",
+                        selectedRatio === r.id 
+                          ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100" 
+                          : "bg-white text-zinc-500 border-zinc-100 hover:border-indigo-200"
+                      )}
+                    >
+                      <span className="text-lg">{r.icon}</span>
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Settings2 className="h-3 w-3" />
+                  Quality Mode
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setIsHighQuality(false)}
+                    className={cn(
+                      "flex-1 py-3 rounded-2xl text-xs font-bold transition-all border-2",
+                      !isHighQuality 
+                        ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100" 
+                        : "bg-white text-zinc-500 border-zinc-100 hover:border-indigo-200"
+                    )}
+                  >
+                    Standard
+                  </button>
+                  <button
+                    onClick={() => setIsHighQuality(true)}
+                    className={cn(
+                      "flex-1 py-3 rounded-2xl text-xs font-bold transition-all border-2 flex items-center justify-center gap-2",
+                      isHighQuality 
+                        ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white border-transparent shadow-lg shadow-amber-100" 
+                        : "bg-white text-zinc-500 border-zinc-100 hover:border-amber-200"
+                    )}
+                  >
+                    <Sparkles className={cn("h-3 w-3", isHighQuality ? "text-white" : "text-amber-500")} />
+                    Ultra HD
+                  </button>
+                </div>
+              </div>
             </div>
 
             <Button 
               onClick={generateImage} 
               disabled={loading || !prompt.trim()}
-              className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-lg font-bold shadow-lg shadow-indigo-100"
+              className="w-full h-20 rounded-[2rem] bg-indigo-600 hover:bg-indigo-700 text-xl font-black shadow-2xl shadow-indigo-200/50 transition-all active:scale-[0.98] border-none"
             >
               {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Generating Masterpiece...
-                </>
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <span>AI is Dreaming...</span>
+                </div>
               ) : (
-                <>
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Generate Image
-                </>
+                <div className="flex items-center gap-3">
+                  <Sparkles className="h-6 w-6" />
+                  <span>Generate Masterpiece</span>
+                </div>
               )}
             </Button>
 
             {error && (
-              <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold border-2 border-red-100 flex items-center gap-3"
+              >
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shrink-0 shadow-sm">
+                  <Key className="h-4 w-4 text-red-400" />
+                </div>
                 {error}
-              </div>
+              </motion.div>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {["Cyberpunk", "Oil Painting", "3D Render", "Minimalist"].map((style) => (
-              <button
-                key={style}
-                onClick={() => setPrompt(prev => prev + (prev ? ", " : "") + style)}
-                className="p-4 rounded-2xl bg-white border border-zinc-100 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all text-sm font-bold text-zinc-600 text-left group"
-              >
-                <div className="flex items-center justify-between">
-                  {style}
-                  <Wand2 className="h-4 w-4 text-zinc-300 group-hover:text-indigo-500 transition-colors" />
-                </div>
-              </button>
-            ))}
+          <div className="space-y-4">
+            <label className="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] ml-2">Artistic Styles</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {STYLES.map((style) => (
+                <button
+                  key={style.id}
+                  onClick={() => setSelectedStyle(style.id)}
+                  className={cn(
+                    "p-4 rounded-2xl border-2 transition-all text-left group relative overflow-hidden",
+                    selectedStyle === style.id 
+                      ? "bg-indigo-50 border-indigo-500 shadow-lg shadow-indigo-100" 
+                      : "bg-white border-zinc-100 hover:border-indigo-200 hover:bg-indigo-50/30"
+                  )}
+                >
+                  <div className="flex flex-col gap-2">
+                    <span className="text-2xl">{style.icon}</span>
+                    <span className={cn(
+                      "text-[11px] font-black uppercase tracking-widest",
+                      selectedStyle === style.id ? "text-indigo-600" : "text-zinc-400"
+                    )}>
+                      {style.label}
+                    </span>
+                  </div>
+                  {selectedStyle === style.id && (
+                    <div className="absolute top-2 right-2">
+                      <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="relative">
+        <div className="lg:col-span-5 relative">
           <AnimatePresence mode="wait">
             {result ? (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="glass-card p-4 rounded-[2.5rem] bg-white shadow-2xl border-white/40 sticky top-24"
+                initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.9, rotate: 2 }}
+                className="glass-card p-6 rounded-[3.5rem] bg-white shadow-2xl border-white/40 sticky top-24"
               >
-                <div className="relative group overflow-hidden rounded-[2rem]">
+                <div className="relative group overflow-hidden rounded-[2.5rem] shadow-2xl border-8 border-white">
                   <img 
                     src={result} 
                     alt="AI Generated" 
-                    className="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-110"
+                    className={cn(
+                      "w-full object-cover transition-transform duration-1000 group-hover:scale-110",
+                      selectedRatio === "16:9" ? "aspect-video" : selectedRatio === "9:16" ? "aspect-[9/16]" : "aspect-square"
+                    )}
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                    <Button onClick={downloadImage} className="rounded-xl bg-white text-zinc-900 hover:bg-zinc-100">
-                      <Download className="h-5 w-5 mr-2" />
-                      Download
-                    </Button>
-                    <Button onClick={() => setResult(null)} variant="outline" className="rounded-xl bg-white/10 border-white/20 text-white hover:bg-white/20">
-                      <RefreshCw className="h-5 w-5" />
-                    </Button>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8 gap-4">
+                    <div className="flex gap-3">
+                      <Button onClick={downloadImage} className="flex-1 h-14 rounded-2xl bg-white text-zinc-900 hover:bg-zinc-100 font-bold shadow-xl">
+                        <Download className="h-5 w-5 mr-2" />
+                        Save to Device
+                      </Button>
+                      <Button onClick={() => setResult(null)} variant="outline" className="h-14 w-14 rounded-2xl bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-md">
+                        <RefreshCw className="h-5 w-5" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                <div className="mt-6 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
-                  <p className="text-xs font-medium text-zinc-400 italic">"{prompt}"</p>
+                <div className="mt-8 p-6 bg-zinc-50 rounded-[2rem] border-2 border-zinc-100 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-3 w-3 text-indigo-500" />
+                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Generation Metadata</span>
+                  </div>
+                  <p className="text-sm font-medium text-zinc-600 leading-relaxed italic">"{prompt}"</p>
+                  <div className="flex gap-2 pt-2">
+                    <span className="px-2 py-1 bg-white rounded-md text-[9px] font-bold text-zinc-400 border border-zinc-100 uppercase tracking-widest">{selectedStyle}</span>
+                    <span className="px-2 py-1 bg-white rounded-md text-[9px] font-bold text-zinc-400 border border-zinc-100 uppercase tracking-widest">{selectedRatio}</span>
+                  </div>
                 </div>
               </motion.div>
             ) : (
-              <div className="glass-card p-12 rounded-[2.5rem] bg-zinc-50/50 border-dashed border-2 border-zinc-200 flex flex-col items-center justify-center text-center space-y-6 min-h-[500px]">
-                <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center shadow-xl shadow-zinc-200/50">
-                  <ImageIcon className="h-12 w-12 text-zinc-200" />
+              <div className="glass-card p-12 rounded-[3.5rem] bg-zinc-50/50 border-dashed border-4 border-zinc-200 flex flex-col items-center justify-center text-center space-y-8 min-h-[600px]">
+                <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-zinc-200/50 relative">
+                  <ImageIcon className="h-16 w-16 text-zinc-100" />
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white animate-bounce">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-xl font-bold text-zinc-900">Ready to Visualize?</h4>
-                  <p className="text-zinc-400 font-medium max-w-xs mx-auto">
-                    Your generated image will appear here. Be specific with your prompt for better results!
+                <div className="space-y-4">
+                  <h4 className="text-2xl font-black text-zinc-900 font-display">Your Canvas Awaits</h4>
+                  <p className="text-zinc-400 font-medium max-w-xs mx-auto leading-relaxed">
+                    Enter a prompt and select a style to generate your unique AI masterpiece. The possibilities are endless.
                   </p>
+                </div>
+                <div className="flex gap-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-2 h-2 rounded-full bg-zinc-200" />
+                  ))}
                 </div>
               </div>
             )}

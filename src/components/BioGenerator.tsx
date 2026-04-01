@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { cn } from "../lib/utils";
+import { cn, downloadAsDoc } from "../lib/utils";
 import { generateText } from "../lib/gemini";
 import { Button } from "./ui/Button";
-import { Loader2, Copy, Check, Sparkles, Instagram } from "lucide-react";
+import { Loader2, Copy, Check, Sparkles, Instagram, Download } from "lucide-react";
 import { motion } from "motion/react";
 
 export function BioGenerator() {
@@ -59,6 +59,11 @@ export function BioGenerator() {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleDownloadAll = () => {
+    const content = bios.map((b, i) => `Bio ${i + 1}:\n${b}\n`).join("\n---\n\n");
+    downloadAsDoc(content, `Bios-${keywords.slice(0, 20)}`);
   };
 
   const tones = ["Professional", "Funny", "Minimalist", "Aesthetic", "Witty"];
@@ -149,8 +154,19 @@ export function BioGenerator() {
       )}
 
       {bios.length > 0 && !loading && (
-        <div className="grid gap-6">
-          {bios.map((bio, index) => (
+        <div className="space-y-6">
+          <div className="flex justify-end px-4">
+            <Button 
+              variant="outline" 
+              onClick={handleDownloadAll}
+              className="rounded-2xl font-bold border-2 h-12"
+            >
+              <Download className="h-5 w-5 mr-2" />
+              Download All as DOC
+            </Button>
+          </div>
+          <div className="grid gap-6">
+            {bios.map((bio, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -169,6 +185,7 @@ export function BioGenerator() {
               </Button>
             </motion.div>
           ))}
+          </div>
         </div>
       )}
     </div>

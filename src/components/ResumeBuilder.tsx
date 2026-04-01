@@ -537,12 +537,14 @@ export function ResumeBuilder() {
                   <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">{selectedTemplate.name}</span>
                 </div>
                 
-                <div className="relative origin-top scale-[0.45] md:scale-[0.55] lg:scale-[0.65] xl:scale-[0.75] -mb-[55%] md:-mb-[45%] lg:-mb-[35%] xl:-mb-[25%] pointer-events-none select-none shadow-2xl">
-                  <div 
-                    className="bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-zinc-100 antialiased mx-auto"
-                    style={{ minHeight: "297mm", width: "210mm", imageRendering: "auto" }}
-                  >
-                    {renderResumeContent()}
+                <div className="flex flex-col items-center overflow-x-auto pb-8 custom-scrollbar">
+                  <div className="relative origin-top scale-[0.35] sm:scale-[0.45] md:scale-[0.55] lg:scale-[0.65] xl:scale-[0.75] -mb-[65%] sm:-mb-[55%] md:-mb-[45%] lg:-mb-[35%] xl:-mb-[25%] pointer-events-none select-none shadow-2xl">
+                    <div 
+                      className="bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-zinc-100 antialiased mx-auto"
+                      style={{ minHeight: "297mm", width: "210mm", imageRendering: "auto" }}
+                    >
+                      {renderResumeContent()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -558,11 +560,11 @@ export function ResumeBuilder() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="space-y-8"
           >
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/50 backdrop-blur-md p-4 rounded-3xl border border-white/40 shadow-xl">
               <Button 
                 variant="ghost" 
                 onClick={() => setStep("fill")}
-                className="rounded-xl font-bold w-full sm:w-auto"
+                className="rounded-xl font-bold w-full sm:w-auto h-12"
               >
                 <ChevronLeft className="mr-1 h-4 w-4" />
                 Edit Details
@@ -572,26 +574,28 @@ export function ResumeBuilder() {
                   variant="outline" 
                   onClick={downloadPDF}
                   disabled={loading}
-                  className="rounded-xl font-bold border-2 w-full sm:w-auto"
+                  className="rounded-xl font-bold border-2 w-full sm:w-auto h-12"
                 >
                   {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                   Download PDF
                 </Button>
                 <Button 
                   onClick={() => setStep("select")}
-                  className="rounded-xl font-bold bg-zinc-900 hover:bg-zinc-800 w-full sm:w-auto"
+                  className="rounded-xl font-bold bg-zinc-900 hover:bg-zinc-800 w-full sm:w-auto h-12 text-white"
                 >
                   New Resume
                 </Button>
               </div>
             </div>
 
-            <div 
-              ref={resumeRef}
-              className="bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-zinc-100 max-w-4xl mx-auto antialiased"
-              style={{ minHeight: "297mm", width: "210mm", imageRendering: "auto" }}
-            >
-              {renderResumeContent()}
+            <div className="overflow-x-auto pb-12 custom-scrollbar flex justify-center">
+              <div 
+                ref={resumeRef}
+                className="bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-zinc-100 antialiased transform scale-[0.9] sm:scale-100 origin-top"
+                style={{ minHeight: "297mm", width: "210mm", imageRendering: "auto" }}
+              >
+                {renderResumeContent()}
+              </div>
             </div>
           </motion.div>
         )}

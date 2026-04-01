@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { generateText } from "../lib/gemini";
 import { Button } from "./ui/Button";
-import { Loader2, Copy, Check, Sparkles, FileText } from "lucide-react";
+import { Loader2, Copy, Check, Sparkles, FileText, Download } from "lucide-react";
 import Markdown from "react-markdown";
 import { motion } from "motion/react";
-import { cn } from "../lib/utils";
+import { cn, downloadAsDoc } from "../lib/utils";
 
 export function ArticleRewriter() {
   const [text, setText] = useState("");
@@ -56,6 +56,10 @@ export function ArticleRewriter() {
     navigator.clipboard.writeText(rewritten);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    downloadAsDoc(rewritten, `Rewritten-${tone}`);
   };
 
   const tones = [
@@ -151,15 +155,26 @@ export function ArticleRewriter() {
               <h3 className="text-lg font-bold font-display tracking-tight text-zinc-900">Rewritten Version</h3>
             </div>
             {rewritten && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="rounded-xl text-emerald-600 hover:bg-emerald-50 font-bold px-4 h-9 border border-emerald-100"
-                onClick={copyToClipboard}
-              >
-                {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
-                {copied ? "Copied!" : "Copy"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-xl text-zinc-600 hover:bg-zinc-50 font-bold px-4 h-9 border-2"
+                  onClick={handleDownload}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download DOC
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="rounded-xl text-emerald-600 hover:bg-emerald-50 font-bold px-4 h-9 border border-emerald-100"
+                  onClick={copyToClipboard}
+                >
+                  {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                  {copied ? "Copied!" : "Copy"}
+                </Button>
+              </div>
             )}
           </div>
 

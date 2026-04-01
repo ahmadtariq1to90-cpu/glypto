@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { cn } from "../lib/utils";
+import { cn, downloadAsDoc } from "../lib/utils";
 import { generateText } from "../lib/gemini";
 import { Button } from "./ui/Button";
-import { Loader2, Copy, Check, Sparkles } from "lucide-react";
+import { Loader2, Copy, Check, Sparkles, Download } from "lucide-react";
 import { motion } from "motion/react";
 
 export function CaptionGenerator() {
@@ -97,6 +97,11 @@ export function CaptionGenerator() {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleDownloadAll = () => {
+    const content = captions.map((c, i) => `Caption ${i + 1}:\n${c}\n`).join("\n---\n\n");
+    downloadAsDoc(content, `Captions-${topic.slice(0, 20)}`);
   };
 
   return (
@@ -239,7 +244,18 @@ export function CaptionGenerator() {
         >
           <div className="flex items-center justify-between px-2">
             <h3 className="text-lg font-bold font-display tracking-tight text-zinc-900">Generated Results</h3>
-            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">5 Variations</span>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDownloadAll}
+                className="rounded-xl h-9 font-bold text-xs border-2"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download DOC
+              </Button>
+              <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">5 Variations</span>
+            </div>
           </div>
           <div className="grid gap-4">
             {captions.map((caption, i) => (

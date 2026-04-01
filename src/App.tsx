@@ -145,15 +145,6 @@ const TOOLS: Tool[] = [
     image: "https://picsum.photos/seed/password/600/400"
   },
   {
-    id: "unit-conv",
-    name: "Unit Converter",
-    description: "Quickly convert between length, weight, temperature, and more. A simple, fast tool for your daily calculations.",
-    icon: ArrowLeftRight,
-    category: "Productivity",
-    color: "bg-emerald-600",
-    image: "https://picsum.photos/seed/unit/600/400"
-  },
-  {
     id: "tweet",
     name: "Tweet Generator",
     description: "Craft viral-worthy tweets in seconds. Our AI understands trends and brevity to help you stand out on X/Twitter.",
@@ -491,7 +482,7 @@ export default function App() {
             );
           }
 
-          if (["bg-remover", "qr-gen", "qr-scan", "pass-gen", "unit-conv", "logo"].includes(view)) {
+          if (["bg-remover", "qr-gen", "qr-scan", "pass-gen", "logo"].includes(view)) {
             return <SimpleTools type={view as any} />;
           }
 
