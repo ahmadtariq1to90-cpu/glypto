@@ -43,150 +43,165 @@ import {
   ArrowRight,
   Heart,
   Sun,
-  Moon
+  Moon,
+  ChevronUp,
+  ArrowUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Tool, ToolView } from "./types";
 import { Button } from "./components/ui/Button";
 import { cn } from "./lib/utils";
 import { ChatBot } from "./components/ChatBot";
+import { TextTool } from "./components/TextTool";
 
 // Lazy load components for performance
-const CaptionGenerator = lazy(() => import("./components/CaptionGenerator").then(m => ({ default: m.CaptionGenerator })));
-const ResumeBuilder = lazy(() => import("./components/ResumeBuilder").then(m => ({ default: m.ResumeBuilder })));
-const ArticleRewriter = lazy(() => import("./components/ArticleRewriter").then(m => ({ default: m.ArticleRewriter })));
-const ImageToCartoon = lazy(() => import("./components/ImageToCartoon").then(m => ({ default: m.ImageToCartoon })));
 const PdfTools = lazy(() => import("./components/PdfTools").then(m => ({ default: m.PdfTools })));
-const BioGenerator = lazy(() => import("./components/BioGenerator").then(m => ({ default: m.BioGenerator })));
 const StaticPage = lazy(() => import("./components/StaticPage").then(m => ({ default: m.StaticPage })));
 const SimpleTools = lazy(() => import("./components/SimpleTools").then(m => ({ default: m.SimpleTools })));
-const ImageGenerator = lazy(() => import("./components/ImageGenerator").then(m => ({ default: m.ImageGenerator })));
 
 const TOOLS: Tool[] = [
   {
-    id: "caption",
+    id: "caption-gen",
     name: "AI Caption Generator",
-    description: "Elevate your social presence with AI-crafted captions that drive engagement. Tailored for Instagram, Twitter, and LinkedIn with perfect hashtags and tone. Boost your visibility and connect with your audience effortlessly.",
+    description: "Elevate your social presence with AI-crafted captions that drive engagement. Tailored for Instagram, Twitter, and LinkedIn with perfect hashtags and tone.",
     icon: MessageSquare,
     category: "Social",
     color: "bg-indigo-500",
     image: "https://picsum.photos/seed/caption/600/400"
   },
   {
-    id: "resume",
-    name: "AI Resume Builder",
-    description: "Transform your career path with a professional resume. Our AI analyzes industry standards to generate high-impact bullet points and summaries that get you noticed by recruiters and ATS systems alike.",
-    icon: FileUser,
-    category: "Productivity",
-    color: "bg-emerald-500",
-    image: "https://picsum.photos/seed/resume/600/400"
-  },
-  {
-    id: "rewrite",
-    name: "Article Rewriter",
-    description: "Breathe new life into your content. Instantly rewrite articles to be unique, engaging, and plagiarism-free while maintaining the original core message. Perfect for bloggers, students, and content creators.",
+    id: "article-rewrite",
+    name: "AI Article Rewriter",
+    description: "Breathe new life into your content. Instantly rewrite articles to be unique, engaging, and plagiarism-free while maintaining the original core message.",
     icon: RefreshCw,
     category: "Content",
     color: "bg-amber-500",
     image: "https://picsum.photos/seed/rewrite/600/400"
   },
   {
-    id: "cartoon",
-    name: "Image to Cartoon",
-    description: "Turn your portraits into stunning digital art. Our advanced AI styles your photos into high-quality cartoons, perfect for unique avatars, social media profiles, and personalized gifts.",
-    icon: ImageIcon,
-    category: "Design",
-    color: "bg-rose-500",
-    image: "https://picsum.photos/seed/cartoon/600/400"
+    id: "article-gen",
+    name: "AI Article Generator",
+    description: "Generate high-quality, SEO-optimized articles in seconds. Perfect for bloggers and content marketers looking to rank higher on Google search results with unique content.",
+    icon: FileText,
+    category: "Content",
+    color: "bg-indigo-500",
+    image: "https://picsum.photos/seed/article/600/400"
   },
   {
-    id: "pdf",
-    name: "PDF Merge & Tools",
-    description: "The ultimate PDF utility belt. Merge multiple documents, split pages, and manage your files with lightning speed and zero quality loss. Simplify your document management workflow in seconds.",
-    icon: FileText,
+    id: "seo-meta",
+    name: "SEO Meta Generator",
+    description: "Create compelling meta titles and descriptions that improve your click-through rate (CTR) and search engine visibility for better Google rankings and traffic.",
+    icon: Search,
+    category: "Marketing",
+    color: "bg-emerald-500",
+    image: "https://picsum.photos/seed/seo/600/400"
+  },
+  {
+    id: "email-writer",
+    name: "AI Email Writer",
+    description: "Draft professional emails for business, outreach, or personal use. Ensure your tone is perfect and your message is clear, persuasive, and effective.",
+    icon: Mail,
     category: "Productivity",
     color: "bg-blue-500",
-    image: "https://picsum.photos/seed/pdf/600/400"
+    image: "https://picsum.photos/seed/email/600/400"
   },
   {
-    id: "bio",
-    name: "Instagram Bio Generator",
-    description: "Make a powerful first impression. Generate creative, catchy, and personality-driven bios that reflect your brand and attract new followers instantly. Stand out in the crowded social landscape.",
+    id: "code-explainer",
+    name: "AI Code Explainer",
+    description: "Understand complex code snippets instantly. Our AI breaks down programming logic into simple, easy-to-understand explanations for any programming language.",
+    icon: Zap,
+    category: "Development",
+    color: "bg-amber-500",
+    image: "https://picsum.photos/seed/code/600/400"
+  },
+  {
+    id: "yt-script",
+    name: "YouTube Script Writer",
+    description: "Create engaging scripts for your YouTube videos. From catchy intros to compelling calls-to-action, boost your channel's growth and viewer engagement.",
+    icon: MessageSquare,
+    category: "Social",
+    color: "bg-rose-500",
+    image: "https://picsum.photos/seed/yt/600/400"
+  },
+  {
+    id: "product-desc",
+    name: "Product Description",
+    description: "Write persuasive product descriptions that sell. Ideal for e-commerce stores like Shopify, Amazon, and Etsy to increase conversion rates and sales.",
+    icon: LayoutGrid,
+    category: "Marketing",
+    color: "bg-pink-500",
+    image: "https://picsum.photos/seed/product/600/400"
+  },
+  {
+    id: "grammar-fix",
+    name: "Grammar & Tone Fixer",
+    description: "Polish your writing to perfection. Fix grammar errors and adjust the tone of your text to sound professional, friendly, or authoritative for any audience.",
+    icon: Sparkles,
+    category: "Content",
+    color: "bg-cyan-500",
+    image: "https://picsum.photos/seed/grammar/600/400"
+  },
+  {
+    id: "summarizer",
+    name: "AI Text Summarizer",
+    description: "Condense long articles or documents into concise summaries. Save time while capturing all the essential information from any text source instantly.",
+    icon: FileText,
+    category: "Productivity",
+    color: "bg-orange-500",
+    image: "https://picsum.photos/seed/summary/600/400"
+  },
+  {
+    id: "linkedin-post",
+    name: "LinkedIn Post Creator",
+    description: "Craft professional and engaging LinkedIn posts that build your personal brand and connect with industry leaders and potential employers effectively.",
+    icon: Linkedin,
+    category: "Social",
+    color: "bg-sky-600",
+    image: "https://picsum.photos/seed/linkedin/600/400"
+  },
+  {
+    id: "bio-gen",
+    name: "AI Bio Generator",
+    description: "Make a powerful first impression. Generate creative, catchy, and personality-driven bios for Instagram, Twitter, and TikTok to attract more followers.",
     icon: Instagram,
     category: "Social",
-    color: "bg-pink-500",
+    color: "bg-fuchsia-500",
     image: "https://picsum.photos/seed/bio/600/400"
   },
   {
-    id: "bg-remover",
-    name: "Background Remover",
-    description: "Remove image backgrounds instantly with AI precision. Perfect for product photos, profile pictures, and clean design assets. Fine-tune your results with advanced edge detection and detail preservation.",
-    icon: Eraser,
-    category: "Design",
-    color: "bg-cyan-500",
-    image: "https://picsum.photos/seed/bgrem/600/400"
-  },
-  {
     id: "qr-gen",
-    name: "QR Code Generator",
-    description: "Create custom QR codes for URLs, text, or even images. High-quality, scan-ready codes for your marketing and personal needs. Now supports AI-powered image-to-QR generation.",
+    name: "AI QR Generator",
+    description: "Create custom, high-quality QR codes for URLs, text, or images. Add your brand logo for a professional look and track engagement.",
     icon: QrCode,
     category: "Utility",
-    color: "bg-slate-700",
-    image: "https://picsum.photos/seed/qrcode/600/400"
-  },
-  {
-    id: "pass-gen",
-    name: "Password Generator",
-    description: "Generate ultra-secure, random passwords to protect your digital life. Customizable length and complexity for maximum security. Keep your accounts safe from unauthorized access.",
-    icon: Lock,
-    category: "Productivity",
-    color: "bg-orange-500",
-    image: "https://picsum.photos/seed/password/600/400"
-  },
-  {
-    id: "tweet",
-    name: "Tweet Generator",
-    description: "Craft viral-worthy tweets in seconds. Our AI understands trends and brevity to help you stand out on X/Twitter. Engage your followers with witty and relevant content.",
-    icon: MessageSquare,
-    category: "Social",
-    color: "bg-sky-500",
-    image: "https://picsum.photos/seed/tweet/600/400"
-  },
-  {
-    id: "email",
-    name: "AI Email Writer",
-    description: "Write professional emails for any occasion. From cold outreach to follow-ups, our AI ensures your tone is perfect and your message is clear. Save time and communicate more effectively.",
-    icon: Mail,
-    category: "Content",
-    color: "bg-indigo-400",
-    image: "https://picsum.photos/seed/email/600/400"
+    color: "bg-slate-600",
+    image: "https://picsum.photos/seed/qr/600/400"
   },
   {
     id: "qr-scan",
     name: "QR Code Scanner",
-    description: "Scan any QR code instantly using your camera or an uploaded image. Fast, secure, and easy to use. Supports all standard QR formats for seamless information access.",
+    description: "Instantly scan and decode any QR code using your camera or by uploading an image. Fast, secure, and works with all standard QR formats.",
     icon: Search,
     category: "Utility",
-    color: "bg-emerald-400",
-    image: "https://picsum.photos/seed/qrscan/600/400"
+    color: "bg-emerald-600",
+    image: "https://picsum.photos/seed/scan/600/400"
   },
   {
-    id: "image-gen",
-    name: "AI Image Generator",
-    description: "Transform your text descriptions into stunning AI-generated images. High-quality, unique art in seconds. Explore various artistic styles from watercolor to steampunk.",
-    icon: ImageIcon,
-    category: "Design",
-    color: "bg-indigo-600",
-    image: "https://picsum.photos/seed/imggen/600/400"
+    id: "pass-gen",
+    name: "Password Generator",
+    description: "Generate ultra-secure, random passwords to protect your online accounts. Customize length and complexity for maximum security.",
+    icon: Lock,
+    category: "Utility",
+    color: "bg-orange-500",
+    image: "https://picsum.photos/seed/pass/600/400"
   },
   {
     id: "logo",
-    name: "Simple Logo Maker",
-    description: "Generate clean, modern logo ideas for your brand. A quick tool to spark inspiration for your next project's visual identity. Perfect for startups and side projects.",
+    name: "Logo Idea Maker",
+    description: "Get instant creative inspiration for your brand. Generate modern and professional logo concepts based on your business name and industry.",
     icon: LayoutGrid,
     category: "Design",
-    color: "bg-zinc-800",
+    color: "bg-zinc-900",
     image: "https://picsum.photos/seed/logo/600/400"
   }
 ];
@@ -429,13 +444,13 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 pt-4">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 pt-4 px-4">
             {["All", ...categories].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={cn(
-                  "px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
+                  "px-4 md:px-6 py-2 md:py-2.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] transition-all border whitespace-nowrap",
                   selectedCategory === cat 
                     ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-500/20" 
                     : "bg-bg-card text-text-muted border-border-main hover:border-indigo-500/50 hover:text-indigo-500"
@@ -448,7 +463,7 @@ export default function App() {
         </div>
 
         {filteredTools.length > 0 ? (
-          <div className="tool-grid pt-8">
+          <div className="tool-grid pt-8 px-4">
             {filteredTools.map((tool, idx) => (
               <motion.div
                 key={tool.id}
@@ -514,18 +529,118 @@ export default function App() {
             return <SimpleTools type={view as any} />;
           }
 
+          const tool = TOOLS.find(t => t.id === view);
+          
           switch (view) {
-            case "image-gen": return <ImageGenerator />;
-            case "caption":
-            case "tweet":
-              return <CaptionGenerator />;
-            case "resume": return <ResumeBuilder />;
-            case "rewrite":
-            case "email":
-              return <ArticleRewriter />;
-            case "cartoon": return <ImageToCartoon />;
+            case "caption-gen":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="What is your post about? (e.g., a beautiful sunset at the beach)..."
+                  systemInstruction="You are a social media expert. Generate 5 engaging, catchy captions for the user's post. Include relevant hashtags and emojis. Provide variations for different platforms if applicable."
+                  promptPrefix="Generate 5 creative social media captions for the following topic. Include hashtags and emojis."
+                />
+              );
+            case "article-rewrite":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Paste the article or text you want to rewrite..."
+                  systemInstruction="You are an expert editor. Rewrite the provided text to be unique, engaging, and professional while maintaining the original meaning. Ensure it is plagiarism-free."
+                  promptPrefix="Rewrite the following text to be more engaging and unique while keeping the core message intact."
+                />
+              );
+            case "article-gen":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Enter a topic or outline for your article..."
+                  systemInstruction="You are an expert SEO content writer. Generate high-quality, engaging, and SEO-optimized articles based on the user's topic. Use proper headings, bullet points, and a professional yet engaging tone."
+                  promptPrefix="Generate a comprehensive, SEO-optimized article about the following topic. Include a catchy title and structured content with H2 and H3 tags."
+                />
+              );
+            case "seo-meta":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Enter your page content or URL description..."
+                  systemInstruction="You are an SEO specialist. Generate compelling meta titles (max 60 chars) and meta descriptions (max 160 chars) that are optimized for search engines and high click-through rates."
+                  promptPrefix="Generate 3 variations of SEO meta titles and descriptions for the following content. Make them catchy and relevant."
+                />
+              );
+            case "email-writer":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Describe the purpose of the email, recipient, and key points..."
+                  systemInstruction="You are a professional business communicator. Write clear, concise, and effective emails tailored to the user's specific context and desired tone."
+                  promptPrefix="Write a professional email based on these details. Provide a subject line and the email body."
+                />
+              );
+            case "code-explainer":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Paste the code snippet you want explained..."
+                  systemInstruction="You are a senior software engineer and mentor. Explain code snippets in simple terms, breaking down the logic, functions, and potential edge cases."
+                  promptPrefix="Explain the following code snippet in detail but in a way that is easy to understand for a beginner."
+                />
+              );
+            case "yt-script":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="What is your video about? Mention key points or style..."
+                  systemInstruction="You are a successful YouTube scriptwriter. Create engaging scripts with hooks, transitions, and clear calls to action that keep viewers watching."
+                  promptPrefix="Write a YouTube video script for the following topic. Include an intro, main points, and an outro."
+                />
+              );
+            case "product-desc":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Enter product name and key features..."
+                  systemInstruction="You are an expert e-commerce copywriter. Write persuasive product descriptions that highlight benefits, solve problems, and drive sales."
+                  promptPrefix="Generate a persuasive product description for the following item. Focus on benefits and emotional appeal."
+                />
+              );
+            case "grammar-fix":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Paste the text you want to fix or improve..."
+                  systemInstruction="You are a professional editor. Fix grammar, spelling, and punctuation errors while improving the overall flow and clarity of the text."
+                  promptPrefix="Fix the grammar and improve the tone of the following text. Provide the corrected version and a brief summary of changes."
+                />
+              );
+            case "summarizer":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Paste the long text or article you want to summarize..."
+                  systemInstruction="You are an expert at information synthesis. Create concise, accurate summaries that capture all key points without losing the core message."
+                  promptPrefix="Summarize the following text into a few concise paragraphs or bullet points."
+                />
+              );
+            case "linkedin-post":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="What do you want to share on LinkedIn? (e.g., achievement, insight)..."
+                  systemInstruction="You are a thought leader on LinkedIn. Write professional, engaging posts that encourage discussion and build authority in your niche."
+                  promptPrefix="Create an engaging LinkedIn post based on the following input. Use appropriate spacing and relevant hashtags."
+                />
+              );
+            case "bio-gen":
+              return (
+                <TextTool 
+                  {...tool!}
+                  placeholder="Tell us about yourself, your interests, or your brand..."
+                  systemInstruction="You are a social media branding expert. Generate creative, catchy, and personality-driven bios that fit the constraints of platforms like Instagram or Twitter."
+                  promptPrefix="Generate 5 creative social media bio variations based on the following information."
+                />
+              );
             case "pdf": return <PdfTools />;
-            case "bio": return <BioGenerator />;
             default: return null;
           }
         })()}
@@ -814,25 +929,6 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-                    <div className="relative group">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-[4rem] blur-3xl opacity-10 group-hover:opacity-20 transition-opacity duration-1000" />
-                      <div className="aspect-square glass-card rounded-[4rem] relative z-10 flex items-center justify-center p-16 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent" />
-                        <div className="text-center space-y-8 relative z-20">
-                          <motion.div 
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                            className="w-32 h-32 bg-indigo-500/10 text-indigo-500 rounded-[3rem] flex items-center justify-center mx-auto border border-indigo-500/20"
-                          >
-                            <Sparkles className="h-16 w-12" />
-                          </motion.div>
-                          <div className="space-y-3">
-                            <p className="text-3xl font-black text-text-main tracking-tight">The ProToolix Standard</p>
-                            <p className="text-base text-text-muted font-medium max-w-xs mx-auto">Privacy-first, ultra-smooth, and professional AI tools for the elite creator.</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </section>
 
@@ -929,9 +1025,9 @@ export default function App() {
                 <h4 className="font-black text-xs text-white uppercase tracking-[0.3em]">Platform</h4>
                 <ul className="space-y-5 text-sm font-bold">
                   <li className="text-zinc-500 hover:text-indigo-400 cursor-pointer transition-colors" onClick={() => handleNavigate("all-tools")}>All Tools</li>
-                  <li className="text-zinc-500 hover:text-indigo-400 cursor-pointer transition-colors" onClick={() => handleNavigate("caption")}>Caption Generator</li>
-                  <li className="text-zinc-500 hover:text-indigo-400 cursor-pointer transition-colors" onClick={() => handleNavigate("resume")}>Resume Builder</li>
-                  <li className="text-zinc-500 hover:text-indigo-400 cursor-pointer transition-colors" onClick={() => handleNavigate("rewrite")}>Article Rewriter</li>
+                  <li className="text-zinc-500 hover:text-indigo-400 cursor-pointer transition-colors" onClick={() => handleNavigate("article-gen")}>Article Generator</li>
+                  <li className="text-zinc-500 hover:text-indigo-400 cursor-pointer transition-colors" onClick={() => handleNavigate("seo-meta")}>SEO Meta Gen</li>
+                  <li className="text-zinc-500 hover:text-indigo-400 cursor-pointer transition-colors" onClick={() => handleNavigate("email-writer")}>Email Writer</li>
                 </ul>
               </div>
 
@@ -989,10 +1085,10 @@ export default function App() {
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.8, x: 20 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-8 right-24 z-40 w-12 h-12 bg-bg-card border border-border-main rounded-2xl flex items-center justify-center text-text-main shadow-2xl hover:border-indigo-500/50 hover:text-indigo-500 transition-all group"
+            className="fixed bottom-8 right-8 md:right-24 z-40 w-12 h-12 bg-bg-card border border-border-main rounded-2xl flex items-center justify-center text-text-main shadow-2xl hover:border-indigo-500/50 hover:text-indigo-500 transition-all group"
             aria-label="Scroll to top"
           >
-            <ArrowLeft className="h-5 w-5 rotate-90 group-hover:-translate-y-1 transition-transform" />
+            <ArrowUp className="h-5 w-5 group-hover:-translate-y-1 transition-transform" />
           </motion.button>
         )}
       </AnimatePresence>

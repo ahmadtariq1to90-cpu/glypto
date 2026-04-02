@@ -18,147 +18,6 @@ export function SimpleTools({ type }: { type: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (type === "bg-remover") {
-    const [file, setFile] = useState<File | null>(null);
-    const [processing, setProcessing] = useState(false);
-    const [bgResult, setBgResult] = useState<string | null>(null);
-    const [quality, setQuality] = useState<"medium" | "high">("high");
-    const [outputFormat, setOutputFormat] = useState<"image/png" | "image/webp">("image/png");
-
-    const handleProcess = async () => {
-      if (!file) return;
-      setProcessing(true);
-      try {
-        const blob = await removeBackground(file, {
-          model: quality === "high" ? "isnet" : "isnet_fp16",
-          output: {
-            format: outputFormat,
-            quality: 0.8
-          },
-          progress: (status, progress) => {
-            console.log(`Background removal progress: ${status} - ${Math.round(progress * 100)}%`);
-          }
-        });
-        setBgResult(URL.createObjectURL(blob));
-      } catch (error) {
-        console.error("Background removal failed:", error);
-        alert("Failed to remove background. Please try another image.");
-      } finally {
-        setProcessing(false);
-      }
-    };
-
-    return (
-      <div className="glass-card p-8 rounded-[2.5rem] space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
-        <div className="w-20 h-20 bg-cyan-100 text-cyan-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-cyan-50">
-          <Eraser className="h-10 w-10" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-3xl font-black tracking-tight text-zinc-900">Background Remover Pro</h3>
-          <p className="text-zinc-500 font-medium max-w-sm mx-auto leading-relaxed">Remove backgrounds instantly with AI precision and custom controls.</p>
-        </div>
-
-        {!bgResult ? (
-          <div className="space-y-8">
-            <div className="border-4 border-dashed border-zinc-100 rounded-[2rem] p-16 hover:border-cyan-500/50 hover:bg-cyan-50/30 transition-all cursor-pointer group relative overflow-hidden">
-              <input 
-                type="file" 
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                accept="image/*"
-              />
-              <div className="space-y-4">
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-zinc-100 group-hover:scale-110 transition-transform">
-                  <Upload className="h-8 w-8 text-zinc-300 group-hover:text-cyan-500 transition-colors" />
-                </div>
-                <div>
-                  <p className="text-zinc-900 font-black uppercase tracking-widest text-xs">
-                    {file ? file.name : "Drop your image here"}
-                  </p>
-                  <p className="text-[10px] text-zinc-400 mt-2 uppercase tracking-[0.2em]">Supports JPG, PNG, WEBP</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2 text-left">
-                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Processing Mode</label>
-                <div className="flex p-1 bg-zinc-100 rounded-xl">
-                  <button 
-                    onClick={() => setQuality("medium")}
-                    className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", quality === "medium" ? "bg-white text-cyan-600 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}
-                  >
-                    Fast
-                  </button>
-                  <button 
-                    onClick={() => setQuality("high")}
-                    className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", quality === "high" ? "bg-white text-cyan-600 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}
-                  >
-                    High Quality
-                  </button>
-                </div>
-              </div>
-              <div className="space-y-2 text-left">
-                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Output Format</label>
-                <div className="flex p-1 bg-zinc-100 rounded-xl">
-                  <button 
-                    onClick={() => setOutputFormat("image/png")}
-                    className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", outputFormat === "image/png" ? "bg-white text-cyan-600 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}
-                  >
-                    PNG
-                  </button>
-                  <button 
-                    onClick={() => setOutputFormat("image/webp")}
-                    className={cn("flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", outputFormat === "image/webp" ? "bg-white text-cyan-600 shadow-sm" : "text-zinc-400 hover:text-zinc-600")}
-                  >
-                    WEBP
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <Button 
-              onClick={handleProcess} 
-              disabled={!file || processing}
-              className="w-full h-14 rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-lg font-bold shadow-lg shadow-cyan-100"
-            >
-              {processing ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  AI is working...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Remove Background
-                </>
-              )}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border-8 border-white group">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/checkerboard.png')] opacity-10" />
-              <img src={bgResult} alt="Result" className="w-full relative z-10" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20">
-                <Button onClick={() => window.open(bgResult, "_blank")} className="rounded-xl bg-white text-zinc-900 hover:bg-zinc-100">
-                  <Download className="h-5 w-5 mr-2" />
-                  Download
-                </Button>
-                <Button onClick={() => setBgResult(null)} variant="outline" className="rounded-xl bg-white/10 border-white/20 text-white hover:bg-white/20">
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-            <div className="p-4 bg-cyan-50 rounded-2xl border border-cyan-100">
-              <p className="text-xs font-bold text-cyan-700 uppercase tracking-widest">Background Removed Successfully</p>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   if (type === "qr-gen") {
     const [logo, setLogo] = useState<File | null>(null);
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -247,18 +106,18 @@ export function SimpleTools({ type }: { type: string }) {
     };
 
     return (
-      <div className="glass-card p-8 rounded-[2.5rem] space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
-        <div className="w-20 h-20 bg-slate-100 text-slate-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-slate-50">
-          <QrCode className="h-10 w-10" />
+      <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 text-slate-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-slate-50">
+          <QrCode className="h-8 w-8 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-3xl font-black tracking-tight text-zinc-900">QR Code Generator Pro</h3>
-          <p className="text-zinc-500 font-medium max-w-sm mx-auto leading-relaxed">Create custom QR codes for URLs, text, or even images with AI-powered linking.</p>
+          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900">QR Code Generator Pro</h3>
+          <p className="text-zinc-500 font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Create custom QR codes for URLs, text, or even images with AI-powered linking.</p>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Text or URL</label>
                 <input
@@ -267,12 +126,12 @@ export function SimpleTools({ type }: { type: string }) {
                   disabled={!!qrImage}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Enter URL or text..."
-                  className="w-full h-14 px-6 rounded-2xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-inner disabled:opacity-50"
+                  className="w-full h-12 md:h-14 px-4 md:px-6 rounded-xl md:rounded-2xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 outline-none font-bold text-sm transition-all shadow-inner disabled:opacity-50"
                 />
               </div>
               <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Or Upload Image</label>
-                <div className="relative h-14 rounded-2xl bg-zinc-50 border border-zinc-100 hover:border-indigo-500 hover:bg-indigo-50 transition-all flex items-center justify-center gap-3 cursor-pointer group overflow-hidden">
+                <div className="relative h-12 md:h-14 rounded-xl md:rounded-2xl bg-zinc-50 border border-zinc-100 hover:border-indigo-500 hover:bg-indigo-50 transition-all flex items-center justify-center gap-3 cursor-pointer group overflow-hidden">
                   <input 
                     type="file" 
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
@@ -299,7 +158,7 @@ export function SimpleTools({ type }: { type: string }) {
 
             <div className="space-y-2 text-left">
               <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-2">Add Center Logo (Optional)</label>
-              <div className="relative h-20 rounded-2xl bg-zinc-50 border-2 border-dashed border-zinc-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all flex items-center justify-center gap-3 cursor-pointer group overflow-hidden">
+              <div className="relative h-16 md:h-20 rounded-xl md:rounded-2xl bg-zinc-50 border-2 border-dashed border-zinc-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all flex items-center justify-center gap-3 cursor-pointer group overflow-hidden">
                 <input 
                   type="file" 
                   className="absolute inset-0 opacity-0 cursor-pointer z-10"
@@ -308,8 +167,8 @@ export function SimpleTools({ type }: { type: string }) {
                 />
                 {logoPreview ? (
                   <div className="flex items-center gap-3">
-                    <img src={logoPreview} alt="Logo" className="w-12 h-12 rounded-lg object-cover shadow-md" />
-                    <span className="text-xs font-bold text-zinc-600">{logo?.name}</span>
+                    <img src={logoPreview} alt="Logo" className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover shadow-md" />
+                    <span className="text-xs font-bold text-zinc-600 truncate max-w-[150px]">{logo?.name}</span>
                     <button onClick={(e) => { e.stopPropagation(); setLogo(null); setLogoPreview(null); }} className="p-1 bg-red-50 text-red-500 rounded-md hover:bg-red-100 relative z-20">
                       <X className="h-4 w-4" />
                     </button>
@@ -327,7 +186,7 @@ export function SimpleTools({ type }: { type: string }) {
           <Button 
             onClick={generateQR} 
             disabled={(!input && !qrImage) || generating}
-            className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-lg font-bold shadow-lg shadow-slate-100"
+            className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl bg-slate-900 hover:bg-slate-800 text-base md:text-lg font-bold shadow-lg shadow-slate-100"
           >
             {generating ? (
               <>
@@ -458,32 +317,32 @@ export function SimpleTools({ type }: { type: string }) {
     }, []);
 
     return (
-      <div className="glass-card p-8 rounded-[2.5rem] space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
-        <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-50">
-          <Search className="h-10 w-10" />
+      <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-emerald-100 text-emerald-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-50">
+          <Search className="h-8 w-8 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-3xl font-black tracking-tight text-zinc-900">QR Code Scanner Pro</h3>
-          <p className="text-zinc-500 font-medium max-w-sm mx-auto leading-relaxed">Scan any QR code instantly using your camera or an image file with enhanced detection.</p>
+          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900">QR Code Scanner Pro</h3>
+          <p className="text-zinc-500 font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Scan any QR code instantly using your camera or an image file with enhanced detection.</p>
         </div>
 
         {cameraError && (
-          <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold flex items-center gap-2 justify-center">
-            <AlertCircle className="h-4 w-4" />
+          <div className="p-3 md:p-4 bg-red-50 border border-red-100 rounded-xl md:rounded-2xl text-red-600 text-[10px] md:text-xs font-bold flex items-center gap-2 justify-center">
+            <AlertCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
             {cameraError}
           </div>
         )}
 
         {!scanning && !scannedResult && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Button 
               onClick={startScanner}
-              className="h-32 rounded-3xl bg-emerald-600 hover:bg-emerald-700 flex flex-col gap-3 shadow-lg shadow-emerald-100"
+              className="h-24 md:h-32 rounded-2xl md:rounded-3xl bg-emerald-600 hover:bg-emerald-700 flex flex-col gap-2 md:gap-3 shadow-lg shadow-emerald-100"
             >
-              <Camera className="h-8 w-8" />
-              <span className="font-bold uppercase tracking-widest text-xs">Use Camera</span>
+              <Camera className="h-6 w-6 md:h-8 md:w-8" />
+              <span className="font-bold uppercase tracking-widest text-[10px]">Use Camera</span>
             </Button>
-            <div className="relative h-32 rounded-3xl bg-white border-2 border-dashed border-zinc-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all flex flex-col items-center justify-center gap-3 cursor-pointer group">
+            <div className="relative h-24 md:h-32 rounded-2xl md:rounded-3xl bg-white border-2 border-dashed border-zinc-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all flex flex-col items-center justify-center gap-2 md:gap-3 cursor-pointer group">
               <input 
                 type="file" 
                 className="absolute inset-0 opacity-0 cursor-pointer z-10"
@@ -492,11 +351,11 @@ export function SimpleTools({ type }: { type: string }) {
                 disabled={fileScanning}
               />
               {fileScanning ? (
-                <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+                <Loader2 className="h-6 w-6 md:h-8 md:w-8 text-emerald-500 animate-spin" />
               ) : (
-                <Upload className="h-8 w-8 text-zinc-300 group-hover:text-emerald-500 transition-colors" />
+                <Upload className="h-6 w-6 md:h-8 md:w-8 text-zinc-300 group-hover:text-emerald-500 transition-colors" />
               )}
-              <span className="font-bold uppercase tracking-widest text-xs text-zinc-400 group-hover:text-emerald-600 transition-colors">
+              <span className="font-bold uppercase tracking-widest text-[10px] text-zinc-400 group-hover:text-emerald-600 transition-colors">
                 {fileScanning ? "Scanning..." : "Upload Image"}
               </span>
             </div>
@@ -506,31 +365,31 @@ export function SimpleTools({ type }: { type: string }) {
         <div id="qr-reader-hidden" style={{ display: 'none' }}></div>
 
         {scanning && (
-          <div className="space-y-6">
-            <div id="qr-reader" className="overflow-hidden rounded-[2rem] border-4 border-emerald-500 shadow-2xl bg-black aspect-square" />
-            <Button onClick={stopScanner} variant="outline" className="w-full h-14 rounded-2xl font-bold">
+          <div className="space-y-4 md:space-y-6">
+            <div id="qr-reader" className="overflow-hidden rounded-[1.5rem] md:rounded-[2rem] border-4 border-emerald-500 shadow-2xl bg-black aspect-square" />
+            <Button onClick={stopScanner} variant="outline" className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl font-bold">
               Cancel Scanning
             </Button>
           </div>
         )}
 
         {scannedResult && (
-          <div className="space-y-6">
-            <div className="p-8 bg-emerald-50 rounded-[2rem] border-2 border-emerald-100 space-y-4">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto shadow-md">
-                <Check className="h-6 w-6 text-emerald-500" />
+          <div className="space-y-4 md:space-y-6">
+            <div className="p-6 md:p-8 bg-emerald-50 rounded-[1.5rem] md:rounded-[2rem] border-2 border-emerald-100 space-y-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center mx-auto shadow-md">
+                <Check className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" />
               </div>
               <div className="space-y-2">
-                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Scanned Content</p>
-                <p className="text-lg font-bold text-zinc-900 break-all">{scannedResult}</p>
+                <p className="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Scanned Content</p>
+                <p className="text-base md:text-lg font-bold text-zinc-900 break-all">{scannedResult}</p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button 
                   onClick={() => {
                     navigator.clipboard.writeText(scannedResult);
                     setScannedResult(null);
                   }}
-                  className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold"
+                  className="flex-1 h-11 md:h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold"
                 >
                   Copy & Close
                 </Button>
@@ -538,14 +397,14 @@ export function SimpleTools({ type }: { type: string }) {
                   <Button 
                     onClick={() => window.open(scannedResult, "_blank")}
                     variant="outline"
-                    className="flex-1 h-12 rounded-xl font-bold border-2"
+                    className="flex-1 h-11 md:h-12 rounded-xl font-bold border-2"
                   >
                     Open Link
                   </Button>
                 )}
               </div>
             </div>
-            <Button onClick={() => setScannedResult(null)} variant="ghost" className="font-bold text-zinc-400">
+            <Button onClick={() => setScannedResult(null)} variant="ghost" className="font-bold text-zinc-400 text-sm">
               Scan Another
             </Button>
           </div>
@@ -565,18 +424,18 @@ export function SimpleTools({ type }: { type: string }) {
     };
 
     return (
-      <div className="glass-card p-8 rounded-[2.5rem] space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
-        <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-orange-50">
-          <Lock className="h-10 w-10" />
+      <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-orange-100 text-orange-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-orange-50">
+          <Lock className="h-8 w-8 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-3xl font-black tracking-tight text-zinc-900">Password Generator</h3>
-          <p className="text-zinc-500 font-medium max-w-sm mx-auto leading-relaxed">Generate ultra-secure, random passwords to keep your accounts safe.</p>
+          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900">Password Generator</h3>
+          <p className="text-zinc-500 font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Generate ultra-secure, random passwords to keep your accounts safe.</p>
         </div>
 
         <Button 
           onClick={generatePass} 
-          className="w-full h-14 rounded-2xl bg-orange-600 hover:bg-orange-700 text-lg font-bold shadow-lg shadow-orange-100"
+          className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl bg-orange-600 hover:bg-orange-700 text-base md:text-lg font-bold shadow-lg shadow-orange-100"
         >
           <RefreshCw className="h-5 w-5 mr-2" />
           Generate Password
@@ -586,11 +445,11 @@ export function SimpleTools({ type }: { type: string }) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-6 bg-zinc-50 rounded-[2rem] border border-zinc-100 flex items-center justify-between shadow-inner"
+            className="p-4 md:p-6 bg-zinc-50 rounded-2xl md:rounded-[2rem] border border-zinc-100 flex items-center justify-between shadow-inner"
           >
-            <code className="text-2xl font-mono font-black text-indigo-600 tracking-wider">{result}</code>
-            <button onClick={() => handleCopy(result)} className="p-3 bg-white rounded-xl shadow-md hover:text-indigo-600 transition-all active:scale-90">
-              {copied ? <Check className="h-6 w-6 text-emerald-500" /> : <Copy className="h-6 w-6 text-zinc-400" />}
+            <code className="text-lg md:text-2xl font-mono font-black text-indigo-600 tracking-wider break-all">{result}</code>
+            <button onClick={() => handleCopy(result)} className="p-2.5 md:p-3 bg-white rounded-xl shadow-md hover:text-indigo-600 transition-all active:scale-90 ml-4 shrink-0">
+              {copied ? <Check className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" /> : <Copy className="h-5 w-5 md:h-6 md:w-6 text-zinc-400" />}
             </button>
           </motion.div>
         )}
@@ -619,13 +478,13 @@ export function SimpleTools({ type }: { type: string }) {
     };
 
     return (
-      <div className="glass-card p-8 rounded-[2.5rem] space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
-        <div className="w-20 h-20 bg-zinc-900 text-white rounded-3xl flex items-center justify-center mx-auto shadow-xl">
-          <LayoutGrid className="h-10 w-10" />
+      <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-zinc-900 text-white rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-xl">
+          <LayoutGrid className="h-8 w-8 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-3xl font-black tracking-tight text-zinc-900">Logo Idea Maker</h3>
-          <p className="text-zinc-500 font-medium max-w-sm mx-auto leading-relaxed">Enter your brand name to generate modern, professional logo concepts.</p>
+          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900">Logo Idea Maker</h3>
+          <p className="text-zinc-500 font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Enter your brand name to generate modern, professional logo concepts.</p>
         </div>
         <div className="space-y-4">
           <input
@@ -633,25 +492,25 @@ export function SimpleTools({ type }: { type: string }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Your Brand Name..."
-            className="w-full h-14 px-6 rounded-2xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 outline-none font-bold text-lg transition-all shadow-inner"
+            className="w-full h-12 md:h-14 px-4 md:px-6 rounded-xl md:rounded-2xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 outline-none font-bold text-base md:text-lg transition-all shadow-inner"
           />
           <Button 
             onClick={generateIdeas} 
             disabled={loading || !input}
-            className="w-full h-14 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-lg font-bold shadow-lg"
+            className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-base md:text-lg font-bold shadow-lg"
           >
-            {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : "Generate Concepts"}
+            {loading ? <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin" /> : "Generate Concepts"}
           </Button>
         </div>
 
         {ideas.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 pt-4">
             {ideas.map((idea, i) => (
-              <div key={i} className="p-6 bg-white rounded-[2rem] border border-zinc-100 shadow-xl flex flex-col items-center justify-center gap-4 group hover:scale-105 transition-all cursor-pointer">
-                <div className="w-16 h-16 bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-900 font-black text-2xl shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+              <div key={i} className="p-4 md:p-6 bg-white rounded-2xl md:rounded-[2rem] border border-zinc-100 shadow-xl flex flex-col items-center justify-center gap-3 md:gap-4 group hover:scale-105 transition-all cursor-pointer">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-zinc-50 rounded-xl md:rounded-2xl flex items-center justify-center text-zinc-900 font-black text-xl md:text-2xl shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                   {idea.charAt(0)}
                 </div>
-                <p className="font-black uppercase tracking-widest text-[10px] text-zinc-400 group-hover:text-indigo-600 transition-colors">{idea}</p>
+                <p className="font-black uppercase tracking-widest text-[9px] md:text-[10px] text-zinc-400 group-hover:text-indigo-600 transition-colors">{idea}</p>
               </div>
             ))}
           </div>
