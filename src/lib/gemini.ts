@@ -1,5 +1,5 @@
 // OpenRouter API Configuration
-const OPENROUTER_API_KEY = "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";
+const OPENROUTER_API_KEY = "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".trim();
 export const chatModel = "google/gemini-2.0-flash-001";
 export const fallbackModel = "google/gemini-flash-1.5";
 export const imageModel = "openai/gpt-4o";
@@ -53,8 +53,8 @@ export async function generateText(prompt: string, systemInstruction?: string, i
         // Not JSON
       }
       
-      if (errorMessage.toLowerCase().includes("user not found")) {
-        throw new Error("USER_NOT_FOUND");
+      if (errorMessage.toLowerCase().includes("user not found") || errorMessage.toLowerCase().includes("invalid api key")) {
+        throw new Error("USER_NOT_FOUND_OR_INVALID_KEY");
       }
       
       throw new Error(errorMessage);
@@ -71,16 +71,16 @@ export async function generateText(prompt: string, systemInstruction?: string, i
   try {
     return await tryModel(chatModel);
   } catch (error: any) {
-    if (error.message === "USER_NOT_FOUND") {
-      throw new Error("AI Service Account Issue: The API key might be invalid or the account was not found. Please check your OpenRouter account.");
+    if (error.message === "USER_NOT_FOUND_OR_INVALID_KEY") {
+      throw new Error(`AI Service Account Issue: The API key provided (${OPENROUTER_API_KEY.slice(0, 10)}...) is being reported as 'User not found' or 'Invalid' by OpenRouter. Please verify your key at openrouter.ai/keys.`);
     }
     
     console.warn(`Primary model (${chatModel}) failed, trying fallback (${fallbackModel})...`);
     try {
       return await tryModel(fallbackModel);
     } catch (fallbackError: any) {
-      if (fallbackError.message === "USER_NOT_FOUND") {
-        throw new Error("AI Service Account Issue: The API key might be invalid or the account was not found. Please check your OpenRouter account.");
+      if (fallbackError.message === "USER_NOT_FOUND_OR_INVALID_KEY") {
+        throw new Error(`AI Service Account Issue: The API key provided (${OPENROUTER_API_KEY.slice(0, 10)}...) is being reported as 'User not found' or 'Invalid' by OpenRouter. Please verify your key at openrouter.ai/keys.`);
       }
       console.error("AI Generation Error (Fallback also failed):", fallbackError);
       throw fallbackError;
