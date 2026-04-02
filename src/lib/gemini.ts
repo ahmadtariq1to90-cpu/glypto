@@ -1,88 +1,42 @@
 import { GoogleGenAI } from "@google/genai";
 
-export const chatModel = "google/gemini-2.0-flash-001";
-export const imageModel = "openai/gpt-4o";
+export const chatModel = "gemini-2.0-flash";
+export const imageModel = "gemini-2.5-flash-image";
 
 // Initialize Gemini AI
-const geminiApiKey = process.env.GEMINI_API_KEY;
+// We use import.meta.env for Vite to expose it to the client
+// If you want to hardcode the key (not recommended), put it here:
+const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || ""; 
 const ai = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
 
 export async function generateText(prompt: string, systemInstruction?: string, imageBase64?: string, mimeType?: string) {
   try {
-    // If it's a Gemini model AND we have a Gemini API key, use the native SDK directly in the frontend
-    if (ai && (chatModel.startsWith("gemini-") || chatModel.includes("google/gemini"))) {
-      const modelName = chatModel.includes("/") ? chatModel.split("/")[1] : chatModel;
-      
-      const parts: any[] = [{ text: prompt }];
-      if (imageBase64 && mimeType) {
-        parts.push({
-          inlineData: {
-            data: imageBase64,
-            mimeType: mimeType
-          }
-        });
-      }
-
-      const response = await ai.models.generateContent({
-        model: modelName,
-        contents: [{ role: "user", parts }],
-        config: {
-          systemInstruction: systemInstruction || "You are a helpful assistant.",
-        },
-      });
-      
-      if (!response.text) {
-        throw new Error("Empty response from Gemini AI.");
-      }
-      return response.text;
+    if (!ai) {
+      throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment.");
     }
 
-    // Fallback to backend proxy for other models (like GPT-4o via OpenRouter)
-    const response = await fetch("/api/ai/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt,
-        systemInstruction,
-        model: chatModel,
-      }),
-    });
-
-    const contentType = response.headers.get("content-type");
-    if (!response.ok) {
-      let errorMessage = `AI Service Error (${response.status})`;
-      
-      if (contentType && contentType.includes("application/json")) {
-        const errorData = await response.json();
-        console.error("Backend Error Data:", errorData);
-        // If errorData.error is an object, try to get its message
-        if (typeof errorData.error === 'object' && errorData.error !== null) {
-          errorMessage = errorData.error.message || JSON.stringify(errorData.error);
-        } else {
-          errorMessage = errorData.error || errorMessage;
+    const parts: any[] = [{ text: prompt }];
+    if (imageBase64 && mimeType) {
+      parts.push({
+        inlineData: {
+          data: imageBase64,
+          mimeType: mimeType
         }
-      } else {
-        const text = await response.text();
-        console.error("Backend Error Text:", text);
-        errorMessage = text || errorMessage;
-      }
-      throw new Error(errorMessage);
+      });
     }
 
-    if (!contentType || !contentType.includes("application/json")) {
-      const text = await response.text();
-      console.error("Non-JSON response from server:", text);
-      throw new Error("Invalid response format from server.");
-    }
-
-    const data = await response.json();
-    if (!data || !data.text) {
-      throw new Error("Empty response from AI service.");
-    }
+    const response = await ai.models.generateContent({
+      model: chatModel,
+      contents: [{ role: "user", parts }],
+      config: {
+        systemInstruction: systemInstruction || "You are a helpful assistant.",
+      },
+    });
     
-    return data.text;
+    if (!response.text) {
+      throw new Error("Empty response from Gemini AI.");
+    }
+    return response.text;
   } catch (error: any) {
     console.error("AI Generation Error:", error);
     throw error;
