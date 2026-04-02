@@ -1,10 +1,11 @@
 // OpenRouter API Configuration
 const OPENROUTER_API_KEY = "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";
 export const chatModel = "google/gemini-2.0-flash-001";
+export const fallbackModel = "google/gemini-flash-1.5";
 export const imageModel = "openai/gpt-4o";
 
 export async function generateText(prompt: string, systemInstruction?: string, imageBase64?: string, mimeType?: string) {
-  try {
+  const tryModel = async (modelName: string) => {
     const messages: any[] = [
       { role: "system", content: systemInstruction || "You are a helpful assistant." }
     ];
@@ -31,19 +32,32 @@ export async function generateText(prompt: string, systemInstruction?: string, i
       headers: {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://protoolix.vercel.app/",
+        "HTTP-Referer": window.location.origin || "https://protoolix.com",
         "X-Title": "ProToolix AI Tools",
       },
       body: JSON.stringify({
-        model: chatModel,
+        model: modelName,
         messages: messages,
         temperature: 0.7,
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || `OpenRouter Error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`OpenRouter Error (${modelName}):`, errorText);
+      let errorMessage = `OpenRouter Error: ${response.status}`;
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error?.message || errorData.error || errorMessage;
+      } catch (e) {
+        // Not JSON
+      }
+      
+      if (errorMessage.toLowerCase().includes("user not found")) {
+        throw new Error("USER_NOT_FOUND");
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -52,9 +66,25 @@ export async function generateText(prompt: string, systemInstruction?: string, i
     }
 
     return data.choices[0].message.content;
+  };
+
+  try {
+    return await tryModel(chatModel);
   } catch (error: any) {
-    console.error("AI Generation Error:", error);
-    throw error;
+    if (error.message === "USER_NOT_FOUND") {
+      throw new Error("AI Service Account Issue: The API key might be invalid or the account was not found. Please check your OpenRouter account.");
+    }
+    
+    console.warn(`Primary model (${chatModel}) failed, trying fallback (${fallbackModel})...`);
+    try {
+      return await tryModel(fallbackModel);
+    } catch (fallbackError: any) {
+      if (fallbackError.message === "USER_NOT_FOUND") {
+        throw new Error("AI Service Account Issue: The API key might be invalid or the account was not found. Please check your OpenRouter account.");
+      }
+      console.error("AI Generation Error (Fallback also failed):", fallbackError);
+      throw fallbackError;
+    }
   }
 }
 

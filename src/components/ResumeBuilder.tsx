@@ -312,8 +312,10 @@ export function ResumeBuilder() {
       const message = err.message || String(err);
       let friendlyMessage = "Failed to generate resume. Please try again.";
       
-      if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("not configured")) {
-        friendlyMessage = "AI Service is not properly configured. Please add your OPENROUTER_API_KEY or GEMINI_API_KEY to the environment secrets.";
+      if (message.toLowerCase().includes("user not found") || message.toLowerCase().includes("account issue")) {
+        friendlyMessage = "AI Service Account Issue: The API key might be invalid or the account was not found. Please check your OpenRouter account.";
+      } else if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("not configured")) {
+        friendlyMessage = "AI Service is not properly configured. Please check your API key settings.";
       } else if (message.includes("500") || message.toLowerCase().includes("server error")) {
         friendlyMessage = "Our AI is currently taking a short break. Please try again in a few seconds.";
       } else if (message.length > 10 && !message.includes("500") && !message.includes("Internal Server Error")) {

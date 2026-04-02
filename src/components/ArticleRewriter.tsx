@@ -21,8 +21,11 @@ export function ArticleRewriter() {
     if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
       return "You've reached the limit for now. Please wait a moment before trying again.";
     }
+    if (message.toLowerCase().includes("user not found") || message.toLowerCase().includes("account issue")) {
+      return "AI Service Account Issue: The API key might be invalid or the account was not found. Please check your OpenRouter account.";
+    }
     if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("not configured")) {
-      return "AI Service is not properly configured. Please add your OPENROUTER_API_KEY or GEMINI_API_KEY to the environment secrets.";
+      return "AI Service is not properly configured. Please check your API key settings.";
     }
     if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
       return "Connection lost. Please check your internet and try again.";
