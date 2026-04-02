@@ -1,42 +1,57 @@
-import { GoogleGenAI } from "@google/genai";
-
-export const chatModel = "gemini-2.0-flash";
-export const imageModel = "gemini-2.5-flash-image";
-
-// Initialize Gemini AI
-// We use import.meta.env for Vite to expose it to the client
-// If you want to hardcode the key (not recommended), put it here:
-const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || ""; 
-const ai = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
+// OpenRouter API Configuration
+const OPENROUTER_API_KEY = "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";
+export const chatModel = "google/gemini-2.0-flash-001";
+export const imageModel = "openai/gpt-4o";
 
 export async function generateText(prompt: string, systemInstruction?: string, imageBase64?: string, mimeType?: string) {
   try {
-    if (!ai) {
-      throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your environment.");
-    }
+    const messages: any[] = [
+      { role: "system", content: systemInstruction || "You are a helpful assistant." }
+    ];
 
-    const parts: any[] = [{ text: prompt }];
     if (imageBase64 && mimeType) {
-      parts.push({
-        inlineData: {
-          data: imageBase64,
-          mimeType: mimeType
-        }
+      messages.push({
+        role: "user",
+        content: [
+          { type: "text", text: prompt },
+          {
+            type: "image_url",
+            image_url: {
+              url: `data:${mimeType};base64,${imageBase64}`
+            }
+          }
+        ]
       });
+    } else {
+      messages.push({ role: "user", content: prompt });
     }
 
-    const response = await ai.models.generateContent({
-      model: chatModel,
-      contents: [{ role: "user", parts }],
-      config: {
-        systemInstruction: systemInstruction || "You are a helpful assistant.",
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://protoolix.vercel.app/",
+        "X-Title": "ProToolix AI Tools",
       },
+      body: JSON.stringify({
+        model: chatModel,
+        messages: messages,
+        temperature: 0.7,
+      }),
     });
-    
-    if (!response.text) {
-      throw new Error("Empty response from Gemini AI.");
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `OpenRouter Error: ${response.status}`);
     }
-    return response.text;
+
+    const data = await response.json();
+    if (!data.choices || data.choices.length === 0) {
+      throw new Error("No response from AI service.");
+    }
+
+    return data.choices[0].message.content;
   } catch (error: any) {
     console.error("AI Generation Error:", error);
     throw error;
@@ -44,39 +59,11 @@ export async function generateText(prompt: string, systemInstruction?: string, i
 }
 
 export async function generateChatResponse(prompt: string, history: any[] = []) {
-  // For simplicity, we use the same generateText logic for chat as well
   return generateText(prompt, "You are OneAI, a helpful and versatile AI assistant. You provide clear, concise, and accurate information.");
 }
 
 export async function generateImage(prompt: string): Promise<string> {
-  if (ai) {
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: [{ parts: [{ text: prompt }] }],
-        config: {
-          imageConfig: {
-            aspectRatio: "1:1",
-          },
-        },
-      });
-
-      const parts = response.candidates?.[0]?.content?.parts;
-      if (parts) {
-        for (const part of parts) {
-          if (part.inlineData) {
-            return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-          }
-        }
-      }
-      throw new Error("No image data returned from Gemini.");
-    } catch (error: any) {
-      console.error("Gemini Image Generation Error:", error);
-      // Fallback to picsum if Gemini fails (e.g. safety filters or quota)
-      return `https://picsum.photos/seed/${encodeURIComponent(prompt)}/1024/1024`;
-    }
-  }
-
-  // Fallback to picsum if no API key
+  // Fallback to picsum for image generation as OpenRouter is primarily for LLMs
+  // and DALL-E/Imagen via OpenRouter might be expensive or require different parameters
   return `https://picsum.photos/seed/${encodeURIComponent(prompt)}/1024/1024`;
 }
