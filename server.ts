@@ -1,4 +1,5 @@
 import express from "express";
+import "dotenv/config";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -12,7 +13,24 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  console.log("Starting server...");
+  if (!process.env.OPENROUTER_API_KEY) {
+    console.warn("WARNING: OPENROUTER_API_KEY is not set. AI tools using the backend proxy will fail.");
+  }
+
+  app.use(express.json({ limit: '10mb' }));
+
+  // Health check
+  app.get("/api/health", (req, res) => {
+    res.json({ 
+      status: "ok", 
+      env: {
+        hasOpenRouterKey: !!process.env.OPENROUTER_API_KEY,
+        hasGeminiKey: !!process.env.GEMINI_API_KEY,
+        nodeEnv: process.env.NODE_ENV
+      }
+    });
+  });
 
   // OpenRouter API Route
   app.post("/api/ai/generate", async (req, res) => {
@@ -67,4 +85,7 @@ async function startServer() {
   });
 }
 
-startServer();
+startServer().catch(err => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
+});
