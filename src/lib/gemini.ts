@@ -1,14 +1,18 @@
 // OpenRouter API Configuration
-const OPENROUTER_API_KEY = "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".trim();
-export const chatModel = "google/gemini-2.0-flash-001";
+const OPENROUTER_API_KEY = "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".trim();
+
+// Using a guaranteed FREE model as primary to avoid "User not found" / "No credits" issues
+export const chatModel = "meta-llama/llama-3.1-8b-instruct:free";
 export const fallbackModel = "google/gemini-flash-1.5";
 export const imageModel = "openai/gpt-4o";
 
 export async function generateText(prompt: string, systemInstruction?: string, imageBase64?: string, mimeType?: string) {
   const tryModel = async (modelName: string) => {
-    const messages: any[] = [
-      { role: "system", content: systemInstruction || "You are a helpful assistant." }
-    ];
+    const messages: any[] = [];
+    
+    if (systemInstruction) {
+      messages.push({ role: "system", content: systemInstruction });
+    }
 
     if (imageBase64 && mimeType) {
       messages.push({
@@ -32,8 +36,6 @@ export async function generateText(prompt: string, systemInstruction?: string, i
       headers: {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": window.location.origin || "https://protoolix.com",
-        "X-Title": "ProToolix AI Tools",
       },
       body: JSON.stringify({
         model: modelName,
@@ -53,8 +55,8 @@ export async function generateText(prompt: string, systemInstruction?: string, i
         // Not JSON
       }
       
-      if (errorMessage.toLowerCase().includes("user not found") || errorMessage.toLowerCase().includes("invalid api key")) {
-        throw new Error("USER_NOT_FOUND_OR_INVALID_KEY");
+      if (response.status === 401 || errorMessage.toLowerCase().includes("user not found") || errorMessage.toLowerCase().includes("invalid api key")) {
+        throw new Error("AUTH_ERROR");
       }
       
       throw new Error(errorMessage);
@@ -71,17 +73,14 @@ export async function generateText(prompt: string, systemInstruction?: string, i
   try {
     return await tryModel(chatModel);
   } catch (error: any) {
-    if (error.message === "USER_NOT_FOUND_OR_INVALID_KEY") {
-      throw new Error(`AI Service Account Issue: The API key provided (${OPENROUTER_API_KEY.slice(0, 10)}...) is being reported as 'User not found' or 'Invalid' by OpenRouter. Please verify your key at openrouter.ai/keys.`);
+    if (error.message === "AUTH_ERROR") {
+      throw new Error(`AI Service Account Issue: OpenRouter is not accepting the API key. Please ensure you have clicked 'Create' in OpenRouter and copied the key correctly. Current key starts with: ${OPENROUTER_API_KEY.slice(0, 10)}...`);
     }
     
     console.warn(`Primary model (${chatModel}) failed, trying fallback (${fallbackModel})...`);
     try {
       return await tryModel(fallbackModel);
     } catch (fallbackError: any) {
-      if (fallbackError.message === "USER_NOT_FOUND_OR_INVALID_KEY") {
-        throw new Error(`AI Service Account Issue: The API key provided (${OPENROUTER_API_KEY.slice(0, 10)}...) is being reported as 'User not found' or 'Invalid' by OpenRouter. Please verify your key at openrouter.ai/keys.`);
-      }
       console.error("AI Generation Error (Fallback also failed):", fallbackError);
       throw fallbackError;
     }
