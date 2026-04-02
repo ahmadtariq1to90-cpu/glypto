@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { generateText } from "../lib/gemini";
 import { Button } from "./ui/Button";
-import { Loader2, Download, Sparkles, FileUser, Upload, ChevronLeft, Check, Palette, Eye } from "lucide-react";
+import { Loader2, Download, Sparkles, FileUser, Upload, ChevronLeft, Check, Palette, Eye, FileText } from "lucide-react";
 import Markdown from "react-markdown";
 import { motion, AnimatePresence } from "motion/react";
-import { cn } from "../lib/utils";
+import { cn, downloadAsDoc } from "../lib/utils";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -308,7 +308,19 @@ export function ResumeBuilder() {
       setResumeMarkdown(result);
       setStep("preview");
     } catch (err: any) {
-      setErrors({ general: err.message || "Failed to generate resume." });
+      console.error("Resume Generation Error:", err);
+      const message = err.message || String(err);
+      let friendlyMessage = "Failed to generate resume. Please try again.";
+      
+      if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("not configured")) {
+        friendlyMessage = "AI Service is not properly configured. Please add your OPENROUTER_API_KEY or GEMINI_API_KEY to the environment secrets.";
+      } else if (message.includes("500") || message.toLowerCase().includes("server error")) {
+        friendlyMessage = "Our AI is currently taking a short break. Please try again in a few seconds.";
+      } else if (message.length > 10 && !message.includes("500") && !message.includes("Internal Server Error")) {
+        friendlyMessage = message;
+      }
+      
+      setErrors({ general: friendlyMessage });
     } finally {
       setLoading(false);
     }
@@ -570,6 +582,18 @@ export function ResumeBuilder() {
                 Edit Details
               </Button>
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    if (resumeRef.current) {
+                      downloadAsDoc(resumeRef.current.innerHTML, `${formData["Full Name"] || "Resume"}`);
+                    }
+                  }}
+                  className="rounded-xl font-bold border-2 w-full sm:w-auto h-12"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Download DOC
+                </Button>
                 <Button 
                   variant="outline" 
                   onClick={downloadPDF}

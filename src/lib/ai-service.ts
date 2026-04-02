@@ -41,6 +41,7 @@ export async function generateAIContent(prompt: string, systemInstruction?: stri
   }
 
   if (!response.ok) {
+    console.error(`OpenRouter API Error: ${response.status} ${response.statusText}`, data);
     const errorMsg = data.error?.message || data.error || `OpenRouter Error ${response.status}: ${response.statusText}`;
     throw new Error(errorMsg);
   }

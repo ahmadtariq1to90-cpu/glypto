@@ -66,7 +66,7 @@ const TOOLS: Tool[] = [
   {
     id: "caption",
     name: "AI Caption Generator",
-    description: "Elevate your social presence with AI-crafted captions that drive engagement. Tailored for Instagram, Twitter, and LinkedIn with perfect hashtags and tone.",
+    description: "Elevate your social presence with AI-crafted captions that drive engagement. Tailored for Instagram, Twitter, and LinkedIn with perfect hashtags and tone. Boost your visibility and connect with your audience effortlessly.",
     icon: MessageSquare,
     category: "Social",
     color: "bg-indigo-500",
@@ -75,7 +75,7 @@ const TOOLS: Tool[] = [
   {
     id: "resume",
     name: "AI Resume Builder",
-    description: "Transform your career path with a professional resume. Our AI analyzes industry standards to generate high-impact bullet points and summaries that get you noticed.",
+    description: "Transform your career path with a professional resume. Our AI analyzes industry standards to generate high-impact bullet points and summaries that get you noticed by recruiters and ATS systems alike.",
     icon: FileUser,
     category: "Productivity",
     color: "bg-emerald-500",
@@ -84,7 +84,7 @@ const TOOLS: Tool[] = [
   {
     id: "rewrite",
     name: "Article Rewriter",
-    description: "Breathe new life into your content. Instantly rewrite articles to be unique, engaging, and plagiarism-free while maintaining the original core message.",
+    description: "Breathe new life into your content. Instantly rewrite articles to be unique, engaging, and plagiarism-free while maintaining the original core message. Perfect for bloggers, students, and content creators.",
     icon: RefreshCw,
     category: "Content",
     color: "bg-amber-500",
@@ -93,7 +93,7 @@ const TOOLS: Tool[] = [
   {
     id: "cartoon",
     name: "Image to Cartoon",
-    description: "Turn your portraits into stunning digital art. Our advanced AI styles your photos into high-quality cartoons, perfect for unique avatars and social media profiles.",
+    description: "Turn your portraits into stunning digital art. Our advanced AI styles your photos into high-quality cartoons, perfect for unique avatars, social media profiles, and personalized gifts.",
     icon: ImageIcon,
     category: "Design",
     color: "bg-rose-500",
@@ -102,7 +102,7 @@ const TOOLS: Tool[] = [
   {
     id: "pdf",
     name: "PDF Merge & Tools",
-    description: "The ultimate PDF utility belt. Merge multiple documents, split pages, and manage your files with lightning speed and zero quality loss.",
+    description: "The ultimate PDF utility belt. Merge multiple documents, split pages, and manage your files with lightning speed and zero quality loss. Simplify your document management workflow in seconds.",
     icon: FileText,
     category: "Productivity",
     color: "bg-blue-500",
@@ -111,7 +111,7 @@ const TOOLS: Tool[] = [
   {
     id: "bio",
     name: "Instagram Bio Generator",
-    description: "Make a powerful first impression. Generate creative, catchy, and personality-driven bios that reflect your brand and attract new followers instantly.",
+    description: "Make a powerful first impression. Generate creative, catchy, and personality-driven bios that reflect your brand and attract new followers instantly. Stand out in the crowded social landscape.",
     icon: Instagram,
     category: "Social",
     color: "bg-pink-500",
@@ -120,7 +120,7 @@ const TOOLS: Tool[] = [
   {
     id: "bg-remover",
     name: "Background Remover",
-    description: "Remove image backgrounds instantly with AI precision. Perfect for product photos, profile pictures, and clean design assets.",
+    description: "Remove image backgrounds instantly with AI precision. Perfect for product photos, profile pictures, and clean design assets. Fine-tune your results with advanced edge detection and detail preservation.",
     icon: Eraser,
     category: "Design",
     color: "bg-cyan-500",
@@ -129,7 +129,7 @@ const TOOLS: Tool[] = [
   {
     id: "qr-gen",
     name: "QR Code Generator",
-    description: "Create custom QR codes for URLs, text, or contact info. High-quality, scan-ready codes for your marketing and personal needs.",
+    description: "Create custom QR codes for URLs, text, or even images. High-quality, scan-ready codes for your marketing and personal needs. Now supports AI-powered image-to-QR generation.",
     icon: QrCode,
     category: "Utility",
     color: "bg-slate-700",
@@ -138,7 +138,7 @@ const TOOLS: Tool[] = [
   {
     id: "pass-gen",
     name: "Password Generator",
-    description: "Generate ultra-secure, random passwords to protect your digital life. Customizable length and complexity for maximum security.",
+    description: "Generate ultra-secure, random passwords to protect your digital life. Customizable length and complexity for maximum security. Keep your accounts safe from unauthorized access.",
     icon: Lock,
     category: "Productivity",
     color: "bg-orange-500",
@@ -147,7 +147,7 @@ const TOOLS: Tool[] = [
   {
     id: "tweet",
     name: "Tweet Generator",
-    description: "Craft viral-worthy tweets in seconds. Our AI understands trends and brevity to help you stand out on X/Twitter.",
+    description: "Craft viral-worthy tweets in seconds. Our AI understands trends and brevity to help you stand out on X/Twitter. Engage your followers with witty and relevant content.",
     icon: MessageSquare,
     category: "Social",
     color: "bg-sky-500",
@@ -156,7 +156,7 @@ const TOOLS: Tool[] = [
   {
     id: "email",
     name: "AI Email Writer",
-    description: "Write professional emails for any occasion. From cold outreach to follow-ups, our AI ensures your tone is perfect and your message is clear.",
+    description: "Write professional emails for any occasion. From cold outreach to follow-ups, our AI ensures your tone is perfect and your message is clear. Save time and communicate more effectively.",
     icon: Mail,
     category: "Content",
     color: "bg-indigo-400",
@@ -165,7 +165,7 @@ const TOOLS: Tool[] = [
   {
     id: "qr-scan",
     name: "QR Code Scanner",
-    description: "Scan any QR code instantly using your camera or an uploaded image. Fast, secure, and easy to use.",
+    description: "Scan any QR code instantly using your camera or an uploaded image. Fast, secure, and easy to use. Supports all standard QR formats for seamless information access.",
     icon: Search,
     category: "Utility",
     color: "bg-emerald-400",
@@ -174,7 +174,7 @@ const TOOLS: Tool[] = [
   {
     id: "image-gen",
     name: "AI Image Generator",
-    description: "Transform your text descriptions into stunning AI-generated images. High-quality, unique art in seconds.",
+    description: "Transform your text descriptions into stunning AI-generated images. High-quality, unique art in seconds. Explore various artistic styles from watercolor to steampunk.",
     icon: ImageIcon,
     category: "Design",
     color: "bg-indigo-600",
@@ -183,7 +183,7 @@ const TOOLS: Tool[] = [
   {
     id: "logo",
     name: "Simple Logo Maker",
-    description: "Generate clean, modern logo ideas for your brand. A quick tool to spark inspiration for your next project's visual identity.",
+    description: "Generate clean, modern logo ideas for your brand. A quick tool to spark inspiration for your next project's visual identity. Perfect for startups and side projects.",
     icon: LayoutGrid,
     category: "Design",
     color: "bg-zinc-800",
@@ -203,6 +203,8 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFooterInView, setIsFooterInView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem("theme");
     return saved ? saved === "dark" : true;
@@ -334,6 +336,11 @@ export default function App() {
       } else {
         setShowFloatingButton(false);
       }
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -378,12 +385,16 @@ export default function App() {
   };
 
   const filteredTools = useMemo(() => {
-    return TOOLS.filter(tool => 
-      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery]);
+    return TOOLS.filter(tool => {
+      const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.category.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = selectedCategory === "All" || tool.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
 
   const renderAllTools = () => {
     return (
@@ -416,6 +427,23 @@ export default function App() {
                 className="w-full pl-14 pr-6 py-5 bg-bg-card border border-border-main rounded-2xl focus:border-indigo-500/50 outline-none transition-all font-medium text-text-main placeholder:text-text-muted"
               />
             </div>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3 pt-4">
+            {["All", ...categories].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={cn(
+                  "px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
+                  selectedCategory === cat 
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-500/20" 
+                    : "bg-bg-card text-text-muted border-border-main hover:border-indigo-500/50 hover:text-indigo-500"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -953,6 +981,22 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.8, x: 20 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-8 right-24 z-40 w-12 h-12 bg-bg-card border border-border-main rounded-2xl flex items-center justify-center text-text-main shadow-2xl hover:border-indigo-500/50 hover:text-indigo-500 transition-all group"
+            aria-label="Scroll to top"
+          >
+            <ArrowLeft className="h-5 w-5 rotate-90 group-hover:-translate-y-1 transition-transform" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Chat Support */}
       <ChatBot />
     </div>

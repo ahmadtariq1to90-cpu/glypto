@@ -21,11 +21,18 @@ export function ArticleRewriter() {
     if (message.includes("429") || message.toLowerCase().includes("rate limit")) {
       return "You've reached the limit for now. Please wait a moment before trying again.";
     }
-    if (message.includes("500") || message.toLowerCase().includes("server error")) {
-      return "Our AI is currently taking a short break. Please try again in a few seconds.";
+    if (message.toLowerCase().includes("api key") || message.toLowerCase().includes("unauthorized") || message.toLowerCase().includes("not configured")) {
+      return "AI Service is not properly configured. Please add your OPENROUTER_API_KEY or GEMINI_API_KEY to the environment secrets.";
     }
     if (message.toLowerCase().includes("network") || message.toLowerCase().includes("fetch")) {
       return "Connection lost. Please check your internet and try again.";
+    }
+    // If it's a 500 but we have a specific message, show it
+    if (message.length > 10 && !message.includes("500") && !message.includes("Internal Server Error")) {
+      return message;
+    }
+    if (message.includes("500") || message.toLowerCase().includes("server error")) {
+      return "Our AI is currently taking a short break. Please try again in a few seconds.";
     }
     return message;
   };
