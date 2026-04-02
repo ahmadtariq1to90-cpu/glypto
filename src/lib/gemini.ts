@@ -1,12 +1,18 @@
 // OpenRouter API Configuration
-const OPENROUTER_API_KEY = "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".trim();
+// We now use an Environment Variable for security. 
+// This prevents OpenRouter from disabling the key when the code is pushed to GitHub.
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 
-// Using a guaranteed FREE model as primary to avoid "User not found" / "No credits" issues
-export const chatModel = "meta-llama/llama-3.1-8b-instruct:free";
+// Using more reliable model IDs to avoid 404 "No endpoints found" errors
+export const chatModel = "google/gemini-2.0-flash-001";
 export const fallbackModel = "google/gemini-flash-1.5";
 export const imageModel = "openai/gpt-4o";
 
 export async function generateText(prompt: string, systemInstruction?: string, imageBase64?: string, mimeType?: string) {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error("API_KEY_MISSING: Please add VITE_OPENROUTER_API_KEY to your App Settings/Secrets.");
+  }
+
   const tryModel = async (modelName: string) => {
     const messages: any[] = [];
     
@@ -36,6 +42,8 @@ export async function generateText(prompt: string, systemInstruction?: string, i
       headers: {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
+        "HTTP-Referer": "https://protoolix.com",
+        "X-Title": "ProToolix AI Tools",
       },
       body: JSON.stringify({
         model: modelName,
@@ -74,7 +82,7 @@ export async function generateText(prompt: string, systemInstruction?: string, i
     return await tryModel(chatModel);
   } catch (error: any) {
     if (error.message === "AUTH_ERROR") {
-      throw new Error(`AI Service Account Issue: OpenRouter is not accepting the API key. Please ensure you have clicked 'Create' in OpenRouter and copied the key correctly. Current key starts with: ${OPENROUTER_API_KEY.slice(0, 10)}...`);
+      throw new Error(`AI Service Account Issue: OpenRouter is reporting an authentication error. Please check if your key in Settings is correct and active.`);
     }
     
     console.warn(`Primary model (${chatModel}) failed, trying fallback (${fallbackModel})...`);
