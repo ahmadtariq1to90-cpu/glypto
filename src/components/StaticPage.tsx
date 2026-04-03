@@ -148,7 +148,7 @@ function ContactSection({ onBack }: { onBack: () => void }) {
 export function StaticPage({ type, onBack }: StaticPageProps) {
   const content = {
     about: {
-      title: "About Glypto",
+      title: "About ProToolix",
       subtitle: "Empowering the next generation of creators.",
       icon: Info,
       color: "text-indigo-600",
@@ -156,7 +156,7 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
       body: (
         <div className="space-y-8">
           <p className="text-lg text-zinc-600 leading-relaxed font-medium">
-            Glypto was founded with a simple mission: to make advanced AI technology accessible to everyone. We believe that tools shouldn't be complicated—they should be intuitive, fast, and powerful.
+            ProToolix was founded with a simple mission: to make advanced AI technology accessible to everyone. We believe that tools shouldn't be complicated—they should be intuitive, fast, and powerful.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="p-6 bg-white rounded-3xl border border-zinc-100 shadow-sm">
@@ -206,15 +206,15 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
         <div className="space-y-8">
           <div className="space-y-4">
             <h4 className="text-xl font-bold text-zinc-900">1. Usage Agreement</h4>
-            <p className="text-zinc-600 leading-relaxed">By using Glypto, you agree to use our tools responsibly and not for any illegal or harmful activities.</p>
+            <p className="text-zinc-600 leading-relaxed">By using ProToolix, you agree to use our tools responsibly and not for any illegal or harmful activities.</p>
           </div>
           <div className="space-y-4">
             <h4 className="text-xl font-bold text-zinc-900">2. Intellectual Property</h4>
-            <p className="text-zinc-600 leading-relaxed">The content you generate using our tools is yours. However, the Glypto brand, logo, and website code are protected by copyright.</p>
+            <p className="text-zinc-600 leading-relaxed">The content you generate using our tools is yours. However, the ProToolix brand, logo, and website code are protected by copyright.</p>
           </div>
           <div className="space-y-4">
             <h4 className="text-xl font-bold text-zinc-900">3. Disclaimer</h4>
-            <p className="text-zinc-600 leading-relaxed">While we strive for accuracy, AI-generated content should be reviewed by a human. Glypto is not responsible for any errors or omissions in the output.</p>
+            <p className="text-zinc-600 leading-relaxed">While we strive for accuracy, AI-generated content should be reviewed by a human. ProToolix is not responsible for any errors or omissions in the output.</p>
           </div>
         </div>
       )
@@ -239,7 +239,7 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
             <h4 className="text-xl font-bold text-zinc-900">Frequently Asked Questions</h4>
             <div className="space-y-3">
               {[
-                { q: "Is Glypto free to use?", a: "Yes! All our basic tools are free. We use ads to keep the service running." },
+                { q: "Is ProToolix free to use?", a: "Yes! All our basic tools are free. We use ads to keep the service running." },
                 { q: "Do I need an account?", a: "No account is required. You can start using our tools immediately." },
                 { q: "How accurate is the AI?", a: "Our AI uses state-of-the-art models, but we always recommend a quick human review." }
               ].map((faq, i) => (
@@ -261,7 +261,7 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
       )
     },
     blog: {
-      title: "Glypto Blog",
+      title: "ProToolix Blog",
       subtitle: "Insights, updates, and AI tips.",
       icon: MessageSquare,
       color: "text-indigo-600",
@@ -270,8 +270,8 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
         <div className="space-y-12">
           {[
             { title: "The Future of AI Micro-Tools", date: "March 25, 2026", excerpt: "How small, specialized AI tools are changing the way we work and create content." },
-            { title: "Mastering Social Media with Glypto", date: "March 20, 2026", excerpt: "Tips and tricks for using our AI Caption Generator to boost your engagement." },
-            { title: "Privacy in the Age of AI", date: "March 15, 2026", excerpt: "Why Glypto prioritizes your data security and how we keep our tools anonymous." }
+            { title: "Mastering Social Media with ProToolix", date: "March 20, 2026", excerpt: "Tips and tricks for using our AI Caption Generator to boost your engagement." },
+            { title: "Privacy in the Age of AI", date: "March 15, 2026", excerpt: "Why ProToolix prioritizes your data security and how we keep our tools anonymous." }
           ].map((post, i) => (
             <div key={i} className="space-y-3 group cursor-pointer">
               <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">{post.date}</p>
