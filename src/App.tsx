@@ -45,7 +45,8 @@ import {
   Sun,
   Moon,
   ChevronUp,
-  ArrowUp
+  ArrowUp,
+  Play
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Tool, ToolView } from "./types";
@@ -53,6 +54,10 @@ import { Button } from "./components/ui/Button";
 import { cn } from "./lib/utils";
 import { ChatBot } from "./components/ChatBot";
 import { TextTool } from "./components/TextTool";
+import { UsageLimitModal } from "./components/UsageLimitModal";
+import { AdBanner } from "./components/AdBanner";
+import { SocialBarManager } from "./components/SocialBarManager";
+import { checkAndResetUsage, canUseTool, unlockWithAd } from "./lib/usage";
 
 // Lazy load components for performance
 const PdfTools = lazy(() => import("./components/PdfTools").then(m => ({ default: m.PdfTools })));
@@ -219,6 +224,15 @@ export default function App() {
   const [isFooterInView, setIsFooterInView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [hasTriggeredPopunder, setHasTriggeredPopunder] = useState(false);
+
+  // Usage Limit State
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [limitToolId, setLimitToolId] = useState<string | null>(null);
+
+  useEffect(() => {
+    checkAndResetUsage();
+  }, []);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem("theme");
     return saved ? saved === "dark" : true;
@@ -358,20 +372,17 @@ export default function App() {
   }, []);
 
   const triggerPopunder = () => {
-    // IMPORTANT: For the "Click-to-Unlock" logic to work, you MUST use an Adsterra DIRECT LINK.
-    // If you use a Script URL (ending in .js), the browser will just show the code (as seen in your screenshot).
-    
-    if (POPUNDER_URL.includes(".js")) {
-      console.warn("You are using a Script URL instead of a Direct Link. Injecting as script instead of opening tab.");
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.src = POPUNDER_URL;
-      document.body.appendChild(script);
-    } else if (POPUNDER_URL && !POPUNDER_URL.includes("YOUR_DIRECT_LINK_HERE")) {
-      // This is the correct way for a Direct Link
-      window.open(POPUNDER_URL, '_blank');
-    } else {
-      console.error("Please set your Adsterra Direct Link in App.tsx");
+    // Adsterra Popunder Logic
+    if (!hasTriggeredPopunder) {
+      console.log("Triggering Adsterra Popunder...");
+      // <!-- PASTE YOUR ADSTERRA POPUNDER CODE HERE -->
+      
+      // Fallback for demo/direct link if needed
+      if (POPUNDER_URL && !POPUNDER_URL.includes("YOUR_DIRECT_LINK_HERE")) {
+        window.open(POPUNDER_URL, '_blank');
+      }
+      
+      setHasTriggeredPopunder(true);
     }
   };
 
@@ -386,8 +397,8 @@ export default function App() {
   };
 
   const handleNavigate = (view: string) => {
-    // If navigating back to home, show an ad
-    if (view === "home" && currentView !== "home") {
+    // If navigating to a tool, trigger popunder on first click
+    if (view !== "home" && view !== "all-tools") {
       triggerPopunder();
     }
     const path = view === "home" ? "/" : `/${view}`;
@@ -410,6 +421,12 @@ export default function App() {
   const renderAllTools = () => {
     return (
       <div className="space-y-24">
+        {/* Header Banner Ad */}
+        <div className="ad-header max-w-4xl mx-auto py-4 flex flex-col items-center gap-4">
+          <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+          <AdBanner />
+        </div>
+
         <div className="text-center space-y-8 max-w-4xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
@@ -461,31 +478,42 @@ export default function App() {
         {filteredTools.length > 0 ? (
           <div className="tool-grid pt-8 px-4">
             {filteredTools.map((tool, idx) => (
-              <motion.div
-                key={tool.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05, type: "spring", stiffness: 100 }}
-                whileHover={{ y: -12 }}
-                className="glass-card p-10 rounded-[3rem] cursor-pointer group flex flex-col relative overflow-hidden"
-                onClick={() => handleAction(`all-${tool.id}`, () => handleNavigate(tool.id))}
-              >
-                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-8 shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6", tool.color)}>
-                  <tool.icon className="h-7 w-7" />
-                </div>
-                <div className="flex-grow space-y-4">
-                  <h3 className="text-2xl font-black font-display text-text-main group-hover:text-indigo-500 transition-colors">{tool.name}</h3>
-                  <p className="text-text-muted text-sm leading-relaxed mb-8 line-clamp-3 font-medium">
-                    {tool.description}
-                  </p>
-                </div>
-                <div className="pt-6">
-                  <div className="flex items-center text-indigo-500 font-black text-[10px] uppercase tracking-[0.2em] group-hover:translate-x-2 transition-transform">
-                    Launch Tool
-                    <ChevronRight className="h-3 w-3 ml-2" />
+              <React.Fragment key={tool.id}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05, type: "spring", stiffness: 100 }}
+                  whileHover={{ y: -12 }}
+                  className="glass-card p-10 rounded-[3rem] cursor-pointer group flex flex-col relative overflow-hidden"
+                  onClick={() => handleAction(`all-${tool.id}`, () => handleNavigate(tool.id))}
+                >
+                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-8 shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6", tool.color)}>
+                    <tool.icon className="h-7 w-7" />
                   </div>
-                </div>
-              </motion.div>
+                  <div className="flex-grow space-y-4">
+                    <h3 className="text-2xl font-black font-display text-text-main group-hover:text-indigo-500 transition-colors">{tool.name}</h3>
+                    <p className="text-text-muted text-sm leading-relaxed mb-8 line-clamp-3 font-medium">
+                      {tool.description}
+                    </p>
+                  </div>
+                  <div className="pt-6">
+                    <div className="flex items-center text-indigo-500 font-black text-[10px] uppercase tracking-[0.2em] group-hover:translate-x-2 transition-transform">
+                      Launch Tool
+                      <ChevronRight className="h-3 w-3 ml-2" />
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Native Ad after every 3 tools */}
+                {(idx + 1) % 3 === 0 && (
+                  <div className="ad-native col-span-full py-8 flex justify-center">
+                    <div className="glass-card p-8 rounded-[3rem] w-full max-w-4xl flex flex-col items-center justify-center gap-4 border-dashed border-2 border-border-main">
+                      <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Sponsored Content</p>
+                      <AdBanner />
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </div>
         ) : (
@@ -500,8 +528,19 @@ export default function App() {
             <Button variant="ghost" onClick={() => setSearchQuery("")} className="text-indigo-500 font-black uppercase tracking-widest text-xs">Clear Search</Button>
           </div>
         )}
+
+        {/* Bottom Banner Ad for All Tools */}
+        <div className="ad-footer max-w-4xl mx-auto py-12 flex flex-col items-center gap-4 border-t border-border-main">
+          <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+          <AdBanner />
+        </div>
       </div>
     );
+  };
+
+  const handleLimitReached = (toolId: string) => {
+    setLimitToolId(toolId);
+    setShowLimitModal(true);
   };
 
   const renderTool = (view: string) => {
@@ -522,7 +561,7 @@ export default function App() {
           }
 
           if (["bg-remover", "pass-gen", "logo"].includes(view)) {
-            return <SimpleTools type={view as any} />;
+            return <SimpleTools type={view as any} onLimitReached={handleLimitReached} />;
           }
 
           const tool = TOOLS.find(t => t.id === view);
@@ -532,6 +571,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="What is your post about? (e.g., a beautiful sunset at the beach)..."
                   systemInstruction="STRICT OUTPUT ONLY: You are a social media expert. Generate 5 engaging, catchy captions for the user's post. Include relevant hashtags and emojis. Provide variations for different platforms. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the captions."
                   promptPrefix="Generate 5 creative social media captions for the following topic. Include hashtags and emojis. Output ONLY the captions."
@@ -541,6 +581,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Paste the article or text you want to rewrite..."
                   systemInstruction="STRICT OUTPUT ONLY: You are an expert editor. Rewrite the provided text to be unique, engaging, and professional while maintaining the original meaning. Ensure it is plagiarism-free. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the rewritten text."
                   promptPrefix="Rewrite the following text to be more engaging and unique while keeping the core message intact. Output ONLY the rewritten text."
@@ -550,6 +591,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Enter a topic or outline for your article..."
                   systemInstruction="STRICT OUTPUT ONLY: You are an expert SEO content writer. Generate high-quality, engaging, and SEO-optimized articles based on the user's topic. Use proper headings, bullet points, and a professional tone. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the article content."
                   promptPrefix="Generate a comprehensive, SEO-optimized article about the following topic. Include a catchy title and structured content with H2 and H3 tags. Output ONLY the article."
@@ -559,6 +601,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Enter your page content or URL description..."
                   systemInstruction="STRICT OUTPUT ONLY: You are an SEO specialist. Generate compelling meta titles (max 60 chars) and meta descriptions (max 160 chars). DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the meta titles and descriptions."
                   promptPrefix="Generate 3 variations of SEO meta titles and descriptions for the following content. Output ONLY the variations."
@@ -568,6 +611,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Describe the key points of the email..."
                   secondaryInputLabel="Subject Line (Optional)"
                   secondaryInputPlaceholder="Enter a custom subject or leave blank for AI to generate..."
@@ -579,6 +623,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Paste the code snippet you want explained..."
                   systemInstruction="STRICT OUTPUT ONLY: You are a senior software engineer. Explain code snippets in simple terms, breaking down the logic and functions. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the explanation."
                   promptPrefix="Explain the following code snippet in detail. Output ONLY the explanation."
@@ -588,6 +633,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="What is your video about? Mention key points or style..."
                   systemInstruction="STRICT OUTPUT ONLY: You are a successful YouTube scriptwriter. Create engaging scripts with hooks, transitions, and clear calls to action. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the script."
                   promptPrefix="Write a YouTube video script for the following topic. Include an intro, main points, and an outro. Output ONLY the script."
@@ -597,6 +643,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Enter product name and key features..."
                   systemInstruction="STRICT OUTPUT ONLY: You are an expert e-commerce copywriter. Write persuasive product descriptions that highlight benefits and drive sales. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the product description."
                   promptPrefix="Generate a persuasive product description for the following item. Output ONLY the description."
@@ -606,6 +653,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Paste the text you want to fix or improve..."
                   systemInstruction="STRICT OUTPUT ONLY: You are a professional editor. Fix grammar, spelling, and punctuation errors. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the corrected version."
                   promptPrefix="Fix the grammar and improve the tone of the following text. Output ONLY the corrected version."
@@ -615,6 +663,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Paste the long text or article you want to summarize..."
                   systemInstruction="STRICT OUTPUT ONLY: You are an expert at information synthesis. Create concise, accurate summaries. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the summary."
                   promptPrefix="Summarize the following text into a few concise paragraphs or bullet points. Output ONLY the summary."
@@ -624,6 +673,7 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="What do you want to share on LinkedIn? (e.g., achievement, insight)..."
                   systemInstruction="STRICT OUTPUT ONLY: You are a thought leader on LinkedIn. Write professional, engaging posts. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the post content."
                   promptPrefix="Create an engaging LinkedIn post based on the following input. Output ONLY the post."
@@ -633,12 +683,13 @@ export default function App() {
               return (
                 <TextTool 
                   {...tool!}
+                  onLimitReached={handleLimitReached}
                   placeholder="Tell us about yourself, your interests, or your brand..."
                   systemInstruction="STRICT OUTPUT ONLY: You are a social media branding expert. Generate creative, catchy, and personality-driven bios. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the bios."
                   promptPrefix="Generate 5 creative social media bio variations based on the following information. Output ONLY the bios."
                 />
               );
-            case "pdf": return <PdfTools />;
+            case "pdf": return <PdfTools onLimitReached={handleLimitReached} />;
             default: return null;
           }
         })()}
@@ -681,6 +732,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
+      <SocialBarManager />
       {/* AdBlock Warning - Premium Minimalist */}
       <AnimatePresence>
         {showAdBlockMsg && adBlockEnabled && (
@@ -782,6 +834,10 @@ export default function App() {
         </div>
       </header>
 
+      <div className="max-w-7xl mx-auto px-6 mt-6 flex justify-center">
+        <AdBanner />
+      </div>
+
       {/* Mobile Menu - Premium Dark Overlay */}
       <AnimatePresence>
         {isMenuOpen && (
@@ -862,6 +918,12 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Hero Section Banner */}
+                <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4">
+                  <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+                  <AdBanner />
+                </div>
+
                 {/* Why Choose Us Section */}
                 <section id="why-choose-us" className="py-24 md:py-32 scroll-mt-24">
                   <div className="text-center space-y-4 mb-16 md:mb-24">
@@ -909,6 +971,12 @@ export default function App() {
                   </div>
                 </section>
 
+                {/* Mid-Page Banner */}
+                <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4 py-12 border-y border-border-main/50">
+                  <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Sponsored Content</p>
+                  <AdBanner />
+                </div>
+
                 {/* Featured Tools Grid - Homepage Optimized */}
                 <div className="space-y-32">
                   <section className="space-y-16">
@@ -928,28 +996,38 @@ export default function App() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-                      {TOOLS.slice(0, 6).map((tool) => (
-                        <motion.div
-                          key={tool.id}
-                          whileHover={{ y: -12 }}
-                          className="glass-card p-8 rounded-[3rem] cursor-pointer group hover:border-indigo-500/30 transition-all relative overflow-hidden flex flex-col h-full"
-                          onClick={() => handleAction(`featured-${tool.id}`, () => handleNavigate(tool.id))}
-                        >
-                          <div className="flex-grow space-y-6">
-                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-2xl transition-transform group-hover:scale-110 duration-500", tool.color)}>
-                              <tool.icon className="h-7 w-7" />
+                      {TOOLS.slice(0, 6).map((tool, idx) => (
+                        <React.Fragment key={tool.id}>
+                          <motion.div
+                            whileHover={{ y: -12 }}
+                            className="glass-card p-8 rounded-[3rem] cursor-pointer group hover:border-indigo-500/30 transition-all relative overflow-hidden flex flex-col h-full"
+                            onClick={() => handleAction(`featured-${tool.id}`, () => handleNavigate(tool.id))}
+                          >
+                            <div className="flex-grow space-y-6">
+                              <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-6 shadow-2xl transition-transform group-hover:scale-110 duration-500", tool.color)}>
+                                <tool.icon className="h-7 w-7" />
+                              </div>
+                              <h3 className="text-2xl font-black text-text-main group-hover:text-indigo-500 transition-colors tracking-tight">{tool.name}</h3>
+                              <p className="text-text-muted text-base leading-relaxed line-clamp-3 font-medium">
+                                {tool.description}
+                              </p>
                             </div>
-                            <h3 className="text-2xl font-black text-text-main group-hover:text-indigo-500 transition-colors tracking-tight">{tool.name}</h3>
-                            <p className="text-text-muted text-base leading-relaxed line-clamp-3 font-medium">
-                              {tool.description}
-                            </p>
-                          </div>
-                          <div className="pt-10">
-                            <Button className="w-full rounded-2xl h-14 bg-bg-card text-text-main border border-border-main hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all font-black text-xs uppercase tracking-[0.2em]">
-                              Launch Tool
-                            </Button>
-                          </div>
-                        </motion.div>
+                            <div className="pt-10">
+                              <Button className="w-full rounded-2xl h-14 bg-bg-card text-text-main border border-border-main hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all font-black text-xs uppercase tracking-[0.2em]">
+                                Launch Tool
+                              </Button>
+                            </div>
+                          </motion.div>
+                          
+                          {(idx + 1) % 3 === 0 && (
+                            <div className="col-span-full py-8 flex justify-center">
+                              <div className="glass-card p-8 rounded-[3rem] w-full max-w-4xl flex flex-col items-center justify-center gap-4 border-dashed border-2 border-border-main">
+                                <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Sponsored Content</p>
+                                <AdBanner />
+                              </div>
+                            </div>
+                          )}
+                        </React.Fragment>
                       ))}
                     </div>
                   </section>
@@ -957,6 +1035,10 @@ export default function App() {
 
                 {/* About Section */}
                 <section id="about-section" className="py-32 border-t border-border-main">
+                  <div className="max-w-7xl mx-auto px-6 mb-16 flex flex-col items-center gap-4">
+                    <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+                    <AdBanner />
+                  </div>
                   <div className="grid md:grid-cols-2 gap-20 items-center px-4">
                     <div className="space-y-8">
                       <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-[0.3em]">
@@ -988,6 +1070,10 @@ export default function App() {
 
                 {/* Contact Section */}
                 <section id="contact-section" className="py-32 border-t border-border-main">
+                  <div className="max-w-7xl mx-auto px-6 mb-16 flex flex-col items-center gap-4">
+                    <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+                    <AdBanner />
+                  </div>
                   <div className="max-w-4xl mx-auto glass-card p-12 md:p-20 rounded-[4rem] text-center space-y-12 relative overflow-hidden">
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full" />
                     <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/10 blur-[100px] rounded-full" />
@@ -1019,11 +1105,9 @@ export default function App() {
                 </section>
 
                 {/* Ad Placeholder */}
-                <div className="w-full h-24 bg-bg-card rounded-3xl flex items-center justify-center border border-border-main border-dashed">
-                  <div className="text-center">
-                    <p className="text-text-muted text-[10px] uppercase tracking-widest font-black mb-1">Advertisement</p>
-                    <p className="text-text-muted/60 text-sm font-medium">Your Ad Here - Boost Your Traffic</p>
-                  </div>
+                <div className="w-full py-12 flex flex-col items-center justify-center gap-4 border-t border-border-main">
+                  <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+                  <AdBanner />
                 </div>
               </motion.div>
             } />
@@ -1059,8 +1143,20 @@ export default function App() {
                   </p>
                 </div>
 
+                {/* Tool Detail Top Ad */}
+                <div className="py-6 flex flex-col items-center gap-4">
+                  <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+                  <AdBanner />
+                </div>
+
                 <div className="min-h-[400px]">
                   {renderTool(location.pathname.split("/")[1])}
+                </div>
+
+                {/* Tool Detail Bottom Ad */}
+                <div className="py-12 flex flex-col items-center gap-4 border-t border-border-main">
+                  <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+                  <AdBanner />
                 </div>
               </motion.div>
             } />
@@ -1071,6 +1167,11 @@ export default function App() {
 
       {/* Footer */}
       <footer className="bg-black text-white py-20 md:py-32 mt-32 relative overflow-hidden border-t border-zinc-900/50">
+        <div className="max-w-7xl mx-auto px-6 mb-16 flex flex-col items-center gap-4">
+          <p className="text-zinc-500 text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+          <AdBanner />
+        </div>
+
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/5 blur-[120px] rounded-full" />
@@ -1088,22 +1189,6 @@ export default function App() {
               <p className="text-text-muted max-w-sm text-lg leading-relaxed font-medium">
                 The world's most advanced AI micro-tools ecosystem. Designed for creators who demand speed, precision, and ultra-smooth performance.
               </p>
-              
-              <div className="flex items-center gap-4">
-                {[
-                  { icon: Twitter, label: "Twitter" },
-                  { icon: Github, label: "Github" },
-                  { icon: Linkedin, label: "LinkedIn" },
-                  { icon: Facebook, label: "Facebook" }
-                ].map((social) => (
-                  <button 
-                    key={social.label}
-                    className="w-12 h-12 rounded-2xl bg-zinc-900/50 border border-zinc-800/50 flex items-center justify-center text-zinc-500 hover:text-white hover:border-indigo-500/50 transition-all group backdrop-blur-xl"
-                  >
-                    <social.icon className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                  </button>
-                ))}
-              </div>
             </div>
             
             <div className="col-span-1 md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-16">
@@ -1141,6 +1226,12 @@ export default function App() {
           <div className="flex flex-col md:flex-row items-center justify-between pt-20 mt-20 border-t border-zinc-900/50 gap-10">
             <p className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.3em]">© 2026 PROTOOLIX AI. ALL RIGHTS RESERVED.</p>
           </div>
+
+          {/* Bottom Footer Ad */}
+          <div className="mt-20 pt-12 border-t border-zinc-900/30 flex flex-col items-center gap-4">
+            <p className="text-zinc-700 text-[9px] uppercase tracking-widest font-black">Sponsored Content</p>
+            <AdBanner />
+          </div>
         </div>
       </footer>
 
@@ -1165,6 +1256,28 @@ export default function App() {
       </AnimatePresence>
       {/* Chat Support */}
       <ChatBot />
+
+      {/* Sticky Mobile Ad Placeholder (Social Bar is global) */}
+      <div className="ad-sticky fixed bottom-0 left-0 w-full z-[80] md:hidden flex justify-center pointer-events-none">
+        {/* Social Bar script is in index.html and will handle display */}
+      </div>
+
+      {/* Usage Limit Modal */}
+      <UsageLimitModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        onWatchAd={() => {
+          if (limitToolId) {
+            // TRIGGER ADSTERRA DIRECT LINK (REPLACE WITH YOUR REAL LINK)
+            window.open("https://www.google.com", "_blank"); 
+            
+            // UNLOCK ONE MORE USE
+            unlockWithAd(limitToolId);
+            setShowLimitModal(false);
+          }
+        }}
+        toolName={TOOLS.find(t => t.id === limitToolId)?.name || "this tool"}
+      />
     </div>
   );
 }

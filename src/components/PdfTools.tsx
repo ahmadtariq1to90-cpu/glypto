@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { FileText, Merge, Scissors, Upload, Download, Loader2, X, FilePlus, Trash2 } from 'lucide-react';
+import { FileText, Merge, Scissors, Upload, Download, Loader2, X, FilePlus, Trash2, Play, AlertCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { PDFDocument } from 'pdf-lib';
 import { motion, AnimatePresence } from "motion/react";
+import { canUseTool, incrementToolUsage } from "../lib/usage";
+import { AdBanner } from "./AdBanner";
 
-export const PdfTools: React.FC = () => {
+export const PdfTools: React.FC<{ onLimitReached: (toolId: string) => void }> = ({ onLimitReached }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -23,6 +25,13 @@ export const PdfTools: React.FC = () => {
 
   const mergePdfs = async () => {
     if (files.length < 2) return;
+
+    // Check Usage Limit
+    if (!canUseTool("pdf-merger")) {
+      onLimitReached("pdf-merger");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -38,6 +47,7 @@ export const PdfTools: React.FC = () => {
       const pdfBytes = await mergedPdf.save();
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       setResult(URL.createObjectURL(blob));
+      incrementToolUsage("pdf-merger");
     } catch (error) {
       console.error("Error merging PDFs:", error);
       alert("Failed to merge PDFs. Please ensure all files are valid PDF documents.");
@@ -185,6 +195,8 @@ export const PdfTools: React.FC = () => {
           </AnimatePresence>
         </div>
       </div>
+      {/* Individual Tool Page: (B) Below result */}
+      <AdBanner type="result" />
     </div>
   );
 };

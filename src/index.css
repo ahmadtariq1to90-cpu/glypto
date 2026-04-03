@@ -80,8 +80,17 @@
   50% { transform: translateY(-10px); }
 }
 
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(79, 70, 229, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(79, 70, 229, 0.6); }
+}
+
 .animate-float-premium {
   animation: float 6s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
 }
 
 .mesh-bg {
@@ -94,4 +103,29 @@
 
 .tool-grid {
   @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
+}
+
+/* Adsterra Ads Custom Styling */
+.ad-banner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  min-height: 50px;
+}
+
+.ad-sticky {
+  max-width: 350px;
+  width: calc(100% - 3rem);
+}
+
+@media (max-width: 768px) {
+  .ad-sticky {
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    max-width: none;
+    width: auto;
+  }
 }

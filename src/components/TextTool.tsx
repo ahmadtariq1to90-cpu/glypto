@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { generateText } from "../lib/gemini";
 import { Button } from "./ui/Button";
-import { Loader2, Copy, Check, Sparkles, FileText, Download, Send, Wand2, Mail } from "lucide-react";
+import { Loader2, Copy, Check, Sparkles, FileText, Download, Send, Wand2, Mail, Play, AlertCircle } from "lucide-react";
 import Markdown from "react-markdown";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { cn, downloadAsTxt } from "../lib/utils";
+import { canUseTool, incrementToolUsage } from "../lib/usage";
+import { AdBanner } from "./AdBanner";
 
 interface TextToolProps {
   id: string;
@@ -17,6 +19,7 @@ interface TextToolProps {
   promptPrefix: string;
   icon: React.ElementType;
   color: string;
+  onLimitReached: (toolId: string) => void;
 }
 
 export function TextTool({ 
@@ -29,7 +32,8 @@ export function TextTool({
   systemInstruction, 
   promptPrefix, 
   icon: Icon, 
-  color 
+  color,
+  onLimitReached
 }: TextToolProps) {
   const [input, setInput] = useState("");
   const [secondaryInput, setSecondaryInput] = useState("");
@@ -43,6 +47,13 @@ export function TextTool({
       setError("Please provide some input first.");
       return;
     }
+
+    // Check Usage Limit
+    if (!canUseTool(id)) {
+      onLimitReached(id);
+      return;
+    }
+
     setError(null);
     setLoading(true);
     try {
@@ -52,6 +63,7 @@ export function TextTool({
       }
       const response = await generateText(prompt, systemInstruction);
       setResult(response);
+      incrementToolUsage(id);
     } catch (err: any) {
       setError(err.message || "An error occurred while generating content.");
       console.error(err);
@@ -222,6 +234,14 @@ export function TextTool({
                     <Markdown>{result}</Markdown>
                   </motion.div>
 
+                  {/* Tool Result Ad */}
+                  <div className="ad-result py-8 flex justify-center border-t border-border-main mt-8">
+                    <div className="w-full max-w-2xl flex flex-col items-center gap-4">
+                      <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+                      <AdBanner className="w-full flex justify-center" />
+                    </div>
+                  </div>
+
                   {id === 'email-writer' && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -255,6 +275,12 @@ export function TextTool({
             
             <div className={cn("absolute top-0 right-0 w-32 md:w-48 h-32 md:h-48 rounded-bl-[4rem] md:rounded-bl-[6rem] -z-10 opacity-5", color)} />
             <div className={cn("absolute bottom-0 left-0 w-24 md:w-32 h-24 md:h-32 rounded-tr-[3rem] md:rounded-tr-[4rem] -z-10 opacity-5", color)} />
+          </div>
+
+          {/* Persistent Tool Bottom Ad */}
+          <div className="mt-12 py-8 border-t border-border-main flex flex-col items-center gap-4">
+            <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+            <AdBanner />
           </div>
         </div>
       </div>

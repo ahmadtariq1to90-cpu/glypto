@@ -16,6 +16,7 @@ import {
 import { motion } from "motion/react";
 import { Button } from "./ui/Button";
 import { cn } from "../lib/utils";
+import { AdBanner } from "./AdBanner";
 
 interface StaticPageProps {
   type: "about" | "privacy" | "terms" | "contact" | "support" | "blog";
@@ -318,6 +319,12 @@ export function StaticPage({ type, onBack }: StaticPageProps) {
 
         <div className="glass-card p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-zinc-100/50 border-white/40">
           {page.body}
+        </div>
+
+        {/* Static Page Bottom Ad */}
+        <div className="py-12 flex flex-col items-center gap-4 border-t border-zinc-100">
+          <p className="text-zinc-400 text-[10px] uppercase tracking-widest font-black">Advertisement</p>
+          <AdBanner />
         </div>
       </div>
     </motion.div>

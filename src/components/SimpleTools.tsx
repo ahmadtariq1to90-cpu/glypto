@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "./ui/Button";
-import { Copy, Check, RefreshCw, QrCode, Lock, ArrowLeftRight, Eraser, LayoutGrid, Search, Camera, Upload, Download, Loader2, Sparkles, Wand2, X, Image as ImageIcon, AlertCircle } from "lucide-react";
+import { Copy, Check, RefreshCw, QrCode, Lock, ArrowLeftRight, Eraser, LayoutGrid, Search, Camera, Upload, Download, Loader2, Sparkles, Wand2, X, Image as ImageIcon, AlertCircle, Play } from "lucide-react";
 import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
 import { motion, AnimatePresence } from "motion/react";
 import { removeBackground } from "@imgly/background-removal";
 import QRCode from "qrcode";
 import { cn } from "../lib/utils";
+import { canUseTool, incrementToolUsage } from "../lib/usage";
+import { Button } from "./ui/Button";
+import { AdBanner } from "./AdBanner";
 
-export function SimpleTools({ type }: { type: string }) {
+export function SimpleTools({ type, onLimitReached }: { type: string, onLimitReached: (toolId: string) => void }) {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<any>(null);
   const [copied, setCopied] = useState(false);
@@ -38,11 +40,19 @@ export function SimpleTools({ type }: { type: string }) {
 
     const handleRemoveBackground = async () => {
       if (!image) return;
+
+      // Check Usage Limit
+      if (!canUseTool("bg-remover")) {
+        onLimitReached("bg-remover");
+        return;
+      }
+
       setLoading(true);
       try {
         const blob = await removeBackground(image);
         const url = URL.createObjectURL(blob);
         setProcessedImage(url);
+        incrementToolUsage("bg-remover");
       } catch (error) {
         console.error("Background removal failed:", error);
       } finally {
@@ -145,18 +155,27 @@ export function SimpleTools({ type }: { type: string }) {
             </div>
           )}
         </div>
+        {/* Individual Tool Page: (B) Below result */}
+        <AdBanner type="result" />
       </div>
     );
   }
 
   if (type === "pass-gen") {
     const generatePass = () => {
+      // Check Usage Limit
+      if (!canUseTool("pass-gen")) {
+        onLimitReached("pass-gen");
+        return;
+      }
+
       const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
       let pass = "";
       for (let i = 0; i < 16; i++) {
         pass += chars.charAt(Math.floor(Math.random() * chars.length));
       }
       setResult(pass);
+      incrementToolUsage("pass-gen");
     };
 
     return (
@@ -189,6 +208,8 @@ export function SimpleTools({ type }: { type: string }) {
             </button>
           </motion.div>
         )}
+        {/* Individual Tool Page: (B) Below result */}
+        <AdBanner type="result" />
       </div>
     );
   }
@@ -199,6 +220,13 @@ export function SimpleTools({ type }: { type: string }) {
 
     const generateIdeas = () => {
       if (!input) return;
+
+      // Check Usage Limit
+      if (!canUseTool("logo")) {
+        onLimitReached("logo");
+        return;
+      }
+
       setLoading(true);
       setTimeout(() => {
         setIdeas([
@@ -210,6 +238,7 @@ export function SimpleTools({ type }: { type: string }) {
           `${input} Zen`
         ]);
         setLoading(false);
+        incrementToolUsage("logo");
       }, 1500);
     };
 
@@ -251,6 +280,8 @@ export function SimpleTools({ type }: { type: string }) {
             ))}
           </div>
         )}
+        {/* Individual Tool Page: (B) Below result */}
+        <AdBanner type="result" />
       </div>
     );
   }
