@@ -1268,8 +1268,10 @@ export default function App() {
         onClose={() => setShowLimitModal(false)}
         onWatchAd={() => {
           if (limitToolId) {
-            // TRIGGER ADSTERRA DIRECT LINK (REPLACE WITH YOUR REAL LINK)
-            window.open("https://www.google.com", "_blank"); 
+            // TRIGGER ADSTERRA DIRECT LINK / POPUNDER
+            // Using the direct link ID derived from your index.html script
+            const adsterraDirectLink = "https://www.profitablecpmrate.com/d8f123d4048f9e356ef303a430f8b020"; 
+            window.open(adsterraDirectLink, "_blank"); 
             
             // UNLOCK ONE MORE USE
             unlockWithAd(limitToolId);
