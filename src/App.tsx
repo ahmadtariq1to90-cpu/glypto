@@ -169,24 +169,6 @@ const TOOLS: Tool[] = [
     image: "https://picsum.photos/seed/bio/600/400"
   },
   {
-    id: "qr-gen",
-    name: "AI QR Generator",
-    description: "Create custom, high-quality QR codes for URLs, text, or images. Add your brand logo for a professional look and track engagement.",
-    icon: QrCode,
-    category: "Utility",
-    color: "bg-slate-600",
-    image: "https://picsum.photos/seed/qr/600/400"
-  },
-  {
-    id: "qr-scan",
-    name: "QR Code Scanner",
-    description: "Instantly scan and decode any QR code using your camera or by uploading an image. Fast, secure, and works with all standard QR formats.",
-    icon: Search,
-    category: "Utility",
-    color: "bg-emerald-600",
-    image: "https://picsum.photos/seed/scan/600/400"
-  },
-  {
     id: "pass-gen",
     name: "Password Generator",
     description: "Generate ultra-secure, random passwords to protect your online accounts. Customize length and complexity for maximum security.",
@@ -203,6 +185,24 @@ const TOOLS: Tool[] = [
     category: "Design",
     color: "bg-zinc-900",
     image: "https://picsum.photos/seed/logo/600/400"
+  },
+  {
+    id: "pdf",
+    name: "PDF Merger",
+    description: "Combine multiple PDF documents into a single, organized file. Perfect for combining reports, resumes, or any PDF documents quickly and securely.",
+    icon: FileText,
+    category: "Utility",
+    color: "bg-red-500",
+    image: "https://picsum.photos/seed/pdf/600/400"
+  },
+  {
+    id: "bg-remover",
+    name: "AI Background Remover",
+    description: "Remove backgrounds from your images instantly using AI. Create professional-looking transparent PNGs for your products or social media posts.",
+    icon: ImageIcon,
+    category: "Design",
+    color: "bg-purple-500",
+    image: "https://picsum.photos/seed/bg/600/400"
   }
 ];
 
@@ -219,7 +219,6 @@ export default function App() {
   const [isFooterInView, setIsFooterInView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem("theme");
     return saved ? saved === "dark" : true;
@@ -251,12 +250,14 @@ export default function App() {
 
   const currentView = location.pathname.split("/")[1] || "home";
 
-  const categories = ["Social", "Productivity", "Content", "Design", "Utility"];
+  const categories = ["Social", "Productivity", "Content", "Marketing", "Design", "Development", "Utility"];
   const categoryDescriptions: Record<string, string> = {
     Social: "Boost your social media presence with AI-powered engagement tools.",
     Productivity: "Streamline your workflow and get more done in less time.",
     Content: "Transform your writing and content creation process with advanced AI.",
+    Marketing: "Drive growth and sales with AI-optimized marketing copy.",
     Design: "Unleash your creativity with AI-driven visual and design tools.",
+    Development: "Accelerate your coding workflow with AI-powered developer tools.",
     Utility: "Essential daily tools for quick tasks and simple calculations."
   };
 
@@ -350,11 +351,6 @@ export default function App() {
         setShowFloatingButton(true);
       } else {
         setShowFloatingButton(false);
-      }
-      if (window.scrollY > 300) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
       }
     };
     window.addEventListener("scroll", handleScroll);
@@ -525,7 +521,7 @@ export default function App() {
             );
           }
 
-          if (["bg-remover", "qr-gen", "qr-scan", "pass-gen", "logo"].includes(view)) {
+          if (["bg-remover", "pass-gen", "logo"].includes(view)) {
             return <SimpleTools type={view as any} />;
           }
 
@@ -537,8 +533,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="What is your post about? (e.g., a beautiful sunset at the beach)..."
-                  systemInstruction="You are a social media expert. Generate 5 engaging, catchy captions for the user's post. Include relevant hashtags and emojis. Provide variations for different platforms if applicable."
-                  promptPrefix="Generate 5 creative social media captions for the following topic. Include hashtags and emojis."
+                  systemInstruction="STRICT OUTPUT ONLY: You are a social media expert. Generate 5 engaging, catchy captions for the user's post. Include relevant hashtags and emojis. Provide variations for different platforms. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the captions."
+                  promptPrefix="Generate 5 creative social media captions for the following topic. Include hashtags and emojis. Output ONLY the captions."
                 />
               );
             case "article-rewrite":
@@ -546,8 +542,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Paste the article or text you want to rewrite..."
-                  systemInstruction="You are an expert editor. Rewrite the provided text to be unique, engaging, and professional while maintaining the original meaning. Ensure it is plagiarism-free."
-                  promptPrefix="Rewrite the following text to be more engaging and unique while keeping the core message intact."
+                  systemInstruction="STRICT OUTPUT ONLY: You are an expert editor. Rewrite the provided text to be unique, engaging, and professional while maintaining the original meaning. Ensure it is plagiarism-free. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the rewritten text."
+                  promptPrefix="Rewrite the following text to be more engaging and unique while keeping the core message intact. Output ONLY the rewritten text."
                 />
               );
             case "article-gen":
@@ -555,8 +551,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Enter a topic or outline for your article..."
-                  systemInstruction="You are an expert SEO content writer. Generate high-quality, engaging, and SEO-optimized articles based on the user's topic. Use proper headings, bullet points, and a professional yet engaging tone."
-                  promptPrefix="Generate a comprehensive, SEO-optimized article about the following topic. Include a catchy title and structured content with H2 and H3 tags."
+                  systemInstruction="STRICT OUTPUT ONLY: You are an expert SEO content writer. Generate high-quality, engaging, and SEO-optimized articles based on the user's topic. Use proper headings, bullet points, and a professional tone. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the article content."
+                  promptPrefix="Generate a comprehensive, SEO-optimized article about the following topic. Include a catchy title and structured content with H2 and H3 tags. Output ONLY the article."
                 />
               );
             case "seo-meta":
@@ -564,17 +560,19 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Enter your page content or URL description..."
-                  systemInstruction="You are an SEO specialist. Generate compelling meta titles (max 60 chars) and meta descriptions (max 160 chars) that are optimized for search engines and high click-through rates."
-                  promptPrefix="Generate 3 variations of SEO meta titles and descriptions for the following content. Make them catchy and relevant."
+                  systemInstruction="STRICT OUTPUT ONLY: You are an SEO specialist. Generate compelling meta titles (max 60 chars) and meta descriptions (max 160 chars). DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the meta titles and descriptions."
+                  promptPrefix="Generate 3 variations of SEO meta titles and descriptions for the following content. Output ONLY the variations."
                 />
               );
             case "email-writer":
               return (
                 <TextTool 
                   {...tool!}
-                  placeholder="Describe the purpose of the email, recipient, and key points..."
-                  systemInstruction="You are a professional business communicator. Write clear, concise, and effective emails tailored to the user's specific context and desired tone."
-                  promptPrefix="Write a professional email based on these details. Provide a subject line and the email body."
+                  placeholder="Describe the key points of the email..."
+                  secondaryInputLabel="Subject Line (Optional)"
+                  secondaryInputPlaceholder="Enter a custom subject or leave blank for AI to generate..."
+                  systemInstruction="STRICT OUTPUT ONLY: You are a professional business communicator. Write a clear, concise, and effective email. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the Subject and the Body in a structured format."
+                  promptPrefix="Write a professional email based on these details. Output ONLY the Subject and the Body."
                 />
               );
             case "code-explainer":
@@ -582,8 +580,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Paste the code snippet you want explained..."
-                  systemInstruction="You are a senior software engineer and mentor. Explain code snippets in simple terms, breaking down the logic, functions, and potential edge cases."
-                  promptPrefix="Explain the following code snippet in detail but in a way that is easy to understand for a beginner."
+                  systemInstruction="STRICT OUTPUT ONLY: You are a senior software engineer. Explain code snippets in simple terms, breaking down the logic and functions. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the explanation."
+                  promptPrefix="Explain the following code snippet in detail. Output ONLY the explanation."
                 />
               );
             case "yt-script":
@@ -591,8 +589,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="What is your video about? Mention key points or style..."
-                  systemInstruction="You are a successful YouTube scriptwriter. Create engaging scripts with hooks, transitions, and clear calls to action that keep viewers watching."
-                  promptPrefix="Write a YouTube video script for the following topic. Include an intro, main points, and an outro."
+                  systemInstruction="STRICT OUTPUT ONLY: You are a successful YouTube scriptwriter. Create engaging scripts with hooks, transitions, and clear calls to action. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the script."
+                  promptPrefix="Write a YouTube video script for the following topic. Include an intro, main points, and an outro. Output ONLY the script."
                 />
               );
             case "product-desc":
@@ -600,8 +598,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Enter product name and key features..."
-                  systemInstruction="You are an expert e-commerce copywriter. Write persuasive product descriptions that highlight benefits, solve problems, and drive sales."
-                  promptPrefix="Generate a persuasive product description for the following item. Focus on benefits and emotional appeal."
+                  systemInstruction="STRICT OUTPUT ONLY: You are an expert e-commerce copywriter. Write persuasive product descriptions that highlight benefits and drive sales. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the product description."
+                  promptPrefix="Generate a persuasive product description for the following item. Output ONLY the description."
                 />
               );
             case "grammar-fix":
@@ -609,8 +607,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Paste the text you want to fix or improve..."
-                  systemInstruction="You are a professional editor. Fix grammar, spelling, and punctuation errors while improving the overall flow and clarity of the text."
-                  promptPrefix="Fix the grammar and improve the tone of the following text. Provide the corrected version and a brief summary of changes."
+                  systemInstruction="STRICT OUTPUT ONLY: You are a professional editor. Fix grammar, spelling, and punctuation errors. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the corrected version."
+                  promptPrefix="Fix the grammar and improve the tone of the following text. Output ONLY the corrected version."
                 />
               );
             case "summarizer":
@@ -618,8 +616,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Paste the long text or article you want to summarize..."
-                  systemInstruction="You are an expert at information synthesis. Create concise, accurate summaries that capture all key points without losing the core message."
-                  promptPrefix="Summarize the following text into a few concise paragraphs or bullet points."
+                  systemInstruction="STRICT OUTPUT ONLY: You are an expert at information synthesis. Create concise, accurate summaries. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the summary."
+                  promptPrefix="Summarize the following text into a few concise paragraphs or bullet points. Output ONLY the summary."
                 />
               );
             case "linkedin-post":
@@ -627,8 +625,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="What do you want to share on LinkedIn? (e.g., achievement, insight)..."
-                  systemInstruction="You are a thought leader on LinkedIn. Write professional, engaging posts that encourage discussion and build authority in your niche."
-                  promptPrefix="Create an engaging LinkedIn post based on the following input. Use appropriate spacing and relevant hashtags."
+                  systemInstruction="STRICT OUTPUT ONLY: You are a thought leader on LinkedIn. Write professional, engaging posts. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the post content."
+                  promptPrefix="Create an engaging LinkedIn post based on the following input. Output ONLY the post."
                 />
               );
             case "bio-gen":
@@ -636,8 +634,8 @@ export default function App() {
                 <TextTool 
                   {...tool!}
                   placeholder="Tell us about yourself, your interests, or your brand..."
-                  systemInstruction="You are a social media branding expert. Generate creative, catchy, and personality-driven bios that fit the constraints of platforms like Instagram or Twitter."
-                  promptPrefix="Generate 5 creative social media bio variations based on the following information."
+                  systemInstruction="STRICT OUTPUT ONLY: You are a social media branding expert. Generate creative, catchy, and personality-driven bios. DO NOT add any introductory text, explanations, or conversational filler. Output ONLY the bios."
+                  promptPrefix="Generate 5 creative social media bio variations based on the following information. Output ONLY the bios."
                 />
               );
             case "pdf": return <PdfTools />;
@@ -1077,22 +1075,6 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Scroll to Top Button */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8, x: 20 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.8, x: 20 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-8 right-8 md:right-24 z-40 w-12 h-12 bg-bg-card border border-border-main rounded-2xl flex items-center justify-center text-text-main shadow-2xl hover:border-indigo-500/50 hover:text-indigo-500 transition-all group"
-            aria-label="Scroll to top"
-          >
-            <ArrowUp className="h-5 w-5 group-hover:-translate-y-1 transition-transform" />
-          </motion.button>
-        )}
-      </AnimatePresence>
-
       {/* Chat Support */}
       <ChatBot />
     </div>
