@@ -730,9 +730,10 @@ export default function App() {
           
           <div className="hidden md:flex items-center gap-10">
             <nav className="flex items-center gap-8">
+              <button onClick={() => handleAction("nav-home", () => handleNavigate("home"))} className="text-xs font-bold uppercase tracking-widest text-text-muted hover:text-indigo-500 transition-colors">Home</button>
               <button onClick={() => handleAction("nav-tools", () => handleNavigate("all-tools"))} className="text-xs font-bold uppercase tracking-widest text-text-muted hover:text-indigo-500 transition-colors">Tools</button>
               <button onClick={() => handleAction("nav-about", () => handleNavigate("about"))} className="text-xs font-bold uppercase tracking-widest text-text-muted hover:text-indigo-500 transition-colors">About</button>
-              <button onClick={() => handleAction("nav-blog", () => handleNavigate("blog"))} className="text-xs font-bold uppercase tracking-widest text-text-muted hover:text-indigo-500 transition-colors">Blog</button>
+              <button onClick={() => handleAction("nav-contact", () => handleNavigate("contact"))} className="text-xs font-bold uppercase tracking-widest text-text-muted hover:text-indigo-500 transition-colors">Contact</button>
             </nav>
             <div className="flex items-center gap-4">
               <button 
@@ -824,6 +825,14 @@ export default function App() {
               >
                 {/* Hero Section */}
                 <div className="text-center space-y-8 max-w-5xl mx-auto px-4 pt-12 md:pt-24 relative">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    The Future of AI is Here
+                  </motion.div>
                   <h1 className="text-5xl md:text-8xl font-black font-display tracking-tight text-text-main leading-[0.95] mb-8">
                     AI Tools for the <br />
                     <span className="premium-gradient-text">Modern Creator</span>
@@ -837,21 +846,68 @@ export default function App() {
                       className="rounded-full px-12 h-16 text-base font-bold bg-indigo-600 hover:bg-indigo-700 shadow-[0_0_30px_rgba(79,70,229,0.4)] transition-all hover:scale-105 border-none"
                       onClick={() => handleAction("hero-explore", () => handleNavigate("all-tools"))}
                     >
-                      Explore All Tools
+                      Start Using Tools
                     </Button>
                     <Button 
                       variant="outline"
                       size="lg" 
                       className="rounded-full px-12 h-16 text-base font-bold border-border-main text-text-muted hover:bg-bg-card transition-all"
                       onClick={() => {
-                        const aboutSection = document.getElementById('about-section');
-                        if (aboutSection) aboutSection.scrollIntoView({ behavior: 'smooth' });
+                        const whySection = document.getElementById('why-choose-us');
+                        if (whySection) whySection.scrollIntoView({ behavior: 'smooth' });
                       }}
                     >
-                      Our Story
+                      Why Choose Us?
                     </Button>
                   </div>
                 </div>
+
+                {/* Why Choose Us Section */}
+                <section id="why-choose-us" className="py-24 md:py-32 scroll-mt-24">
+                  <div className="text-center space-y-4 mb-16 md:mb-24">
+                    <div className="text-indigo-500 font-mono text-xs tracking-widest uppercase">Premium Benefits</div>
+                    <h2 className="text-4xl md:text-6xl font-black font-display tracking-tight text-text-main">Why Choose ProToolix?</h2>
+                    <p className="text-text-muted font-medium text-lg max-w-2xl mx-auto">We combine cutting-edge AI with a focus on user experience to deliver unmatched results.</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+                    {[
+                      {
+                        title: "Lightning Fast",
+                        desc: "Our optimized AI models deliver high-quality results in milliseconds, keeping you in your creative flow.",
+                        icon: Zap,
+                        color: "text-amber-500",
+                        bg: "bg-amber-500/10"
+                      },
+                      {
+                        title: "Privacy First",
+                        desc: "We don't store your personal data or the content you generate. Your privacy is our top priority.",
+                        icon: Shield,
+                        color: "text-emerald-500",
+                        bg: "bg-emerald-500/10"
+                      },
+                      {
+                        title: "Intuitive Design",
+                        desc: "A clean, modern interface that makes advanced AI technology accessible and easy to use for everyone.",
+                        icon: LayoutGrid,
+                        color: "text-indigo-500",
+                        bg: "bg-indigo-500/10"
+                      }
+                    ].map((benefit, i) => (
+                      <motion.div
+                        key={i}
+                        whileHover={{ y: -10 }}
+                        className="glass-card p-10 rounded-[3rem] space-y-6 border-white/40"
+                      >
+                        <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center shadow-inner", benefit.bg, benefit.color)}>
+                          <benefit.icon className="h-8 w-8" />
+                        </div>
+                        <h3 className="text-2xl font-black text-text-main tracking-tight">{benefit.title}</h3>
+                        <p className="text-text-muted font-medium leading-relaxed">{benefit.desc}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </section>
 
                 {/* Featured Tools Grid - Homepage Optimized */}
                 <div className="space-y-32">
@@ -926,6 +982,38 @@ export default function App() {
                           <p className="text-xs font-bold text-text-muted uppercase tracking-[0.2em]">Premium Tools</p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Contact Section */}
+                <section id="contact-section" className="py-32 border-t border-border-main">
+                  <div className="max-w-4xl mx-auto glass-card p-12 md:p-20 rounded-[4rem] text-center space-y-12 relative overflow-hidden">
+                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full" />
+                    <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/10 blur-[100px] rounded-full" />
+                    
+                    <div className="space-y-6 relative z-10">
+                      <div className="text-indigo-500 font-mono text-xs tracking-widest uppercase">Get in Touch</div>
+                      <h2 className="text-4xl md:text-6xl font-black font-display tracking-tight text-text-main">Have a Question?</h2>
+                      <p className="text-text-muted font-medium text-lg max-w-xl mx-auto">Our support team is ready to assist you with any specific inquiries or feedback about our AI tools.</p>
+                    </div>
+
+                    <div className="flex flex-wrap justify-center gap-6 relative z-10">
+                      <Button 
+                        size="lg" 
+                        className="rounded-full px-12 h-16 text-base font-bold bg-indigo-600 hover:bg-indigo-700 shadow-xl"
+                        onClick={() => handleNavigate("contact")}
+                      >
+                        Contact Support
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        size="lg" 
+                        className="rounded-full px-12 h-16 text-base font-bold"
+                        onClick={() => window.location.href = "mailto:support@protoolix.com"}
+                      >
+                        Email Us Directly
+                      </Button>
                     </div>
                   </div>
                 </section>

@@ -13,17 +13,17 @@ export function Button({
   ...props 
 }: ButtonProps) {
   const variants = {
-    primary: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm",
-    secondary: "bg-zinc-900 text-white hover:bg-zinc-800",
-    outline: "border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700",
-    ghost: "hover:bg-zinc-100 text-zinc-600",
-    link: "bg-transparent text-indigo-600 hover:underline p-0 h-auto",
+    primary: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-[0_0_20px_rgba(79,70,229,0.2)] hover:shadow-[0_0_30px_rgba(79,70,229,0.4)] border-none",
+    secondary: "bg-zinc-900 text-white hover:bg-zinc-800 shadow-xl dark:bg-white dark:text-black dark:hover:bg-zinc-200",
+    outline: "border-2 border-border-main bg-transparent hover:bg-bg-card text-text-main hover:border-indigo-500/50",
+    ghost: "hover:bg-indigo-500/10 text-text-muted hover:text-indigo-500",
+    link: "bg-transparent text-indigo-500 hover:text-indigo-600 p-0 h-auto",
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2",
-    lg: "px-6 py-3 text-lg",
+    sm: "px-4 py-2 text-[10px] font-black uppercase tracking-widest",
+    md: "px-6 py-3 text-xs font-black uppercase tracking-widest",
+    lg: "px-10 py-4 text-sm font-black uppercase tracking-widest",
   };
 
   return (
