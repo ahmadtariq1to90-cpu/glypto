@@ -1,332 +1,211 @@
-import React from "react";
-import { 
-  Shield, 
-  Zap, 
-  Mail, 
-  Info, 
-  FileText, 
-  HelpCircle, 
-  ArrowLeft,
-  CheckCircle2,
-  Globe,
-  Lock,
-  MessageSquare,
-  ChevronRight
-} from "lucide-react";
+import React, { useState } from "react";
 import { motion } from "motion/react";
+import { ArrowLeft, Shield, FileText, Info, Mail, HelpCircle, Cookie, Send, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { SEO } from "./SEO";
 import { Button } from "./ui/Button";
-import { cn } from "../lib/utils";
-import { AdBanner } from "./AdBanner";
 
 interface StaticPageProps {
-  type: "about" | "privacy" | "terms" | "contact" | "support" | "blog";
+  type: "about" | "privacy" | "terms" | "contact" | "support" | "cookies";
   onBack: () => void;
 }
 
-function ContactSection({ onBack }: { onBack: () => void }) {
-  const [formState, setFormState] = React.useState<'idle' | 'sending' | 'sent'>('idle');
-  const [showForm, setShowForm] = React.useState(false);
+const CONTENT = {
+  about: {
+    title: "About ProToolix",
+    icon: Info,
+    description: "Learn more about our mission and the team behind ProToolix.",
+    content: `
+      <p>ProToolix is a comprehensive platform dedicated to providing high-quality, free online tools for everyone. Our mission is to simplify complex tasks and boost productivity through intuitive, AI-powered solutions.</p>
+      <h2>Our Story</h2>
+      <p>Founded in 2024, ProToolix started with a simple idea: professional-grade tools shouldn't be locked behind expensive subscriptions. We've built a suite of over 50 tools ranging from AI content generators to advanced PDF editors, all accessible for free.</p>
+      <h2>Why Choose Us?</h2>
+      <ul>
+        <li><strong>AI-Powered:</strong> We leverage the latest AI models to provide superior results.</li>
+        <li><strong>Privacy First:</strong> Your data is processed securely and never stored on our servers.</li>
+        <li><strong>100% Free:</strong> No hidden costs, no subscriptions, just free tools.</li>
+        <li><strong>Fast & Reliable:</strong> Optimized for speed and performance.</li>
+      </ul>
+    `
+  },
+  privacy: {
+    title: "Privacy Policy",
+    icon: Shield,
+    description: "How we protect your data and respect your privacy.",
+    content: `
+      <p>At ProToolix, we take your privacy seriously. This policy outlines how we handle your data when you use our services.</p>
+      <h2>Data Collection</h2>
+      <p>We do not collect or store any personal data you process through our tools. All processing happens in real-time, and your files are deleted immediately after the task is complete.</p>
+      <h2>Cookies</h2>
+      <p>We use essential cookies to improve your experience and remember your preferences (like dark mode). We also use third-party analytics to understand how our site is used.</p>
+      <h2>Third-Party Services</h2>
+      <p>We may use third-party services like Google Analytics and AdSense. These services have their own privacy policies.</p>
+    `
+  },
+  terms: {
+    title: "Terms of Service",
+    icon: FileText,
+    description: "The rules and guidelines for using ProToolix.",
+    content: `
+      <p>By using ProToolix, you agree to comply with these terms of service.</p>
+      <h2>Usage Guidelines</h2>
+      <p>Our tools are provided for personal and professional use. You agree not to use our services for any illegal or harmful activities.</p>
+      <h2>Disclaimer</h2>
+      <p>ProToolix is provided "as is" without any warranties. We are not responsible for any data loss or damages resulting from the use of our tools.</p>
+      <h2>Changes to Terms</h2>
+      <p>We reserve the right to update these terms at any time. Continued use of the site constitutes acceptance of the new terms.</p>
+    `
+  },
+  cookies: {
+    title: "Cookie Policy",
+    icon: Cookie,
+    description: "How we use cookies to enhance your experience.",
+    content: `
+      <p>This Cookie Policy explains how ProToolix uses cookies and similar technologies to recognize you when you visit our website.</p>
+      <h2>What are cookies?</h2>
+      <p>Cookies are small data files that are placed on your computer or mobile device when you visit a website. Cookies are widely used by website owners in order to make their websites work, or to work more efficiently, as well as to provide reporting information.</p>
+      <h2>Why do we use cookies?</h2>
+      <p>We use first-party and third-party cookies for several reasons. Some cookies are required for technical reasons in order for our Website to operate, and we refer to these as "essential" or "strictly necessary" cookies.</p>
+      <ul>
+        <li><strong>Essential Cookies:</strong> Necessary for the website to function properly.</li>
+        <li><strong>Preference Cookies:</strong> Used to remember your settings like dark mode.</li>
+        <li><strong>Analytics Cookies:</strong> Help us understand how visitors interact with our website.</li>
+      </ul>
+      <h2>How can I control cookies?</h2>
+      <p>You have the right to decide whether to accept or reject cookies. You can set or amend your web browser controls to accept or refuse cookies.</p>
+    `
+  },
+  contact: {
+    title: "Contact Us",
+    icon: Mail,
+    description: "Get in touch with the ProToolix team.",
+    content: "" // Content will be replaced by the form
+  },
+  support: {
+    title: "Help & Support",
+    icon: HelpCircle,
+    description: "Find answers to common questions and get help.",
+    content: `
+      <p>Need help using our tools? Check out our FAQs or contact support.</p>
+      <h2>Frequently Asked Questions</h2>
+      <ul>
+        <li><strong>Is ProToolix really free?</strong> Yes, all our tools are 100% free to use.</li>
+        <li><strong>Do I need to create an account?</strong> No, you can use all tools without registration.</li>
+        <li><strong>Is my data safe?</strong> Yes, we process data securely and do not store your files.</li>
+      </ul>
+    `
+  }
+};
+
+export function StaticPage({ type }: StaticPageProps) {
+  const data = CONTENT[type];
+  const Icon = data.icon;
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setFormState('sending');
-    setTimeout(() => {
-      setFormState('sent');
-    }, 1500);
+    setSubmitted(true);
   };
 
-  if (formState === 'sent') {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-center py-12 space-y-6"
-      >
-        <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-          <CheckCircle2 className="h-10 w-10" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-2xl font-black text-zinc-900">Thanks for reaching out!</h3>
-          <p className="text-zinc-500 font-medium">We've received your message and will get back to you within 24 hours.</p>
-        </div>
-        <Button 
-          onClick={() => setFormState('idle')}
-          className="rounded-xl px-8 h-12 bg-zinc-900 hover:bg-zinc-800 font-bold"
-        >
-          Send Another Message
-        </Button>
-      </motion.div>
-    );
-  }
-
   return (
-    <div className="space-y-12">
-      {/* FAQs Section */}
-      <div className="space-y-6">
-        <h4 className="text-xl font-black text-zinc-900 flex items-center gap-2">
-          <HelpCircle className="h-5 w-5 text-indigo-600" />
-          Common Questions
-        </h4>
-        <div className="grid gap-4">
-          {[
-            { q: "How can I report a bug?", a: "You can use the form below or the feedback button on each tool page." },
-            { q: "Is my data safe?", a: "Absolutely. We don't store any of your inputs or generated content." },
-            { q: "Can I request a new tool?", a: "Yes! We love hearing suggestions. Use the form below to let us know." }
-          ].map((faq, i) => (
-            <div key={i} className="p-5 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-1">
-              <p className="font-bold text-zinc-900 text-sm">{faq.q}</p>
-              <p className="text-sm text-zinc-500 font-medium">{faq.a}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      <SEO 
+        title={`${data.title} - ProToolix`}
+        description={data.description}
+      />
+      
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 text-text-muted hover:text-indigo-600 transition-colors mb-8"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        Back to Home
+      </Link>
 
-      {/* Contact Form Section */}
-      <div className="space-y-6 pt-6 border-t border-zinc-100">
-        {!showForm ? (
-          <div className="text-center py-8 space-y-6">
-            <div className="space-y-2">
-              <h4 className="text-xl font-black text-zinc-900">Need more help?</h4>
-              <p className="text-sm text-zinc-500 font-medium">Our support team is ready to assist you with any specific inquiries.</p>
-            </div>
-            <Button 
-              onClick={() => setShowForm(true)}
-              className="rounded-2xl px-10 h-14 bg-indigo-600 hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-100"
-            >
-              Contact Support
-            </Button>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-bg-card border border-border-main rounded-[2.5rem] p-8 md:p-12 shadow-xl"
+      >
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-16 h-16 bg-indigo-500/10 text-indigo-500 rounded-2xl flex items-center justify-center">
+            <Icon className="w-8 h-8" />
+          </div>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-text-main">{data.title}</h1>
+            <p className="text-text-muted">{data.description}</p>
+          </div>
+        </div>
+
+        {type === "contact" ? (
+          <div className="space-y-8">
+            {submitted ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-12 space-y-4"
+              >
+                <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-10 h-10" />
+                </div>
+                <h2 className="text-2xl font-bold text-text-main">Message Sent!</h2>
+                <p className="text-text-muted">Thank you for reaching out. We'll get back to you soon.</p>
+                <Button onClick={() => setSubmitted(false)} variant="outline">Send Another Message</Button>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-text-main">Full Name</label>
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="John Doe"
+                      className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-text-main">Email Address</label>
+                    <input 
+                      required
+                      type="email" 
+                      placeholder="john@example.com"
+                      className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-text-main">Subject</label>
+                  <input 
+                    required
+                    type="text" 
+                    placeholder="How can we help?"
+                    className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-text-main">Message</label>
+                  <textarea 
+                    required
+                    rows={5}
+                    placeholder="Tell us more about your inquiry..."
+                    className="w-full p-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all resize-none"
+                  />
+                </div>
+                <Button type="submit" className="w-full h-14 rounded-xl bg-indigo-600 text-white font-bold text-lg flex items-center justify-center gap-2">
+                  <Send className="w-5 h-5" />
+                  Send Message
+                </Button>
+              </form>
+            )}
           </div>
         ) : (
-          <motion.form 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            onSubmit={handleSubmit} 
-            className="space-y-4"
-          >
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Name</label>
-                <input 
-                  required
-                  type="text" 
-                  placeholder="Your Name"
-                  className="w-full h-12 px-4 rounded-xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email</label>
-                <input 
-                  required
-                  type="email" 
-                  placeholder="your@email.com"
-                  className="w-full h-12 px-4 rounded-xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium"
-                />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Message</label>
-              <textarea 
-                required
-                rows={4}
-                placeholder="How can we help you?"
-                className="w-full p-4 rounded-xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium resize-none"
-              />
-            </div>
-            <Button 
-              type="submit"
-              disabled={formState === 'sending'}
-              className="w-full h-14 rounded-2xl bg-rose-600 hover:bg-rose-700 font-bold shadow-lg shadow-rose-100 transition-all hover:scale-[1.02]"
-            >
-              {formState === 'sending' ? 'Sending...' : 'Send Message'}
-            </Button>
-          </motion.form>
+          <div 
+            className="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-bold prose-p:text-text-muted prose-li:text-text-muted"
+            dangerouslySetInnerHTML={{ __html: data.content }}
+          />
         )}
-      </div>
+      </motion.div>
     </div>
-  );
-}
-
-export function StaticPage({ type, onBack }: StaticPageProps) {
-  const content = {
-    about: {
-      title: "About ProToolix",
-      subtitle: "Empowering the next generation of creators.",
-      icon: Info,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50",
-      body: (
-        <div className="space-y-8">
-          <p className="text-lg text-zinc-600 leading-relaxed font-medium">
-            ProToolix was founded with a simple mission: to make advanced AI technology accessible to everyone. We believe that tools shouldn't be complicated—they should be intuitive, fast, and powerful.
-          </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 bg-white rounded-3xl border border-zinc-100 shadow-sm">
-              <Zap className="h-6 w-6 text-amber-500 mb-4" />
-              <h4 className="font-bold text-zinc-900 mb-2">Lightning Fast</h4>
-              <p className="text-sm text-zinc-500">Our tools are optimized for speed, delivering professional results in seconds.</p>
-            </div>
-            <div className="p-6 bg-white rounded-3xl border border-zinc-100 shadow-sm">
-              <Shield className="h-6 w-6 text-emerald-500 mb-4" />
-              <h4 className="font-bold text-zinc-900 mb-2">Privacy First</h4>
-              <p className="text-sm text-zinc-500">We don't store your personal data or the content you generate. Your privacy is our priority.</p>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    privacy: {
-      title: "Privacy Policy",
-      subtitle: "Your data is yours. We keep it that way.",
-      icon: Lock,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
-      body: (
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-zinc-900">1. Data Collection</h4>
-            <p className="text-zinc-600 leading-relaxed">We do not collect personal information unless you explicitly provide it. Our AI tools process data in real-time and do not store your inputs or outputs on our servers.</p>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-zinc-900">2. Cookies</h4>
-            <p className="text-zinc-600 leading-relaxed">We use essential cookies to ensure the website functions correctly and to remember your preferences (like theme settings).</p>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-zinc-900">3. Third-Party Services</h4>
-            <p className="text-zinc-600 leading-relaxed">We use trusted third-party services for analytics and advertising to keep our tools free for everyone. These services may collect anonymous usage data.</p>
-          </div>
-        </div>
-      )
-    },
-    terms: {
-      title: "Terms of Service",
-      subtitle: "Simple rules for a better experience.",
-      icon: FileText,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-      body: (
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-zinc-900">1. Usage Agreement</h4>
-            <p className="text-zinc-600 leading-relaxed">By using ProToolix, you agree to use our tools responsibly and not for any illegal or harmful activities.</p>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-zinc-900">2. Intellectual Property</h4>
-            <p className="text-zinc-600 leading-relaxed">The content you generate using our tools is yours. However, the ProToolix brand, logo, and website code are protected by copyright.</p>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-zinc-900">3. Disclaimer</h4>
-            <p className="text-zinc-600 leading-relaxed">While we strive for accuracy, AI-generated content should be reviewed by a human. ProToolix is not responsible for any errors or omissions in the output.</p>
-          </div>
-        </div>
-      )
-    },
-    contact: {
-      title: "Contact Us",
-      subtitle: "We're here to help you succeed.",
-      icon: Mail,
-      color: "text-rose-600",
-      bg: "bg-rose-50",
-      body: <ContactSection onBack={onBack} />
-    },
-    support: {
-      title: "Help & Support",
-      subtitle: "Find answers and get assistance.",
-      icon: HelpCircle,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-      body: (
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-zinc-900">Frequently Asked Questions</h4>
-            <div className="space-y-3">
-              {[
-                { q: "Is ProToolix free to use?", a: "Yes! All our basic tools are free. We use ads to keep the service running." },
-                { q: "Do I need an account?", a: "No account is required. You can start using our tools immediately." },
-                { q: "How accurate is the AI?", a: "Our AI uses state-of-the-art models, but we always recommend a quick human review." }
-              ].map((faq, i) => (
-                <div key={i} className="p-6 bg-white rounded-2xl border border-zinc-100 shadow-sm space-y-2">
-                  <p className="font-bold text-zinc-900">{faq.q}</p>
-                  <p className="text-sm text-zinc-500">{faq.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="p-8 bg-blue-600 rounded-[2.5rem] text-white text-center space-y-4">
-            <h4 className="text-xl font-bold">Still need help?</h4>
-            <p className="text-blue-100 text-sm">Our support team is ready to assist you with any questions or issues.</p>
-            <Button variant="secondary" className="w-full h-12 rounded-xl font-bold" onClick={() => onBack()}>
-              Contact Support
-            </Button>
-          </div>
-        </div>
-      )
-    },
-    blog: {
-      title: "ProToolix Blog",
-      subtitle: "Insights, updates, and AI tips.",
-      icon: MessageSquare,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50",
-      body: (
-        <div className="space-y-12">
-          {[
-            { title: "The Future of AI Micro-Tools", date: "March 25, 2026", excerpt: "How small, specialized AI tools are changing the way we work and create content." },
-            { title: "Mastering Social Media with ProToolix", date: "March 20, 2026", excerpt: "Tips and tricks for using our AI Caption Generator to boost your engagement." },
-            { title: "Privacy in the Age of AI", date: "March 15, 2026", excerpt: "Why ProToolix prioritizes your data security and how we keep our tools anonymous." }
-          ].map((post, i) => (
-            <div key={i} className="space-y-3 group cursor-pointer">
-              <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">{post.date}</p>
-              <h4 className="text-2xl font-bold text-zinc-900 group-hover:text-indigo-600 transition-colors">{post.title}</h4>
-              <p className="text-zinc-500 font-medium leading-relaxed">{post.excerpt}</p>
-              <div className="pt-2">
-                <Button variant="ghost" className="p-0 h-auto font-bold text-zinc-900 hover:bg-transparent">Read More →</Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )
-    }
-  };
-
-  const page = content[type];
-  const Icon = page.icon;
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="max-w-3xl mx-auto space-y-12"
-    >
-      <button 
-        onClick={onBack}
-        className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors text-sm font-bold uppercase tracking-wider group"
-      >
-        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-        Back to Home
-      </button>
-
-      <div className="space-y-8">
-        <div className="flex items-center gap-6">
-          <div className={cn("w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-inner", page.bg, page.color)}>
-            <Icon className="h-10 w-10" />
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-4xl font-black font-display tracking-tight text-zinc-900">{page.title}</h1>
-            <p className="text-lg text-zinc-500 font-medium">{page.subtitle}</p>
-          </div>
-        </div>
-
-        <div className="glass-card p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-zinc-100/50 border-white/40">
-          {page.body}
-        </div>
-
-        {/* Static Page Bottom Ad */}
-        <div className="py-12 flex flex-col items-center gap-4 border-t border-zinc-100">
-          <p className="text-zinc-400 text-[10px] uppercase tracking-widest font-black">Advertisement</p>
-          <AdBanner />
-        </div>
-      </div>
-    </motion.div>
   );
 }

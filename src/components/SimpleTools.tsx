@@ -72,18 +72,18 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
 
     return (
       <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40 overflow-hidden">
-        <div className="w-16 h-16 md:w-20 md:h-20 bg-purple-100 text-purple-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-purple-50">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-purple-500/10 text-purple-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg">
           <ImageIcon className="h-8 w-8 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900">AI Background Remover</h3>
-          <p className="text-zinc-500 font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Instantly remove backgrounds from your images using advanced AI technology.</p>
+          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-text-main">AI Background Remover</h3>
+          <p className="text-text-muted font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Instantly remove backgrounds from your images using advanced AI technology.</p>
         </div>
 
         <div className="space-y-6">
           {!image ? (
             <label className="block">
-              <div className="p-12 md:p-16 rounded-[2rem] md:rounded-[2.5rem] border-2 border-dashed border-zinc-200 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-4 group">
+              <div className="p-12 md:p-16 rounded-[2rem] md:rounded-[2.5rem] border-2 border-dashed border-border-main hover:border-indigo-500 hover:bg-indigo-500/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-4 group">
                 <input 
                   type="file" 
                   accept="image/*" 
@@ -91,18 +91,18 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
                   className="hidden"
                   ref={fileInputRef}
                 />
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-2xl md:rounded-3xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                  <Upload className="h-8 w-8 md:h-10 md:w-10 text-zinc-300 group-hover:text-indigo-500 transition-colors" />
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-bg-card rounded-2xl md:rounded-3xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                  <Upload className="h-8 w-8 md:h-10 md:w-10 text-text-muted group-hover:text-indigo-500 transition-colors" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs md:text-sm font-black uppercase tracking-widest text-zinc-400 group-hover:text-indigo-600 transition-colors">Upload Image</p>
-                  <p className="text-[10px] text-zinc-300 font-medium">PNG, JPG or WEBP (Max 5MB)</p>
+                  <p className="text-xs md:text-sm font-black uppercase tracking-widest text-text-muted group-hover:text-indigo-600 transition-colors">Upload Image</p>
+                  <p className="text-[10px] text-text-muted opacity-60 font-medium">PNG, JPG or WEBP (Max 5MB)</p>
                 </div>
               </div>
             </label>
           ) : (
             <div className="space-y-6">
-              <div className="relative group rounded-[2rem] md:rounded-[2.5rem] overflow-hidden bg-zinc-100 border border-zinc-200 min-h-[200px] md:min-h-[300px] flex items-center justify-center">
+              <div className="relative group rounded-[2rem] md:rounded-[2.5rem] overflow-hidden bg-bg-card border border-border-main min-h-[200px] md:min-h-[300px] flex items-center justify-center">
                 <img 
                   src={processedImage || image} 
                   alt="Preview" 
@@ -110,7 +110,7 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
                 />
                 <button 
                   onClick={() => { setImage(null); setProcessedImage(null); }}
-                  className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-zinc-400 hover:text-red-500 transition-all"
+                  className="absolute top-4 right-4 p-2 bg-bg-card/90 backdrop-blur-md rounded-xl shadow-lg text-text-muted hover:text-red-500 transition-all"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -147,7 +147,7 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
                 <Button 
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="h-12 md:h-14 rounded-xl md:rounded-2xl border-zinc-200 font-bold px-8"
+                  className="h-12 md:h-14 rounded-xl md:rounded-2xl border-border-main font-bold px-8 text-text-main"
                 >
                   Change Image
                 </Button>
@@ -156,7 +156,7 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
           )}
         </div>
         {/* Individual Tool Page: (B) Below result */}
-        <AdBanner type="result" />
+        <AdBanner />
       </div>
     );
   }
@@ -180,12 +180,12 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
 
     return (
       <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40 overflow-hidden">
-        <div className="w-16 h-16 md:w-20 md:h-20 bg-orange-100 text-orange-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-orange-50">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-orange-500/10 text-orange-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg">
           <Lock className="h-8 w-8 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900">Password Generator</h3>
-          <p className="text-zinc-500 font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Generate ultra-secure, random passwords to keep your accounts safe.</p>
+          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-text-main">Password Generator</h3>
+          <p className="text-text-muted font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Generate ultra-secure, random passwords to keep your accounts safe.</p>
         </div>
 
         <Button 
@@ -200,16 +200,16 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 md:p-6 bg-zinc-50 rounded-2xl md:rounded-[2rem] border border-zinc-100 flex flex-col sm:flex-row items-center justify-between shadow-inner gap-4"
+            className="p-4 md:p-6 bg-bg-card rounded-2xl md:rounded-[2rem] border border-border-main flex flex-col sm:flex-row items-center justify-between shadow-inner gap-4"
           >
             <code className="text-base md:text-2xl font-mono font-black text-indigo-600 tracking-wider break-all text-center sm:text-left">{result}</code>
-            <button onClick={() => handleCopy(result)} className="p-2.5 md:p-3 bg-white rounded-xl shadow-md hover:text-indigo-600 transition-all active:scale-90 shrink-0">
-              {copied ? <Check className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" /> : <Copy className="h-5 w-5 md:h-6 md:w-6 text-zinc-400" />}
+            <button onClick={() => handleCopy(result)} className="p-2.5 md:p-3 bg-bg-main rounded-xl shadow-md hover:text-indigo-600 transition-all active:scale-90 shrink-0">
+              {copied ? <Check className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" /> : <Copy className="h-5 w-5 md:h-6 md:w-6 text-text-muted" />}
             </button>
           </motion.div>
         )}
         {/* Individual Tool Page: (B) Below result */}
-        <AdBanner type="result" />
+        <AdBanner />
       </div>
     );
   }
@@ -244,12 +244,12 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
 
     return (
       <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40 overflow-hidden">
-        <div className="w-16 h-16 md:w-20 md:h-20 bg-zinc-900 text-white rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-xl">
+        <div className="w-16 h-16 md:w-20 md:h-20 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-xl">
           <LayoutGrid className="h-8 w-8 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900">Logo Idea Maker</h3>
-          <p className="text-zinc-500 font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Enter your brand name to generate modern, professional logo concepts.</p>
+          <h3 className="text-2xl md:text-3xl font-black tracking-tight text-text-main">Logo Idea Maker</h3>
+          <p className="text-text-muted font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Enter your brand name to generate modern, professional logo concepts.</p>
         </div>
         <div className="space-y-4">
           <input
@@ -257,12 +257,12 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Your Brand Name..."
-            className="w-full h-12 md:h-14 px-4 md:px-6 rounded-xl md:rounded-2xl bg-zinc-50 border border-zinc-100 focus:border-indigo-500 outline-none font-bold text-base md:text-lg transition-all shadow-inner"
+            className="w-full h-12 md:h-14 px-4 md:px-6 rounded-xl md:rounded-2xl bg-bg-card border border-border-main focus:border-indigo-500 outline-none font-bold text-base md:text-lg transition-all shadow-inner text-text-main"
           />
           <Button 
             onClick={generateIdeas} 
             disabled={loading || !input}
-            className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-base md:text-lg font-bold shadow-lg"
+            className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 text-base md:text-lg font-bold shadow-lg"
           >
             {loading ? <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin" /> : "Generate Concepts"}
           </Button>
@@ -271,17 +271,17 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
         {ideas.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 pt-4">
             {ideas.map((idea, i) => (
-              <div key={i} className="p-4 md:p-6 bg-white rounded-2xl md:rounded-[2rem] border border-zinc-100 shadow-xl flex flex-col items-center justify-center gap-3 md:gap-4 group hover:scale-105 transition-all cursor-pointer overflow-hidden">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-zinc-50 rounded-xl md:rounded-2xl flex items-center justify-center text-zinc-900 font-black text-xl md:text-2xl shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+              <div key={i} className="p-4 md:p-6 bg-bg-card rounded-2xl md:rounded-[2rem] border border-border-main shadow-xl flex flex-col items-center justify-center gap-3 md:gap-4 group hover:scale-105 transition-all cursor-pointer overflow-hidden">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-bg-main rounded-xl md:rounded-2xl flex items-center justify-center text-text-main font-black text-xl md:text-2xl shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                   {idea.charAt(0)}
                 </div>
-                <p className="font-black uppercase tracking-widest text-[9px] md:text-[10px] text-zinc-400 group-hover:text-indigo-600 transition-colors truncate w-full px-1">{idea}</p>
+                <p className="font-black uppercase tracking-widest text-[9px] md:text-[10px] text-text-muted group-hover:text-indigo-600 transition-colors truncate w-full px-1">{idea}</p>
               </div>
             ))}
           </div>
         )}
         {/* Individual Tool Page: (B) Below result */}
-        <AdBanner type="result" />
+        <AdBanner />
       </div>
     );
   }

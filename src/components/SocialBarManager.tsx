@@ -1,15 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
+const SOCIAL_BAR_DISMISS_KEY = 'protoolix_social_bar_dismissed_until';
+const DISMISS_DURATION = 20000; // 20 seconds
 
 export function SocialBarManager() {
   const location = useLocation();
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
   const scriptId = 'adsterra-social-bar-script';
-  const isAdVisibleRef = useRef(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const injectSocialBar = () => {
-    // If ad is already visible, don't re-inject
-    if (isAdVisibleRef.current) return;
+    const dismissedUntil = localStorage.getItem(SOCIAL_BAR_DISMISS_KEY);
+    if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {
+      setIsVisible(false);
+      return;
+    }
 
     // Remove existing script if any
     const existingScript = document.getElementById(scriptId);
@@ -22,25 +28,15 @@ export function SocialBarManager() {
     script.src = `https://pl29003205.profitablecpmratenetwork.com/88/a1/ee/88a1ee9665c441b7575bda546e234b4b.js?t=${Date.now()}`;
     script.async = true;
     document.body.appendChild(script);
-    isAdVisibleRef.current = true;
+    setIsVisible(true);
   };
 
   useEffect(() => {
-    // Initial injection on mount
     injectSocialBar();
 
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        // Detect when ad is added
-        for (const addedNode of mutation.addedNodes) {
-          if (addedNode instanceof HTMLElement) {
-            if (addedNode.id.includes('adsterra') || addedNode.className.includes('social-bar')) {
-              isAdVisibleRef.current = true;
-            }
-          }
-        }
-
-        // Detect when ad is closed/removed
+        // Detect when ad is closed/removed by user
         for (const removedNode of mutation.removedNodes) {
           if (removedNode instanceof HTMLElement) {
             const isAd = removedNode.id.includes('adsterra') || 
@@ -48,11 +44,15 @@ export function SocialBarManager() {
                          removedNode.querySelector('a[href*="adsterra"]');
             
             if (isAd) {
-              isAdVisibleRef.current = false;
+              // User closed the ad
+              const dismissUntil = Date.now() + DISMISS_DURATION;
+              localStorage.setItem(SOCIAL_BAR_DISMISS_KEY, dismissUntil.toString());
+              setIsVisible(false);
+
               if (timerRef.current) clearTimeout(timerRef.current);
               timerRef.current = setTimeout(() => {
                 injectSocialBar();
-              }, 20000); // 20 seconds delay after close
+              }, DISMISS_DURATION);
             }
           }
         }
@@ -67,12 +67,10 @@ export function SocialBarManager() {
     };
   }, []);
 
-  // On route change, we check if ad is still there. If not, we could re-inject, 
-  // but the user said it appears "too fast", so we'll just let the observer handle it.
-  // However, the user said "jasa hi new page open Kara tab bi yahi function ho", 
-  // which means they WANT it to show on new page if it's not there.
+  // On route change, re-inject if not dismissed
   useEffect(() => {
-    if (!isAdVisibleRef.current) {
+    const dismissedUntil = localStorage.getItem(SOCIAL_BAR_DISMISS_KEY);
+    if (!dismissedUntil || Date.now() >= parseInt(dismissedUntil)) {
       injectSocialBar();
     }
   }, [location.pathname]);

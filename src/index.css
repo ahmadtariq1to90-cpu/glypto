@@ -15,18 +15,18 @@
 
 :root {
   --bg-main: #ffffff;
-  --bg-card: #f9f9fb;
-  --text-main: #09090b;
-  --text-muted: #71717a;
-  --border-main: #e4e4e7;
+  --bg-card: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --border-main: #e2e8f0;
 }
 
 .dark {
-  --bg-main: #050505;
-  --bg-card: #0c0c0e;
-  --text-main: #f4f4f5;
-  --text-muted: #a1a1aa;
-  --border-main: #27272a;
+  --bg-main: #020617;
+  --bg-card: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-main: #1e293b;
 }
 
 @layer base {
@@ -56,7 +56,7 @@
 }
 
 .dark .premium-gradient-text {
-  @apply from-white via-zinc-200 to-zinc-500;
+  @apply from-white via-indigo-300 to-purple-400;
 }
 
 /* Custom Scrollbar */

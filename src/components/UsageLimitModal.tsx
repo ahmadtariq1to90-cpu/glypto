@@ -67,7 +67,7 @@ export function UsageLimitModal({ isOpen, onClose, onWatchAd, toolName }: UsageL
           </div>
 
           <div className="pt-6 border-t border-white/10 flex flex-col items-center gap-3">
-            <AdBanner type="result" />
+            <AdBanner />
           </div>
 
           <button

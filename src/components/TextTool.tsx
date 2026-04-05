@@ -96,16 +96,16 @@ export function TextTool({
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 md:space-y-12 px-4 pb-20">
-      <div className="text-center space-y-4 md:space-y-6 max-w-3xl mx-auto">
-        <div className={cn("w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-[2rem] flex items-center justify-center text-white mx-auto shadow-2xl animate-float-premium", color)}>
-          <Icon className="h-8 w-8 md:h-10 md:w-10" />
+    <div className="max-w-6xl mx-auto space-y-6 md:space-y-12 px-4 pb-20">
+      <div className="text-center space-y-3 md:space-y-6 max-w-3xl mx-auto">
+        <div className={cn("w-14 h-14 md:w-20 md:h-20 rounded-xl md:rounded-[2rem] flex items-center justify-center text-white mx-auto shadow-2xl animate-float-premium", color)}>
+          <Icon className="h-7 w-7 md:h-10 md:w-10" />
         </div>
-        <div className="space-y-3 md:space-y-4">
-          <h2 className="text-3xl md:text-5xl font-black font-display tracking-tight text-text-main leading-tight">
+        <div className="space-y-2 md:space-y-4">
+          <h2 className="text-2xl md:text-5xl font-black font-display tracking-tight text-text-main leading-tight break-words">
             {name}
           </h2>
-          <p className="text-text-muted font-medium text-base md:text-lg leading-relaxed">
+          <p className="text-text-muted font-medium text-sm md:text-lg leading-relaxed">
             {description}
           </p>
         </div>
@@ -113,36 +113,36 @@ export function TextTool({
 
       <div className="grid lg:grid-cols-2 gap-6 md:gap-10">
         <div className="space-y-6 md:space-y-8">
-          <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-xl border-white/40 space-y-6 md:space-y-8">
+          <div className="glass-card p-4 md:p-8 rounded-[1.5rem] md:rounded-[3rem] shadow-xl border-white/40 space-y-4 md:space-y-8">
             <div className="flex items-center gap-3 md:gap-4">
-              <div className={cn("p-2.5 md:p-3 rounded-xl md:rounded-2xl shadow-inner", color.replace('bg-', 'bg-').replace('500', '50'))}>
-                <Send className={cn("h-5 w-5 md:h-6 md:w-6", color.replace('bg-', 'text-'))} />
+              <div className={cn("p-2 md:p-3 rounded-lg md:rounded-2xl shadow-inner", color.replace('bg-', 'bg-').replace('500', '50'))}>
+                <Send className={cn("h-4 w-4 md:h-6 md:w-6", color.replace('bg-', 'text-'))} />
               </div>
-              <h3 className="text-lg md:text-xl font-black font-display tracking-tight text-text-main">Input Details</h3>
+              <h3 className="text-base md:text-xl font-black font-display tracking-tight text-text-main">Input Details</h3>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {secondaryInputLabel && (
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-2">{secondaryInputLabel}</label>
+                <div className="space-y-1.5 md:space-y-2">
+                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-text-muted ml-2">{secondaryInputLabel}</label>
                   <input
                     type="text"
                     placeholder={secondaryInputPlaceholder}
                     value={secondaryInput}
                     onChange={(e) => setSecondaryInput(e.target.value)}
-                    className="w-full h-12 md:h-14 px-6 rounded-xl md:rounded-2xl bg-bg-card/50 border border-border-main focus:border-indigo-500/50 outline-none transition-all font-bold text-sm md:text-base text-text-main"
+                    className="w-full h-11 md:h-14 px-4 md:px-6 rounded-xl md:rounded-2xl bg-bg-card/50 border border-border-main focus:border-indigo-500/50 outline-none transition-all font-bold text-xs md:text-base text-text-main"
                   />
                 </div>
               )}
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-2">Main Content</label>
+              <div className="space-y-1.5 md:space-y-2">
+                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-text-muted ml-2">Main Content</label>
                 <div className={cn(
-                  "relative rounded-2xl md:rounded-[2rem] border-2 transition-all duration-500 bg-bg-card/50",
-                  error ? "border-red-500/50 ring-8 ring-red-500/5" : "border-border-main focus-within:border-indigo-500/50 focus-within:ring-8 focus-within:ring-indigo-500/5"
+                  "relative rounded-xl md:rounded-[2rem] border-2 transition-all duration-500 bg-bg-card/50",
+                  error ? "border-red-500/50 ring-4 md:ring-8 ring-red-500/5" : "border-border-main focus-within:border-indigo-500/50 focus-within:ring-4 md:ring-8 focus-within:ring-indigo-500/5"
                 )}>
                   <textarea
-                    className="w-full p-5 md:p-8 rounded-2xl md:rounded-[2rem] bg-transparent outline-none min-h-[200px] md:min-h-[250px] text-sm md:text-base text-text-main leading-relaxed font-medium placeholder:text-text-muted resize-none"
+                    className="w-full p-4 md:p-8 rounded-xl md:rounded-[2rem] bg-transparent outline-none min-h-[150px] md:min-h-[250px] text-sm md:text-base text-text-main leading-relaxed font-medium placeholder:text-text-muted resize-none"
                     placeholder={placeholder}
                     value={input}
                     onChange={(e) => {
@@ -151,7 +151,7 @@ export function TextTool({
                     }}
                   />
                   {error && (
-                    <p className="absolute -bottom-6 md:-bottom-8 left-4 text-[10px] md:text-xs font-black text-red-500 uppercase tracking-widest animate-in fade-in slide-in-from-top-2">{error}</p>
+                    <p className="absolute -bottom-5 md:-bottom-8 left-4 text-[9px] md:text-xs font-black text-red-500 uppercase tracking-widest animate-in fade-in slide-in-from-top-2">{error}</p>
                   )}
                 </div>
               </div>
@@ -160,16 +160,16 @@ export function TextTool({
             <Button 
               onClick={handleGenerate} 
               disabled={loading}
-              className={cn("w-full py-6 md:py-10 text-lg md:text-xl font-black rounded-2xl md:rounded-[2rem] transition-all shadow-2xl border-none", color, "hover:opacity-90 active:scale-95")}
+              className={cn("w-full py-4 md:py-8 text-base md:text-xl font-black rounded-xl md:rounded-[2rem] transition-all shadow-2xl border-none", color, "hover:opacity-90 active:scale-95")}
             >
               {loading ? (
                 <div className="flex items-center gap-2 md:gap-3">
-                  <Loader2 className="animate-spin h-5 w-5 md:h-6 md:w-6" />
+                  <Loader2 className="animate-spin h-4 w-4 md:h-6 md:w-6" />
                   <span>AI IS THINKING...</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 md:gap-3">
-                  <Wand2 className="h-5 w-5 md:h-6 md:w-6" />
+                  <Wand2 className="h-4 w-4 md:h-6 md:w-6" />
                   <span>GENERATE CONTENT</span>
                 </div>
               )}
@@ -178,32 +178,32 @@ export function TextTool({
         </div>
 
         <div className="space-y-6 md:space-y-8">
-          <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[3rem] min-h-[400px] md:min-h-[500px] bg-bg-card shadow-xl border-white/40 relative overflow-hidden flex flex-col">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="glass-card p-4 md:p-8 rounded-[1.5rem] md:rounded-[3rem] min-h-[300px] md:min-h-[500px] bg-bg-card shadow-xl border-white/40 relative overflow-hidden flex flex-col">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 md:mb-8">
               <div className="flex items-center gap-3 md:gap-4">
-                <div className={cn("p-2.5 md:p-3 rounded-xl md:rounded-2xl shadow-inner", color.replace('bg-', 'bg-').replace('500', '50'))}>
-                  <Sparkles className={cn("h-5 w-5 md:h-6 md:w-6", color.replace('bg-', 'text-'))} />
+                <div className={cn("p-2 md:p-3 rounded-lg md:rounded-2xl shadow-inner", color.replace('bg-', 'bg-').replace('500', '50'))}>
+                  <Sparkles className={cn("h-4 w-4 md:h-6 md:w-6", color.replace('bg-', 'text-'))} />
                 </div>
-                <h3 className="text-lg md:text-xl font-black font-display tracking-tight text-text-main">AI Result</h3>
+                <h3 className="text-base md:text-xl font-black font-display tracking-tight text-text-main">AI Result</h3>
               </div>
               {result && (
                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="flex-grow sm:flex-none rounded-xl md:rounded-2xl text-text-muted hover:bg-bg-main font-black px-4 md:px-6 h-10 md:h-12 border-2 text-[9px] md:text-[10px] uppercase tracking-widest"
+                    className="flex-grow sm:flex-none rounded-lg md:rounded-2xl text-text-muted hover:bg-bg-main font-black px-3 md:px-6 h-9 md:h-12 border-2 text-[8px] md:text-[10px] uppercase tracking-widest"
                     onClick={handleDownload}
                   >
-                    <Download className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
+                    <Download className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                     Download
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="flex-grow sm:flex-none rounded-xl md:rounded-2xl text-indigo-500 hover:bg-indigo-500/10 font-black px-4 md:px-6 h-10 md:h-12 border border-indigo-500/20 text-[9px] md:text-[10px] uppercase tracking-widest"
+                    className="flex-grow sm:flex-none rounded-lg md:rounded-2xl text-indigo-500 hover:bg-indigo-500/10 font-black px-3 md:px-6 h-9 md:h-12 border border-indigo-500/20 text-[8px] md:text-[10px] uppercase tracking-widest"
                     onClick={copyToClipboard}
                   >
-                    {copied ? <Check className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" /> : <Copy className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />}
+                    {copied ? <Check className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" /> : <Copy className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />}
                     {copied ? "COPIED" : "COPY"}
                   </Button>
                 </div>

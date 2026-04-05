@@ -4,6 +4,7 @@ export type ToolCategory = "Text" | "Image" | "Audio" | "Video" | "Utility" | "S
 
 export interface Tool {
   id: string;
+  slug: string;
   name: string;
   description: string;
   icon: LucideIcon;
