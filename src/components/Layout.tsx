@@ -41,25 +41,20 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     setIsMenuOpen(false);
     window.scrollTo(0, 0);
+  }, [location.pathname]);
 
-    // Add Social Bar & Popunder Ad Scripts
+  useEffect(() => {
+    // Add Social Bar & Popunder Ad Scripts once
     const script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = '//www.highperformanceformat.com/bac4b95a2d8e3c8e844d031ea3e89947/invoke.js';
     script.async = true;
     document.body.appendChild(script);
 
-    const popunder = document.createElement('script');
-    popunder.type = 'text/javascript';
-    popunder.src = '//www.highperformanceformat.com/bac4b95a2d8e3c8e844d031ea3e89947/invoke.js';
-    popunder.async = true;
-    document.body.appendChild(popunder);
-
     return () => {
-      document.body.removeChild(script);
-      document.body.removeChild(popunder);
+      if (document.body.contains(script)) document.body.removeChild(script);
     };
-  }, [location.pathname]);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-bg-main text-text-main transition-colors duration-300">
