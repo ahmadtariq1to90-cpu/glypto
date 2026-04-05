@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, Shield, FileText, Info, Mail, HelpCircle, Cookie, Send, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Shield, FileText, Info, Mail, HelpCircle, Cookie, Send, CheckCircle2, Bug, MessageSquare } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { SEO } from "./SEO";
 import { Button } from "./ui/Button";
 
 interface StaticPageProps {
-  type: "about" | "privacy" | "terms" | "contact" | "support" | "cookies";
-  onBack: () => void;
+  type: "about" | "privacy" | "terms" | "contact" | "support" | "cookies" | "contact-form";
+  onBack?: () => void;
 }
 
 const CONTENT = {
@@ -76,10 +76,26 @@ const CONTENT = {
     `
   },
   contact: {
-    title: "Contact Us",
+    title: "Contact Us & FAQs",
     icon: Mail,
-    description: "Get in touch with the ProToolix team.",
-    content: "" // Content will be replaced by the form
+    description: "Find answers to common questions or get in touch with us.",
+    content: `
+      <p>Before reaching out, please check our frequently asked questions below. If you still need help, click the "Contact Now" button at the bottom.</p>
+      <h2>Frequently Asked Questions</h2>
+      <ul>
+        <li><strong>Is ProToolix really free?</strong> Yes, all our tools are 100% free to use.</li>
+        <li><strong>Do I need to create an account?</strong> No, you can use all tools without registration.</li>
+        <li><strong>Is my data safe?</strong> Yes, we process data securely and do not store your files.</li>
+        <li><strong>How do I report a bug?</strong> Click the "Contact Now" button below and select the "Report a Bug" option.</li>
+        <li><strong>Can I suggest a new tool?</strong> Absolutely! We love feedback. Use the contact form to send us your ideas.</li>
+      </ul>
+    `
+  },
+  "contact-form": {
+    title: "Get In Touch",
+    icon: MessageSquare,
+    description: "Send us a message or report a bug.",
+    content: ""
   },
   support: {
     title: "Help & Support",
@@ -100,7 +116,9 @@ const CONTENT = {
 export function StaticPage({ type }: StaticPageProps) {
   const data = CONTENT[type];
   const Icon = data.icon;
+  const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
+  const [activeTab, setActiveTab] = useState<"contact" | "bug">("contact");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +156,39 @@ export function StaticPage({ type }: StaticPageProps) {
         </div>
 
         {type === "contact" ? (
+          <div className="space-y-12">
+            <div 
+              className="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-2xl prose-h2:font-bold prose-p:text-text-muted prose-li:text-text-muted"
+              dangerouslySetInnerHTML={{ __html: data.content }}
+            />
+            <div className="pt-8 border-t border-border-main text-center">
+              <Button 
+                onClick={() => navigate("/contact/form")}
+                className="h-14 px-12 rounded-2xl bg-indigo-600 text-white font-black uppercase tracking-widest text-sm shadow-xl hover:bg-indigo-700 transition-all"
+              >
+                Contact Now
+              </Button>
+            </div>
+          </div>
+        ) : type === "contact-form" ? (
           <div className="space-y-8">
+            <div className="flex p-1 bg-bg-main rounded-2xl border border-border-main">
+              <button 
+                onClick={() => setActiveTab("contact")}
+                className={`flex-1 flex items-center justify-center gap-2 h-12 rounded-xl text-sm font-bold transition-all ${activeTab === "contact" ? "bg-indigo-600 text-white shadow-lg" : "text-text-muted hover:text-text-main"}`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Contact Form
+              </button>
+              <button 
+                onClick={() => setActiveTab("bug")}
+                className={`flex-1 flex items-center justify-center gap-2 h-12 rounded-xl text-sm font-bold transition-all ${activeTab === "bug" ? "bg-red-600 text-white shadow-lg" : "text-text-muted hover:text-text-main"}`}
+              >
+                <Bug className="w-4 h-4" />
+                Report a Bug
+              </button>
+            </div>
+
             {submitted ? (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -148,9 +198,9 @@ export function StaticPage({ type }: StaticPageProps) {
                 <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-10 h-10" />
                 </div>
-                <h2 className="text-2xl font-bold text-text-main">Message Sent!</h2>
-                <p className="text-text-muted">Thank you for reaching out. We'll get back to you soon.</p>
-                <Button onClick={() => setSubmitted(false)} variant="outline">Send Another Message</Button>
+                <h2 className="text-2xl font-bold text-text-main">Submission Received!</h2>
+                <p className="text-text-muted">Thank you for your {activeTab === "contact" ? "message" : "report"}. We'll get back to you soon.</p>
+                <Button onClick={() => setSubmitted(false)} variant="outline">Send Another</Button>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -161,7 +211,7 @@ export function StaticPage({ type }: StaticPageProps) {
                       required
                       type="text" 
                       placeholder="John Doe"
-                      className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all"
+                      className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all text-text-main"
                     />
                   </div>
                   <div className="space-y-2">
@@ -170,31 +220,42 @@ export function StaticPage({ type }: StaticPageProps) {
                       required
                       type="email" 
                       placeholder="john@example.com"
-                      className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all"
+                      className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all text-text-main"
                     />
                   </div>
                 </div>
+                {activeTab === "bug" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-text-main">Tool Name (Where the bug occurred)</label>
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="e.g. Word Counter"
+                      className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all text-text-main"
+                    />
+                  </div>
+                )}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-text-main">Subject</label>
                   <input 
                     required
                     type="text" 
-                    placeholder="How can we help?"
-                    className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all"
+                    placeholder={activeTab === "contact" ? "How can we help?" : "Describe the bug briefly"}
+                    className="w-full h-12 px-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all text-text-main"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-text-main">Message</label>
+                  <label className="text-sm font-bold text-text-main">Message / Bug Details</label>
                   <textarea 
                     required
                     rows={5}
-                    placeholder="Tell us more about your inquiry..."
-                    className="w-full p-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all resize-none"
+                    placeholder={activeTab === "contact" ? "Tell us more about your inquiry..." : "Please provide steps to reproduce the bug..."}
+                    className="w-full p-4 rounded-xl bg-bg-main border border-border-main focus:border-indigo-500 outline-none transition-all resize-none text-text-main"
                   />
                 </div>
-                <Button type="submit" className="w-full h-14 rounded-xl bg-indigo-600 text-white font-bold text-lg flex items-center justify-center gap-2">
+                <Button type="submit" className={`w-full h-14 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-2 ${activeTab === "bug" ? "bg-red-600 hover:bg-red-700" : "bg-indigo-600 hover:bg-indigo-700"}`}>
                   <Send className="w-5 h-5" />
-                  Send Message
+                  {activeTab === "contact" ? "Send Message" : "Submit Bug Report"}
                 </Button>
               </form>
             )}
