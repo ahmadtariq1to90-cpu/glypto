@@ -76,38 +76,42 @@ const CONTENT = {
     `
   },
   contact: {
-    title: "Contact Us & FAQs",
+    title: "Contact Us & Support - ProToolix Help Center",
     icon: Mail,
-    description: "Find answers to common questions or get in touch with us.",
+    description: "Get in touch with the ProToolix team for support, bug reports, or tool suggestions. We're here to help you optimize your workflow.",
     content: `
-      <p>Before reaching out, please check our frequently asked questions below. If you still need help, click the "Contact Now" button at the bottom.</p>
-      <h2>Frequently Asked Questions</h2>
+      <p>Welcome to the ProToolix Help Center. We are committed to providing the best free online tools and support for our community. If you have questions, feedback, or need assistance, you're in the right place.</p>
+      <h2>Frequently Asked Questions (FAQ)</h2>
       <ul>
-        <li><strong>Is ProToolix really free?</strong> Yes, all our tools are 100% free to use.</li>
-        <li><strong>Do I need to create an account?</strong> No, you can use all tools without registration.</li>
-        <li><strong>Is my data safe?</strong> Yes, we process data securely and do not store your files.</li>
-        <li><strong>How do I report a bug?</strong> Click the "Contact Now" button below and select the "Report a Bug" option.</li>
-        <li><strong>Can I suggest a new tool?</strong> Absolutely! We love feedback. Use the contact form to send us your ideas.</li>
+        <li><strong>Is ProToolix really free?</strong> Yes, all our AI-powered tools are 100% free to use with no hidden costs or subscriptions.</li>
+        <li><strong>Do I need to create an account?</strong> No, you can use all our tools without any registration or sign-up. We value your time and privacy.</li>
+        <li><strong>Is my data safe?</strong> Absolutely. We process all data securely and do not store your files or text on our servers.</li>
+        <li><strong>How do I report a bug?</strong> Use the contact form below and select "Report a Bug" to let us know.</li>
+        <li><strong>Can I suggest a new tool?</strong> We love hearing from our users! Send us your ideas through the contact form.</li>
       </ul>
+      <h2>Our Support Mission</h2>
+      <p>Our goal is to democratize access to advanced AI technology. By providing free, high-quality tools without the barrier of sign-ups, we help creators, students, and professionals worldwide stay productive.</p>
     `
   },
   "contact-form": {
-    title: "Get In Touch",
+    title: "Contact Form - Get Support from ProToolix",
     icon: MessageSquare,
-    description: "Send us a message or report a bug.",
+    description: "Send a message to the ProToolix team. We respond to all inquiries regarding our free online tools and services.",
     content: ""
   },
   support: {
-    title: "Help & Support",
+    title: "Help & Support Center - ProToolix Free AI Tools",
     icon: HelpCircle,
-    description: "Find answers to common questions and get help.",
+    description: "Find help and support for all ProToolix tools. Learn how to use our AI generators, PDF tools, and image optimizers for free.",
     content: `
-      <p>Need help using our tools? Check out our FAQs or contact support.</p>
-      <h2>Frequently Asked Questions</h2>
+      <p>Need help with a specific tool? Our support center provides guides and answers to help you get the most out of ProToolix.</p>
+      <h2>How to Use ProToolix Tools</h2>
+      <p>All our tools are designed to be intuitive. Simply select a tool from our homepage, follow the on-screen instructions, and get your results instantly. No sign-up is ever required.</p>
+      <h2>Troubleshooting Common Issues</h2>
       <ul>
-        <li><strong>Is ProToolix really free?</strong> Yes, all our tools are 100% free to use.</li>
-        <li><strong>Do I need to create an account?</strong> No, you can use all tools without registration.</li>
-        <li><strong>Is my data safe?</strong> Yes, we process data securely and do not store your files.</li>
+        <li><strong>Tool not loading:</strong> Try refreshing your browser or clearing your cache.</li>
+        <li><strong>Slow processing:</strong> Large files may take a few extra seconds. Ensure you have a stable internet connection.</li>
+        <li><strong>Browser compatibility:</strong> ProToolix works best on modern browsers like Chrome, Firefox, and Safari.</li>
       </ul>
     `
   }

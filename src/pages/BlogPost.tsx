@@ -51,7 +51,7 @@ export const BlogPost: React.FC = () => {
           </div>
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-black font-display tracking-tight text-text-main leading-[0.95]">
+        <h1 className="text-4xl md:text-6xl font-black font-display tracking-tight text-text-main leading-[1.1] py-2">
           {post.title}
         </h1>
         

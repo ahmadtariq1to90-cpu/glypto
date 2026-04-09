@@ -7,7 +7,6 @@ import QRCode from "qrcode";
 import { cn } from "../lib/utils";
 import { canUseTool, incrementToolUsage } from "../lib/usage";
 import { Button } from "./ui/Button";
-import { AdBanner } from "./AdBanner";
 
 export function SimpleTools({ type, onLimitReached }: { type: string, onLimitReached: (toolId: string) => void }) {
   const [input, setInput] = useState("");
@@ -73,8 +72,8 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
     return (
       <div className="glass-card p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8 text-center max-w-2xl mx-auto shadow-2xl border-white/40 overflow-hidden">
         <div className="w-16 h-16 md:w-20 md:h-20 bg-purple-500/10 text-purple-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-lg">
-          <ImageIcon className="h-8 w-8 md:h-10 md:w-10" />
-        </div>
+            <ImageIcon className="h-8 w-8 md:h-10 md:w-10" />
+          </div>
         <div className="space-y-2">
           <h3 className="text-2xl md:text-3xl font-black tracking-tight text-text-main">AI Background Remover</h3>
           <p className="text-text-muted font-medium text-sm md:text-base max-w-sm mx-auto leading-relaxed">Instantly remove backgrounds from your images using advanced AI technology.</p>
@@ -155,8 +154,6 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
             </div>
           )}
         </div>
-        {/* Individual Tool Page: (B) Below result */}
-        <AdBanner />
       </div>
     );
   }
@@ -209,7 +206,6 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
           </motion.div>
         )}
         {/* Individual Tool Page: (B) Below result */}
-        <AdBanner />
       </div>
     );
   }
@@ -281,7 +277,6 @@ export function SimpleTools({ type, onLimitReached }: { type: string, onLimitRea
           </div>
         )}
         {/* Individual Tool Page: (B) Below result */}
-        <AdBanner />
       </div>
     );
   }

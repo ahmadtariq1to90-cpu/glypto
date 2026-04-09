@@ -97,6 +97,11 @@ export const ToolPage: React.FC = () => {
     }))
   };
 
+  const relatedTools = TOOLS
+    .filter(t => t.id !== toolId)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
+
   return (
     <div className="py-12 px-6 max-w-7xl mx-auto space-y-16">
       <SEO 
@@ -119,11 +124,9 @@ export const ToolPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="glass-card p-8 rounded-[3rem] min-h-[500px]">
-          <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>}>
-            {renderToolComponent()}
-          </Suspense>
-        </div>
+        <Suspense fallback={<div className="flex items-center justify-center h-[500px]"><div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" /></div>}>
+          {renderToolComponent()}
+        </Suspense>
       </section>
 
       {/* SEO Content Section */}
@@ -187,7 +190,7 @@ export const ToolPage: React.FC = () => {
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TOOLS.filter(t => t.id !== toolId).slice(0, 3).map((t) => (
+          {relatedTools.map((t) => (
             <Link key={t.id} to={`/${t.id}`} className="glass-card p-8 rounded-[2.5rem] group">
               <div className={`w-12 h-12 rounded-xl ${t.color} flex items-center justify-center text-white mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
                 <Sparkles className="h-6 w-6" />

@@ -71,7 +71,7 @@ export const AllTools: React.FC = () => {
           <LayoutGrid className="h-3 w-3" />
           Explore our Ecosystem
         </motion.div>
-        <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight text-text-main leading-[0.95]">
+        <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight text-text-main leading-[1.1] py-2">
           All AI <span className="premium-gradient-text italic">Tools</span>
         </h1>
         <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto font-medium leading-relaxed">
@@ -119,7 +119,6 @@ export const AllTools: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              whileHover={{ y: -12 }}
             >
               <Link 
                 to={`/${tool.id}`}

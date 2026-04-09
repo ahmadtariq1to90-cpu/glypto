@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Calendar, 
@@ -15,6 +15,20 @@ import { Button } from "../components/ui/Button";
 
 export const Blog: React.FC = () => {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredPosts = useMemo(() => {
+    if (!searchQuery.trim()) return BLOG_POSTS;
+    const query = searchQuery.toLowerCase();
+    return BLOG_POSTS.filter(post => 
+      post.title.toLowerCase().includes(query) || 
+      post.excerpt.toLowerCase().includes(query) ||
+      post.content.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
+  const featuredPost = filteredPosts.length > 0 ? filteredPosts[0] : null;
+  const otherPosts = filteredPosts.length > 1 ? filteredPosts.slice(1) : [];
 
   return (
     <div className="py-24 px-6 max-w-7xl mx-auto space-y-24">
@@ -39,31 +53,58 @@ export const Blog: React.FC = () => {
         <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto font-medium leading-relaxed">
           Stay ahead of the curve with our latest insights on AI, SEO, and productivity.
         </p>
+
+        {/* Search Bar */}
+        <div className="max-w-2xl mx-auto pt-8">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-indigo-500/20 blur-2xl group-focus-within:bg-indigo-500/30 transition-all duration-500" />
+            <div className="relative flex items-center bg-bg-card border-2 border-border-main rounded-2xl md:rounded-[2rem] p-2 focus-within:border-indigo-500 transition-all duration-300">
+              <div className="p-3 md:p-4 text-text-muted group-focus-within:text-indigo-500 transition-colors">
+                <Search className="h-5 w-5 md:h-6 md:w-6" />
+              </div>
+              <input 
+                type="text"
+                placeholder="Search articles by title or content..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-grow bg-transparent outline-none font-bold text-sm md:text-base text-text-main placeholder:text-text-muted/50 px-2"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery("")}
+                  className="p-2 text-text-muted hover:text-indigo-500 transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Featured Post */}
-      {BLOG_POSTS.length > 0 && (
-        <section className="relative group cursor-pointer" onClick={() => navigate(`/blog/${BLOG_POSTS[0].id}`)}>
+      {featuredPost && (
+        <Link to={`/blog/${featuredPost.id}`} className="relative group block">
           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[3rem] blur opacity-20 group-hover:opacity-40 transition-opacity" />
           <div className="relative glass-card rounded-[3rem] overflow-hidden flex flex-col lg:flex-row">
             <div className="lg:w-1/2 aspect-video lg:aspect-auto overflow-hidden">
               <img 
-                src={BLOG_POSTS[0].image} 
-                alt={BLOG_POSTS[0].title} 
+                src={featuredPost.image} 
+                alt={featuredPost.title} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 referrerPolicy="no-referrer"
               />
             </div>
             <div className="lg:w-1/2 p-10 lg:p-16 flex flex-col justify-center space-y-6">
               <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-indigo-500">
-                <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20">{BLOG_POSTS[0].category}</span>
-                <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {BLOG_POSTS[0].date}</span>
+                <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20">{featuredPost.category}</span>
+                <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {featuredPost.date}</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-black font-display tracking-tight text-text-main group-hover:text-indigo-500 transition-colors">
-                {BLOG_POSTS[0].title}
+              <h2 className="text-3xl md:text-4xl font-black font-display tracking-tight text-text-main group-hover:text-indigo-500 transition-colors leading-[1.1] py-2">
+                {featuredPost.title}
               </h2>
               <p className="text-text-muted font-medium leading-relaxed line-clamp-3">
-                {BLOG_POSTS[0].excerpt}
+                {featuredPost.excerpt}
               </p>
               <div className="pt-4">
                 <Button className="rounded-full px-8 h-12 bg-indigo-600 text-white hover:bg-indigo-700 text-[10px] font-black uppercase tracking-widest">
@@ -73,12 +114,30 @@ export const Blog: React.FC = () => {
               </div>
             </div>
           </div>
-        </section>
+        </Link>
       )}
+
+      {/* No Results */}
+      {!featuredPost && searchQuery && (
+        <div className="text-center py-20 space-y-6">
+          <div className="w-20 h-20 bg-bg-card rounded-3xl flex items-center justify-center mx-auto text-text-muted">
+            <Search className="h-10 w-10" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-black">No articles found</h3>
+            <p className="text-text-muted">Try searching with different keywords.</p>
+          </div>
+          <Button variant="outline" onClick={() => setSearchQuery("")}>Clear Search</Button>
+        </div>
+      )}
+
+      {/* Ad Section - Below Featured Post */}
+      <div className="max-w-7xl mx-auto px-4">
+      </div>
 
       {/* Blog Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {BLOG_POSTS.slice(1).map((post) => (
+        {otherPosts.map((post) => (
           <Link key={post.id} to={`/blog/${post.id}`} className="glass-card rounded-[2.5rem] overflow-hidden group flex flex-col">
             <div className="aspect-video overflow-hidden">
               <img 

@@ -4,7 +4,6 @@ import { Button } from './ui/Button';
 import { PDFDocument } from 'pdf-lib';
 import { motion, AnimatePresence } from "motion/react";
 import { canUseTool, incrementToolUsage } from "../lib/usage";
-import { AdBanner } from "./AdBanner";
 
 export const PdfTools: React.FC<{ onLimitReached: (toolId: string) => void }> = ({ onLimitReached }) => {
   const [files, setFiles] = useState<File[]>([]);
@@ -195,8 +194,6 @@ export const PdfTools: React.FC<{ onLimitReached: (toolId: string) => void }> = 
           </AnimatePresence>
         </div>
       </div>
-      {/* Individual Tool Page: (B) Below result */}
-      <AdBanner />
     </div>
   );
 };

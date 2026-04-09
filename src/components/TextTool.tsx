@@ -6,7 +6,6 @@ import Markdown from "react-markdown";
 import { motion, AnimatePresence } from "motion/react";
 import { cn, downloadAsTxt } from "../lib/utils";
 import { canUseTool, incrementToolUsage } from "../lib/usage";
-import { AdBanner } from "./AdBanner";
 
 interface TextToolProps {
   id: string;
@@ -102,7 +101,7 @@ export function TextTool({
           <Icon className="h-7 w-7 md:h-10 md:w-10" />
         </div>
         <div className="space-y-2 md:space-y-4">
-          <h2 className="text-2xl md:text-5xl font-black font-display tracking-tight text-text-main leading-tight break-words">
+          <h2 className="text-2xl md:text-5xl font-black font-display tracking-tight text-text-main leading-[1.1] py-2 break-words">
             {name}
           </h2>
           <p className="text-text-muted font-medium text-sm md:text-lg leading-relaxed">
@@ -234,14 +233,6 @@ export function TextTool({
                     <Markdown>{result}</Markdown>
                   </motion.div>
 
-                  {/* Tool Result Ad */}
-                  <div className="ad-result py-8 flex justify-center border-t border-border-main mt-8">
-                    <div className="w-full max-w-2xl flex flex-col items-center gap-4">
-                      <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
-                      <AdBanner className="w-full flex justify-center" />
-                    </div>
-                  </div>
-
                   {id === 'email-writer' && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -275,12 +266,6 @@ export function TextTool({
             
             <div className={cn("absolute top-0 right-0 w-32 md:w-48 h-32 md:h-48 rounded-bl-[4rem] md:rounded-bl-[6rem] -z-10 opacity-5", color)} />
             <div className={cn("absolute bottom-0 left-0 w-24 md:w-32 h-24 md:h-32 rounded-tr-[3rem] md:rounded-tr-[4rem] -z-10 opacity-5", color)} />
-          </div>
-
-          {/* Persistent Tool Bottom Ad */}
-          <div className="mt-12 py-8 border-t border-border-main flex flex-col items-center gap-4">
-            <p className="text-text-muted text-[10px] uppercase tracking-widest font-black">Advertisement</p>
-            <AdBanner />
           </div>
         </div>
       </div>

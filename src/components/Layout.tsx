@@ -43,19 +43,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  useEffect(() => {
-    // Add Social Bar & Popunder Ad Scripts once
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '//www.highperformanceformat.com/bac4b95a2d8e3c8e844d031ea3e89947/invoke.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) document.body.removeChild(script);
-    };
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col bg-bg-main text-text-main transition-colors duration-300">
       {/* Navigation */}
@@ -108,11 +95,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               className="md:hidden bg-bg-card border-b border-border-main overflow-hidden"
             >
               <div className="px-6 py-8 flex flex-col gap-6">
-                <Link to="/" className="text-sm font-bold uppercase tracking-widest text-text-main">Home</Link>
-                <Link to="/all-tools" className="text-sm font-bold uppercase tracking-widest text-text-main">Tools</Link>
-                <Link to="/blog" className="text-sm font-bold uppercase tracking-widest text-text-main">Blog</Link>
-                <Link to="/about" className="text-sm font-bold uppercase tracking-widest text-text-main">About</Link>
-                <Button className="w-full bg-indigo-600 text-white" onClick={() => navigate("/all-tools")}>Get Started</Button>
+                <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">Home</Link>
+                <Link to="/all-tools" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">Tools</Link>
+                <Link to="/blog" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">Blog</Link>
+                <Link to="/about" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">About</Link>
+                <Button className="w-full bg-indigo-600 text-white" onClick={() => { setIsMenuOpen(false); navigate("/all-tools"); }}>Get Started</Button>
               </div>
             </motion.div>
           )}

@@ -2,7 +2,6 @@ import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { AlertCircle, Play, Clock, X } from "lucide-react";
 import { Button } from "./ui/Button";
-import { AdBanner } from "./AdBanner";
 
 interface UsageLimitModalProps {
   isOpen: boolean;
@@ -64,10 +63,6 @@ export function UsageLimitModal({ isOpen, onClose, onWatchAd, toolName }: UsageL
               <Clock className="h-5 w-5 mr-2" />
               Wait 24 Hours
             </Button>
-          </div>
-
-          <div className="pt-6 border-t border-white/10 flex flex-col items-center gap-3">
-            <AdBanner />
           </div>
 
           <button
