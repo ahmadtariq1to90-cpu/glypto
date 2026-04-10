@@ -93,6 +93,7 @@ export const Blog: React.FC = () => {
                 alt={featuredPost.title} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 referrerPolicy="no-referrer"
+                loading="lazy"
               />
             </div>
             <div className="lg:w-1/2 p-10 lg:p-16 flex flex-col justify-center space-y-6">
@@ -145,6 +146,7 @@ export const Blog: React.FC = () => {
                 alt={post.title} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 referrerPolicy="no-referrer"
+                loading="lazy"
               />
             </div>
             <div className="p-8 flex flex-col flex-grow space-y-4">

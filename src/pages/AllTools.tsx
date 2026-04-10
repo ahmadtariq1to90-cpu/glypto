@@ -155,6 +155,22 @@ export const AllTools: React.FC = () => {
           <Button variant="ghost" onClick={() => setSearchQuery("")} className="text-indigo-500 font-black uppercase tracking-widest text-xs">Clear Search</Button>
         </div>
       )}
+      {/* SEO Content Section */}
+      <section className="glass-card p-12 md:p-20 rounded-[4rem] space-y-12">
+        <div className="prose prose-indigo dark:prose-invert max-w-none prose-h2:text-3xl prose-h2:font-black prose-h2:tracking-tight prose-p:text-text-muted prose-p:text-lg prose-p:leading-relaxed prose-li:text-text-muted prose-li:text-lg">
+          <h2>The Most Comprehensive Collection of Free Online Tools</h2>
+          <p>Welcome to the ProToolix all-tools directory. Here, you can find every single tool we offer, from <strong>AI content generators</strong> to <strong>PDF management utilities</strong>. Our mission is to provide a one-stop-shop for all your digital needs, ensuring that you have access to professional-grade tools without the professional-grade price tag.</p>
+          
+          <h3>Why Use ProToolix Tools?</h3>
+          <p>Every tool in our collection is designed with three core principles in mind: speed, security, and simplicity. We know that your time is valuable, which is why our <strong>online tools</strong> are optimized to deliver results in seconds. Whether you're using our <strong>AI Article Rewriter</strong> or our <strong>PDF Merger</strong>, you can expect a seamless experience every time.</p>
+          
+          <h3>No Registration, No Sign-up, No Hassle</h3>
+          <p>One of the unique features of ProToolix is that we don't require any form of registration. You can use all our <strong>free tools</strong> anonymously. We don't collect your email address, and we don't track your personal data. This makes ProToolix one of the most private and secure ways to process your documents and generate content online.</p>
+          
+          <h3>Constantly Evolving Toolkit</h3>
+          <p>The digital landscape is always changing, and so are we. We are constantly adding new <strong>AI-powered tools</strong> and updating our existing ones to ensure they use the latest technology. If you have a suggestion for a new tool, feel free to reach out to us through our <Link to="/contact" className="text-indigo-600 font-bold">Contact Page</Link>.</p>
+        </div>
+      </section>
     </div>
   );
 };

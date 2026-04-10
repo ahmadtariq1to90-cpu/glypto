@@ -7,6 +7,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 const Home = lazy(() => import("./pages/Home").then(m => ({ default: m.Home })));
 const AllTools = lazy(() => import("./pages/AllTools").then(m => ({ default: m.AllTools })));
 const ToolPage = lazy(() => import("./pages/ToolPage").then(m => ({ default: m.ToolPage })));
+const CategoryPage = lazy(() => import("./pages/CategoryPage").then(m => ({ default: m.CategoryPage })));
 const Blog = lazy(() => import("./pages/Blog").then(m => ({ default: m.Blog })));
 const BlogPost = lazy(() => import("./pages/BlogPost").then(m => ({ default: m.BlogPost })));
 const StaticPage = lazy(() => import("./components/StaticPage").then(m => ({ default: m.StaticPage })));
@@ -25,6 +26,12 @@ export default function App() {
           <Route path="/all-tools" element={<AllTools />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:postId" element={<BlogPost />} />
+          
+          {/* Category Pages */}
+          <Route path="/pdf-tools" element={<CategoryPage />} />
+          <Route path="/image-tools" element={<CategoryPage />} />
+          <Route path="/ai-tools" element={<CategoryPage />} />
+          <Route path="/category/:categoryId" element={<CategoryPage />} />
           
           {/* Static Pages */}
           <Route path="/about" element={<StaticPage type="about" />} />

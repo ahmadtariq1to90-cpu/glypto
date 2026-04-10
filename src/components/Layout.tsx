@@ -96,7 +96,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <div className="px-6 py-8 flex flex-col gap-6">
                 <Link to="/" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">Home</Link>
-                <Link to="/all-tools" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">Tools</Link>
+                <Link to="/ai-tools" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">AI Tools</Link>
+                <Link to="/pdf-tools" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">PDF Tools</Link>
+                <Link to="/image-tools" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">Image Tools</Link>
+                <Link to="/all-tools" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">All Tools</Link>
                 <Link to="/blog" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">Blog</Link>
                 <Link to="/about" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold uppercase tracking-widest text-text-main">About</Link>
                 <Button className="w-full bg-indigo-600 text-white" onClick={() => { setIsMenuOpen(false); navigate("/all-tools"); }}>Get Started</Button>
@@ -142,6 +145,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
             </div>
             
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-[0.2em] text-text-main mb-6">Categories</h4>
+              <ul className="space-y-4">
+                <li><Link to="/ai-tools" className="text-sm text-text-muted hover:text-indigo-500 transition-colors">AI Tools</Link></li>
+                <li><Link to="/pdf-tools" className="text-sm text-text-muted hover:text-indigo-500 transition-colors">PDF Tools</Link></li>
+                <li><Link to="/image-tools" className="text-sm text-text-muted hover:text-indigo-500 transition-colors">Image Tools</Link></li>
+                <li><Link to="/all-tools?category=Content" className="text-sm text-text-muted hover:text-indigo-500 transition-colors">Content Tools</Link></li>
+              </ul>
+            </div>
+
             <div>
               <h4 className="text-xs font-black uppercase tracking-[0.2em] text-text-main mb-6">Platform</h4>
               <ul className="space-y-4">
